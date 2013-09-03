@@ -93,6 +93,7 @@ group :development do
   gem 'binding_of_caller'
 
   gem 'pry'
+  gem 'pry-rails'
 end
 
 group :test, :development do

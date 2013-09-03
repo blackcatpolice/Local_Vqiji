@@ -1,0 +1,27 @@
+<% unless current_user.is_expert %>
+<div class="bk" data-type="TaskWidget">
+  <div class="bk_t mr_t4"></div>
+  <div class="bk_c mr_c4">
+    <div class="mr_rw">
+      <div class="mr_rwt" data-type="NewTask"><%= link_to "+ 新建",new_meeting_meeting_path(),:class=>"btn", 'data-skip-pjax' => 'true'%></div>
+    </div>
+  </div>
+  <div class="bk_t mr_t4 mr_d4"></div>
+</div>
+
+<script type="text/javascript">
+  WEIBO.todoMyTasks({
+    success: function(data){
+      if(data.length == 0){
+        $('<div class="mr_rwk"><div class="f12" style="margin-top: 20px; text-align:center;" >还没有任务.</div></div>').insertAfter( $('[data-type="NewTask"]', '[data-type=TaskWidget]') );
+        return;
+      }
+      var _tmpl = '<div class="mr_rwk {{if task_danger}} danger {{/if}}"><div class="rwk_1">${value}<span>%</span></div><div class="rwk_2"><div class="rwk_2t"><a href="/todo/tasks/${id}" title="${title}" data-skip-pjax >${$.truncate(title, 24)}</a></div><div class="rwk_2d"><span class="left">${timeout_format}</span><span class="rwk_0${level}"></span></div></div></div>';
+      $.template( "taskTemplate", _tmpl );
+      var _templates = $.tmpl("taskTemplate", data);
+    _templates.insertAfter( $('[data-type="NewTask"]', '[data-type=TaskWidget]') );
+    },
+    error: WEIBO.ui.errorHandler
+  });
+</script>
+<% end %>

@@ -31,11 +31,12 @@
     		<%= render 'widgets/user_card' %>
     		<%= render '/schedule/calendar' %>
     		<%= render '/todo/tasks/widget/my_tasks' %>
-  		</div>
-  		<div class="mr_row" wrl-row2>
-    		<div class="bk" asynch-widget aw-url="<%= asset_path 'widgets/weather.asynch.js' %>" aw-title="天气插件" wrl-strategy="prepend"></div>
-    		<%= render "/network_disks/widgets/files_widget" %>
-    		<%= render '/knowledges/widgets/knowledges_widget' %>
+      </div>
+      <div class="mr_row" wrl-row2>
+        <div class="bk" asynch-widget aw-url="<%= asset_path 'widgets/weather.asynch.js' %>" aw-title="天气插件" wrl-strategy="prepend"></div>
+        <%= render "/network_disks/widgets/files_widget" %>
+        <%= render '/knowledges/widgets/knowledges_widget' %>
+        <%= render '/meeting/meetings/widget/my_meetings' %>
   		</div>
   	</div>
 		<div class="clearfix"></div>

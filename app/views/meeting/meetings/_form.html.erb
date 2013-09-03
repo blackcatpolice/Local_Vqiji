@@ -1,0 +1,67 @@
+<%= form_for(@meeting,:html => { :id => "meeting_form", :class => "form-horizontal" }) do |f| %>
+  <div id="error_message_box"></div>
+  <fieldset>
+    <div class="control-group">
+      <label class="control-label" for="meeting_meeting_subject"><span class="red_a_dc5">*</span>会议主题</label>
+      <div class="controls">
+        <%= f.text_field :subject, :class=>"input-xlarge", :placeholder => "名称长度不超过20字" %>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="meeting_meeting_summary">会议摘要</label>
+      <div class="controls">
+        <%= f.text_area :summary, :class=>"input-xlarge",:size => "30x3", :placeholder => "公告长度不超过50字" %>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="group_summary">小组简介</label>
+      <div class="controls">
+        <%= f.text_area :summary, :class=>"input-xlarge",:size => "30x3", :placeholder => "简介长度不超过50字" %>
+      </div>
+    </div>
+  </fieldset>
+  <p style="width:425px; text-align:right;">
+    <input class="btn" name="" type="submit" value="保存" />
+  </p>
+<% end %>
+
+<script>
+  $(function(){
+    $("#group_form").validate({
+      rules: {
+        'group[name]': {
+          required: true,
+            maxlength: 20
+        },
+        'group[notice]': {
+            maxlength: 50
+        },
+        'group[summary]': {
+            maxlength: 50
+        }
+      },
+      messages: {
+      'group[name]': {
+        required: '请输入小组名.',
+        maxlength: '小组名长度不超过20字.'
+      },
+      'group[notice]': '公告长度不超过50字.',
+      'group[summary]': '简介长度不超过50字.'
+    },
+    onkeyup: false,
+    onfocusout: false,
+    invalidHandler: function(){
+      $('#error_message_box').html('');
+    },
+    showErrors: function(errorMap, errorList){
+      if(errorList.length > 0){
+        var _errorTmpl = '<div style="padding: 7px 0;" class="f12">${message}</div>';
+        $.template( "errorTemlate", _errorTmpl );
+        var _errorDiv = $('<div class="alert alert-error" />');
+        $.tmpl( "errorTemlate", errorList ).appendTo(_errorDiv)
+          $(_errorDiv).appendTo('#error_message_box');
+        }
+    }
+    });
+  });
+</script>
