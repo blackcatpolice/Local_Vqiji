@@ -15,7 +15,7 @@ end
 # => 代替WebRick作为app-server，先不需要过多的了解
 gem 'thin'
 
-# => 与mongodb相关的插件，都不熟悉，还包括
+# => 与mongodb相关的插件，都不熟悉，还包括...
 gem "mongoid", "~> 3.1.4"
 
 gem "mongoid_rails_migrations", "~> 1.0.1"
