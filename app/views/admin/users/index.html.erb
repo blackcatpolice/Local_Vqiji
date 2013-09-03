@@ -1,0 +1,32 @@
+<% content_for :title do%>用户列表<%end%>
+
+<ul class="nav nav-tabs">
+  <li><%= link_to raw('<i class="icon-home"></i>用户主页'), home_admin_users_path %></li>
+  <li class="active"><%= link_to raw('<i class="icon-list"></i>用户列表'), admin_users_path %></li>
+  <li><%= link_to raw('<i class="icon-plus"></i>新建用户'), new_admin_user_path %></li>
+  <li style="float:right;">
+  	<%= render "search_form"%>
+  </li>
+</ul>
+
+<!-- <div class="btn-toolbar">
+  <div class="btn-group">
+   <button class="btn">1</button>
+  <button class="btn">2</button>
+  <button class="btn">3</button>
+  </div>
+</div> -->
+
+<div class="pagination" style="margin:0px;">
+<ul>
+<li><a class="alert">统计: <%= @users.total_entries%> 个用户</a></li>
+<li><a href="<%= admin_users_path %>">所有</a></li>
+<% ("A" .. "Z").each do |c|%>
+<li><a href="?ch=<%= c %>"><%= c %></a></li>
+<%end%>
+<li><a href="?ch=!">其他</a></li>
+</ul>
+</div>
+
+
+<%= render "list" %>

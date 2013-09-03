@@ -1,0 +1,42 @@
+<% content_for :title do%>商品管理<%end%>
+<% content_for :menu_url do%><%= url_for :controller=>"products",:action=>"index" %><%end%>
+<%= link_to '新建商品', new_admin_product_path,:class=>"btn btn-primary" %>
+<table class="table">
+<thead>
+<tr>
+  <th>商品编号</th>
+  <th>名称</th>
+  <th>商品类型</th>
+  <th>所需积分</th>
+  <th>数量</th>
+  <th>截止日期</th>
+  <th>方式</th>
+  <th>状态</th>
+  <th>操作</th>
+</tr>
+</thead>
+<tbody>
+<% @products.each do |product| %>
+<tr>
+	<td>
+		<%= link_to product.serial_no,admin_product_path(product),{:target=>"_blank",:title=>"单击查看展示"} %>
+	</td>
+  <td>
+  	<%= product.name%>
+  	<% link_to product.name,admin_product_path(product),{:target=>"_blank",:title=>"单击查看展示"} %>
+  </td>
+  <td><%= product.product_type %></td>
+  <td><%= product.price %></td>
+  <td><%= product.quantity %> <%= product.unit %></td>
+  <td><%= product.end_date%></td>
+  <td><%= product.enable ? "<span class='label label-success'>上架</span>".html_safe : "<span class='label label-important'>已下架</span>".html_safe %></td>
+  <td><%= product.exchange ? "直接兑换":"发票报销"%></td>
+  <td>
+  	<%= link_to '编辑', edit_admin_product_path(product) %>
+  	<%= link_to "删除", {:controller => "products", :action => "destroy", :id => product.id},{:onclick=>"return confirm('您确定要删除商品？');"} %>
+  </td>
+</tr>
+<% end %>
+</tbody>
+</table>
+<%= will_paginate @products %>

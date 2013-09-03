@@ -1,0 +1,6 @@
+<% content_for :title do%>培训详细<%end%>
+
+<%= render :partial => "admin/elearning/nav_training" ,:locals=>{:training => @training} %>
+
+<%= render :partial => "info", :locals => {:training => @training} %>
+

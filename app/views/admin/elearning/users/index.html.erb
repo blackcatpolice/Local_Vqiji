@@ -1,0 +1,9 @@
+<% content_for :title do%>培训用户列表<%end%>
+<%= render :partial => "admin/elearning/nav_training" ,:locals=>{:training => @training} %>
+<!-- -->
+<%= link_to "设置用户", new_admin_elearning_training_user_path(:training_id=>@training.id),:class=>"btn btn-primary"%>
+
+<% unless @training.released? %>
+
+<%end%>
+<%= render 'list'%>

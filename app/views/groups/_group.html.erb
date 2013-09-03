@@ -1,0 +1,27 @@
+<div class="gzz_list_k <%= 'gzz_list_k1' if !in_group %>">
+  <div class="gzz_t">
+	  <%= in_group ? link_to(truncate_u(group.name, 6),group_path(group),:class=>"tt",:title=>group.name) : raw("<a href='#' class='tt' >#{truncate_u(group.name, 6)}</a>") %> 
+	  <%= link_to '',edit_group_path(group), :class=>"gl",:title=>"管理工作组" if is_admin%>
+	  <p>
+	    <%= in_group ? '已加入' : '未加入' %>
+	    <% if ( (unreads = Notification::TopTweet.unreads_count_of(current_user, group)) > 0) %>
+	      <a href="<%= tops_group_path(group) %>" class="zyc right">
+	        <span class="badge badge-important" title="<%= unreads %>未读重要微博">+ <%= unreads %></span>
+	      </a>
+	    <% end %>
+	  </p>
+  </div>
+
+  <div class="gzz_t1">
+	  <% group.admin_users.each_with_index do |user, i|%>
+	  <% break if i >= 3%>
+      <%= user_tag user%>
+    <%end%>
+    <%= link_to(">>>", group_members_path(group)) if group.admin_users.length > 3 %>
+  </div>
+  <div class="gzz_t2" title="<%= group.summary%>">简介：<%= truncate(group.summary,:length => 18) %></div>
+  <div class="gzz_t2 gzz_t3">
+  	微博数：<%= in_group ? link_to(group.tweets_count,group_path(group)) : group.tweets_count %><br/>
+  	成员：<%= in_group ? link_to(group.members_count,group_members_path(group)) : group.members_count %>
+  </div>
+</div>

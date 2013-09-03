@@ -1,0 +1,16 @@
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="gz_t f18"><span><%= @group.name %></span>
+      <div class="right ran f12" title="<%= @member.is_admin%>">
+        <%= link_to "管理",edit_group_path(@group) if @member.is_admin %> 
+        <%= link_to "退出组" ,quit_group_member_path(:group_id=>@group.id,:id=>@member.id),:'data-skip-pjax'=>true%>
+      </div>
+    </div>
+    <div class="gz_jj gz_ad f13 red_dc5"> <%= @group.notice %> 
+      <%= link_to "编辑",edit_group_path(@group) if @member.is_admin %>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="bk_t bk_d"></div>
+</div>

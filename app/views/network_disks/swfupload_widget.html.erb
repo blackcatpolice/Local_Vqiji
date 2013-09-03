@@ -1,0 +1,83 @@
+<form id="uploadForm" method="post" enctype="multipart/form-data">
+<div class="modal_form">
+	<div class="wd_zf">
+        <div class="wd_zf_k" style="margin-bottom: 10px;">
+        	<span id="spanUploadButton"></span><div class="uploadTips">单个文件最大支持50M</div>
+        	<input type="button" class="btn" id="uploadListCancel" disabled="disabled" value="取消全部上传" />
+        	<div class="clearfix"></div>
+        </div>
+        <div class="wp_sc" style="" id="fsUploadProgress"></div>          
+	</div>
+</div>
+</form>
+<script>
+var swfu = new SWFUpload({
+	flash_url : '/assets/swfupload.swf',
+  	upload_url: '/network_disks/upload.json',
+  	file_post_name: "disk[file]",
+
+  	post_params : {
+    	"<%= key = Rails.application.config.session_options[:key] %>" : "<%= cookies[key] %>",
+    	"<%= request_forgery_protection_token %>" : "<%= form_authenticity_token %>"
+  	},
+
+  	button_image_url: "/assets/images/swfupload.png",
+  	button_width: "68",
+  	button_height: "24",
+  	button_placeholder_id: "spanUploadButton",
+
+
+  	file_size_limit : "50 MB",
+  	file_types : "*.*",
+  	file_types_description : "All Files",
+  	file_upload_limit : 100,
+  	file_queue_limit : 0,
+  	debug : false,
+  	
+  	swfupload_loaded_handler : swfUploadLoaded,
+	file_queued_handler : fileQueued,
+	file_queue_error_handler : fileQueueError,
+	file_dialog_complete_handler : fileDialogComplete,
+	upload_start_handler : uploadStart,
+	upload_progress_handler : uploadProgress,
+	upload_error_handler : uploadError,
+	upload_success_handler : function(file, serverData) {
+		try {
+			var progress = new FileProgress(file, this.customSettings.progressTarget);
+			progress.setComplete();
+			progress.setStatus("上传成功.");
+			progress.toggleCancel(false);
+			var _tmpl = '<li>' + 
+				'<a href="/download/${id}" data-skip-pjax title="${name}">${name}</a>' + 
+				'<span><a href="javascript:;" data-action="file-share" data-id="${id}">分享</a> | <a href="/download/${id}" data-skip-pjax>下载</a></span>' +
+				'</li>';
+			var _tmplHtml = $.tmpl( _tmpl, eval('(' + serverData +')') );
+			$('[data-action=file-share]', _tmplHtml).click(function(){
+				var shareFid = $(this).attr('data-id');
+    			var _shareTmpl = _shareHtml();
+    			$(_shareTmpl).modal({
+    				remote: "/network_disks/share.html?fid=" + shareFid
+    			}).on('hidden', function(){
+    				$(this).remove();
+    			});
+			});
+			_tmplHtml.insertBefore($('li:eq(0)', '[node-type=FileWidget]'));
+			if($('li', '[node-type=FileWidget]').length > 5){
+				$('li:last', '[node-type=FileWidget]').remove();
+			}
+			$('[data-type="message"]', '[node-type=FileWidget]').remove();
+			
+		} catch (ex) {
+			this.debug(ex);
+		}
+	},
+	upload_complete_handler : uploadComplete,
+	
+	//queue_complete_handler : queueComplete,
+	
+	custom_settings: {
+  		progressTarget : "fsUploadProgress",
+		cancelButtonId : "uploadListCancel"
+  	}
+});
+</script>

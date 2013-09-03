@@ -1,0 +1,45 @@
+<% provide(:title, '@我的微博') %>
+
+<div class="bk">
+	<div class="bk_t"></div>
+	<div class="bk_c">
+		<div class="tab">
+			<%= link_to '@我的微博', my_mention_tweets_path , :class=>"qb on" %>
+			<%= link_to '@我的评论', my_mention_comments_path %>
+		</div>
+<!-- 		<div class="tab_sub">
+      <ul>
+        <li><%= link_to "全部", my_mention_tweets_path%></li>
+        <li class="jg">|</li>
+        <li><%= link_to "工作大厅", "#{my_mention_tweets_path}?hall=1"%></li>
+        <li class="jg">|</li>
+        <li class="dropdown" id="menutest1">
+          <a data-toggle="dropdown" href="#menutest1">工作组<b class="caret"></b></a>
+          <ul class="dropdown-menu f12">
+            <a href="javascript:void(0)" class="bos f14">工作组<b class="caret"></b></a>
+            <% current_user.groups.each do |g|%>
+            <%= link_to g.name, "#{my_mention_tweets_path}?group=#{g.id}"%>
+            <% end %>
+          </ul>
+        </li>
+    	</ul>
+  	</div> -->
+
+	  <div data-type="tweet-list">
+    	<% if @tweets.any? %>
+	      <%= render :collection => @tweets, :partial => '/tweets/tweet' %>
+        <div class="text-center">
+          <%= will_paginate @tweets %>
+        </div>
+		  <% else %>
+		    <div class="empty"><span>还没有微博提到我～</span></div>
+		  <% end %>
+		  <div class="clearfix"></div>
+	  </div>
+	</div>
+	<div class="bk_t bk_d"></div>
+</div>
+
+<script type="text/javascript">
+	$("[data-type=tweet-list]").tweetList();
+</script>

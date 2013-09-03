@@ -1,0 +1,25 @@
+<!--     医生名片     -->
+<% 
+	experts = @question_type.enable_experts if @question_type
+	if experts
+%>
+<% experts.each do |e|%>
+<% followship = current_user.followed(e.user_id) %>
+<div class="ys_lb" node-type="Expert" data-id="<%= e.user_id%>">
+	<div class="tx">
+		<%= link_to image_tag(e.user.avatar.url('v80x80'), :class => 'avatar_v80x80'), user_path(e.user_id) %>
+	</div>
+	<div class="mz">
+		<%= link_to "#{truncate_u(e.user.name, 3)} #{e.post}", user_path(e.user_id), :title => "#{e.user.name}" %>
+		<span>频道: <%= @question_type.name%></span>
+		<a class="btn <%= followship ? "" : "btn-warning"%>" href="javascript:;" data-action="expert-follow" data-value="<%= followship ? 1 : 0%>"><i class="<%= followship ? "icon-minus" : "icon-plus"%>"></i> <%= followship ? "取消关注" : "关注"%></a>
+	</div>
+	<div class="tj">
+		<a href="<%= advisory_expert_path(e)%>"></a>
+	</div>  
+</div>
+<% end %>
+<script type="text/javascript">
+	$('div[node-type=Expert]').follow();
+</script>
+<% end %>

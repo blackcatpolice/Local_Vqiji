@@ -1,0 +1,32 @@
+<table class="table" >
+  <thead>
+    <tr>
+      <th>部门名称</th>
+      <th>上级部门</th>
+      <th>成员数</th>
+      <th>下级部门</th>
+      <th>工作组数量</th>
+      <th>创建时间</th>
+      <th>创建人</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @departments.each do |e|%>
+    <tr>
+      <td><%= link_to e.name, admin_department_path(e) %>-[<%= Department::LS[e.level.to_s] %>]</td>
+      <td><%= e.sup ? link_to(e.sup.name, admin_department_path(e.sup)) : '-' %></td>
+      <td><%= e.members.count %></td>
+      <td><%= e.subs.count %></td>
+      <td><%= e.groups_count %></td>
+      <td><%= e.created_at.strftime("%Y-%m-%d %H:%M:%S")%></td>
+      <td><%= e.creator.try(:name) || '-' %></td>
+      <td>
+	      <%= link_to "删除",admin_department_path(e), :confirm => 'Are you sure?',:method => :delete%>
+      </td>
+    </tr>
+    <%end%>
+  </tbody>
+</table>
+
+<%= will_paginate @departments %>

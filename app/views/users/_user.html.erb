@@ -1,0 +1,26 @@
+<% 
+	user = followed_tmpl ? ship.followed : ship.user
+%>
+<div class="gz_lb" data-type="FollowShip" data-id="<%= user.id%>">
+	<div class="sz left">
+		<div class="tb red_dc5">
+			<div class="gz_tx left"><%= link_to image_tag(user.avatar.url('v50x50'), :class => 'avatar_v50x50'), user_path(user) %></div>
+			<div class="gz_wz f13 left">
+				<a href="<%= user_path(user)%>"><%= image_tag (user.gender == User::GENDER_FEMALE ? 'female.png' : 'male.png'), title: (user.gender == User::GENDER_FEMALE ? '女' : '男') %> <%= user.name %></a>
+				<%= "#{user.from.province} #{user.from.name}" if user.from %>
+				<br />
+				关注 <%= link_to user.followeds_count, followeds_user_path(user) %> 　|　
+				粉丝 <%= link_to user.fans_count, fans_user_path(user) %> 　|　
+				微博 <%= link_to user.tweets_count,user_path(user) %>
+				<br />
+				<%= "部门:#{user.department.name}" if user.department%>&nbsp;&nbsp;<%= "职位:#{user.job}" if user.job %>
+			</div>
+		</div>
+	</div>
+	<% if user != current_user %>
+	  <div class="ani left f12">
+      <a class="sx" href="javascript:void(0);" data-action="new-talk-message-to-u" data-receiver-id="<%= user.to_param %>">私信</a>
+	    <%= render :partial => 'users/list/follow_state', :locals => { user: user } %>
+	  </div>
+	<% end %>
+</div>

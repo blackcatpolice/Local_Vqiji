@@ -1,0 +1,36 @@
+<% content_for :title do%>专题类型列表<%end%>
+<%= link_to '新建专题类型', new_admin_atype_blogtype_path,:class=>"btn btn-primary" %>
+<table class="table">
+<thead>
+<tr>
+  <th>类型名称</th>
+  <th>位置</th>
+  <th>是否显示</th>
+  <th>操作</th>
+</tr>
+</thead>
+<tbody>
+<% @rtypes.each do |type| %>
+<tr>
+  <td><%= type.name %></td>
+  <td id="p<%=type.id%>"><%= type.position%></td>
+  <td><%= type.isview %></td>
+  <td>
+    <%= link_to '编辑' ,edit_admin_atype_blogtype_path(type)%>&nbsp;&nbsp;&nbsp;
+    <%=link_to_if(type.isview?, "取消显示", view_admin_atype_blogtype_path(type), :title => "取消页面显示", :class=> "btaction" ,:id=>type.id) do link_to("显示", view_admin_atype_blogtype_path(type), :title => "页面显示",:class=> "btaction",:id=>type.id)  end%> 
+  </td>
+</tr>
+<% end %>
+</tbody>
+</table>
+<%= will_paginate @rtypes %>
+
+<div>
+	小贴士：“位置”数字在重复的情况下必须只能显示一个。
+</div>
+<script>
+	$(".btaction").click(function(){
+		
+		
+	})
+</script>

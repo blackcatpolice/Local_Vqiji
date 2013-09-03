@@ -1,0 +1,41 @@
+<table class="table">
+<thead>
+<tr>
+  <th>问题</th>
+  <th>题目分数</th>
+  <th>题型</th>
+  <th>所属页</th>
+  <th>操作</th>
+</tr>
+</thead>
+<tbody>
+<% @tests.each do |test|%>
+<tr>
+  <td>
+    <%= truncate(test.question, :length => 50) %>
+  </td>
+  <td><%= test.score %></td>
+  <td><%= test.type_desc %></td>
+  <td>
+  <% if test.page%><%= link_to test.page.title,admin_elearning_training_page_path(:training_id=>test.training_id,:id=>test.page.id) %>
+  <%else%>不属于任何一页<%end%>
+  </td>
+  <td>
+    <div class="btn-group">
+    <%= link_to "查看", admin_elearning_training_test_path(:training_id=>test.training_id,:id=>test.id),:class=>"btn" %>
+    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li>
+          <%= link_to raw("<i class='icon-edit'></i>修改") ,edit_admin_elearning_training_test_path(:training_id=>test.training_id,:id=>test.id) %>
+      </li>
+      <li>
+         <%= link_to raw("<i class='icon-trash'></i>删除"),admin_elearning_training_test_path(:training_id=>test.training_id,:id=>test.id),confirm: 'Are you sure?',:method => :delete %>
+      </li>
+    </ul>
+  </div>
+  </td>
+</tr>
+<%end%>
+</tbody>
+</table>
+<%= will_paginate @tests %>

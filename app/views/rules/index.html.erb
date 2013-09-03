@@ -1,0 +1,43 @@
+<% content_for :title do %>综合服务<%end%>
+<div class="sz_nav f12" style="margin-bottom:0px;">
+	<b>制度大厅</b><%= @type ? " » #{@type.name}" : ""%>
+</div>
+<div class="adv1">
+	<div class="adv_t"></div>
+   	<div class="adv_dhk">
+    	<%@types.each do |t|%>
+	   	<%= link_to t.name, "#{search_rules_path}?type_id=#{t.id}"%>
+		<%end%>
+  	</div>
+	<div class="adv_b"></div>
+</div>
+
+<div class="adv">
+<% unless @frule.blank? %>
+	<div class="adv_t"></div>
+   	<div class="adv_dhk" style="padding:0px;">
+    	<div class="zt_hd">
+    	<div class="zt_tu left"><img src="<%= @frule.picture ? @frule.picture.v362x284 : asset_path('003.jpg')%>"></div>
+    	<div class="zt_z left blue f13">
+      		<p class="f15"><%= link_to truncate(@frule.title, :length => 15), rule_path(@frule), :title => "查看详细页", :target => "_blank" %></p>
+      		<%= sub_string(@frule.content, "&nbsp;", 185)%>
+      		<%= link_to "查看全文>>", rule_path(@frule), :title => "查看全文&gt;&gt;", :target => "_blank" %></div>
+  		</div>
+		<%@rules.each do |rule| next if rule.id == @frule.id%>
+      	<div class="px_list">
+      		<div class="pic"><img src="<%= rule.picture ? rule.picture.v362x284 : asset_path('003.jpg')%>"></div>
+      	  	<div class="tit">
+      	  		<span class="blue f15"><%= link_to truncate(rule.title, :length => 30), rule_path(rule), :title => "查看详细页", :target => "_blank" %></span>
+      	  		<%if Isread.isread?(rule.id,current_user.id,"Rule") %>
+         			<img src="<%= asset_path 'read.jpg'%>"/>
+         		<%end%>
+      	  	</div>
+      	  	<div class="dbz"><%= sub_string(rule.content, "&nbsp;", 85)%><span><%= link_to "查看全文>>", rule_path(rule), :title => "查看详细页", :target => "_blank" %></span></div>
+        </div>
+        <% end %>
+  	</div>
+  	<%=will_paginate @rules %>
+<% else %>
+	还没有制度...
+<% end %>
+</div>

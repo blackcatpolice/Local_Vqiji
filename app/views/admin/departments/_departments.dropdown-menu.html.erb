@@ -1,0 +1,6 @@
+<ul class="dropdown-menu">
+  <li><a href="<%= list_admin_departments_path %>">所有部门</a></li>
+  <li><%= link_to '顶级部门', list_admin_departments_path(:level => 0) %></li>
+  <li><%= link_to '一级部门', list_admin_departments_path(:level => 1) %></li>
+  <li><%= link_to '二级部门', list_admin_departments_path(:level => 2) %></li>
+</ul>

@@ -1,0 +1,23 @@
+zh-CN:
+  mongoid:
+    models:
+      attachment/base:    '附件'
+      attachment/picture: '图片附件'
+      attachment/audio:   '录音附件'
+      attachment/file:    '附件'
+      
+    attributes:
+      attachment/base: &base
+        created_at: "上传时间"
+        
+      attachment/picture:
+        <<: *base
+        file: '图片文件'
+
+      attachment/audio:
+        <<: *base
+        file: '音频文件'
+      
+      attachment/file:
+        <<: *base
+        file: '文件'

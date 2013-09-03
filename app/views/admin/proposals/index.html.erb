@@ -1,0 +1,36 @@
+<% content_for :title do %>建议列表 <% end %>
+<% content_for :menu_url do %><%= url_for admin_proposals_path %><% end %>
+
+<div span="8" class = "form-inline">
+	 <table class="table table-bordered" >
+	 <thead>
+	 <tr>
+		<th>标题</th>
+		<th>状态</th>
+		<th>创建时间</th>
+		<th>审核人</th>
+		<th>操作</th>
+		</tr>
+		</thead>
+		<tbody>
+	<% if not @suggests.blank? %>
+		<% @suggests.each do |suggest|%>
+		<tr>
+		<td>
+			<%= link_to truncate(suggest.title), "/admin/proposals/#{suggest.id}", :title => "查看详细页", :target => "_blank" %>
+		</td>
+		<td>
+				<%if suggest.check == 1%>已通过<%elsif suggest.check == 0%>未通过<%else%>未审核<%end%>
+		</td>
+		<td><%= format_time(suggest.created_at, "%Y-%m-%d %H:%M:%S") -%></td>
+		<td><%= suggest.finisher_id ? suggest.finisher.nickname : "未进行审核" %></td>
+		<td>
+		  <%= link_to '审核', "/admin/proposals/#{suggest.id}"%>&nbsp;
+		</td>
+		</tr>
+	<% end %>	
+	<% end %>
+	</tbody>
+</table>
+<%= will_paginate @suggests %>
+</div>

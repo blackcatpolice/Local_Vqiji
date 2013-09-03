@@ -1,0 +1,31 @@
+<div class="container reg_con">
+  <div class="reg">
+    <div class="reg_t">重置密码</div>
+    <div class="reg_c">
+      <%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :post, :class=>"form-horizontal" }) do |f| %>
+        <fieldset>
+          <div class="reg_line f18">请填写登录邮箱</div>
+          <% if resource.errors[:email].any? %>
+            <label class="alert alert-error text-center">
+              <%= resource.errors[:email].collect do |error| %>
+                <% resource.errors.full_message(:email, error) %>
+              <% end.join(',') %>
+            </label>
+          <% end %>
+          <div class="control-group">
+            <label class="control-label">邮箱: <span>*</span></label>
+            <div class="controls">
+              <%= f.email_field :email, :autofocus => true %>
+            </div>
+          </div>
+          <div class="reg_btn">
+          	<%= image_submit_tag("btn-sendmail.png") %>
+          	<%= link_to '返回登录', new_session_path('user') %>
+          </div>
+        </fieldset>
+      <% end %>
+      <div class="clearfix"></div>
+    </div>
+    <div class="reg_d"></div>
+  </div>
+</div>

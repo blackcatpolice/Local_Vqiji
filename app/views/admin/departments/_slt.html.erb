@@ -1,0 +1,9 @@
+<% tops = Department.top_scope %>
+[
+<% tops.each do |t|%>
+{"name":"<%= t.name %>","id":"<%= t.id %>"},
+
+<%end%>
+{}
+]
+<hr/>

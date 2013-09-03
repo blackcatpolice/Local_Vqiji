@@ -1,0 +1,14 @@
+zh-CN:
+  mongoid:
+    models:
+      excel: 'EXCEL文件'
+      
+    attributes:
+      excel:
+        file: '文件'
+        uploader: '上传人'
+        created_at: '上传时间'
+        imported_at: '导入时间'
+        imported?: '已导入？'
+        import_errors: '导入错误'
+        remark: '备注'

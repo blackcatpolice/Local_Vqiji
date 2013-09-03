@@ -1,0 +1,93 @@
+<!--  隐藏菜单 -->
+<ul id="more_menu" class="more_menu" data-id="" style="display:none;">
+	<li><a href="javascript:void(0);" class="tebie" data-action="tbfollow" >特别关注</a></li>
+	<li><a href="javascript:void(0);" class="watch" data-action="qqfollow" >悄悄关注</a></li>
+</ul>
+<script type="text/javascript">
+$(function(){
+/**/
+$("#user_temp a[data-action=more]").hover(
+	function(){
+    	$("#more_menu").hide();
+    	$("#more_menu").attr("data-id",$(this).attr("data-id"));
+    	var offset = $(this).offset();
+   		var left = offset.left-10+"px";
+   		var top = offset.top+14+"px";
+   		$("#more_menu").css("left",left);
+   		$("#more_menu").css("top",top);
+   		$("#more_menu").show();
+	},
+	function(){
+		$("#more_menu").hide();
+	}
+);  
+
+$('#more_menu').hover(function(){
+	$(this).show();
+},function(){
+	$(this).hide();
+});	
+});
+/*关注*/
+$("#user_temp a[data-action=follow]").click(function(){
+	var id = $(this).attr("data-id");
+	WEIBO.follow(id,{
+    success : function() {
+      $("#more_menu").hide();
+      $(".a-follow-"+id).hide();
+      $(".a-unfollow-"+id).show();
+      $(".a-follow-"+id).parent().attr('class', 'nr_btn');
+      WEIBO.ui.alert('关注成功');
+    },
+    error : WEIBO.ui.errorHandler
+  });
+});
+/*取消关注*/
+$("#user_temp a[data-action=unfollow]").click(function(){
+	var id = $(this).attr("data-id");
+	WEIBO.ui.confirm('您确认取消关注TA吗？', function(ensure) {
+     if (ensure) {
+       WEIBO.unfollow(id, {
+         success : function() {
+      	   $(".a-unfollow-"+id).hide();
+           $(".a-follow-"+id).show();
+      	   $(".a-follow-"+id).parent().attr('class', 'nr_btn nr_btn1');
+         },
+         error : WEIBO.ui.errorHandler
+       });
+     }
+   });
+});
+/*特别关注*/
+$("#more_menu a[data-action=tbfollow]").click(function(){
+	var id = $("#more_menu").attr("data-id");
+	WEIBO.follow(id,1, {
+     success : function() {
+        $("#more_menu").hide();
+        $(".a-follow-"+id).hide();
+        $(".a-unfollow-"+id).show();
+        $(".a-follow-"+id).parent().attr('class', 'nr_btn');
+     	WEIBO.ui.alert('特别关注成功');
+      // _update_follow_status(true);
+       // $("#wd_qgz span").text("特别关注");
+       // $("#more_menu").hide();
+     },
+     error : WEIBO.ui.errorHandler
+   });
+});
+/*悄悄关注*/
+$("#more_menu a[data-action=qqfollow]").click(function(){
+	var id = $("#more_menu").attr("data-id");
+	WEIBO.follow(id,-1, {
+     success : function() {
+        $("#more_menu").hide();
+      	$(".a-follow-"+id).hide();
+        $(".a-unfollow-"+id).show();
+      	$(".a-follow-"+id).parent().attr('class', 'nr_btn');
+      	WEIBO.ui.alert('悄悄关注成功');
+     },
+     error : WEIBO.ui.errorHandler
+   });
+});
+
+</script>

@@ -1,0 +1,25 @@
+<div class="bk_t"></div>
+
+<div class="bk_c">
+  <% unless @users.empty? %>
+	  <%= render :collection => @users, :as => :usr, 
+	    :partial => '/users/user2', :locals => { :followed_tmpl => false } %>
+    <div class="lb text-center">
+      <%= will_paginate @users %>
+    </div>
+  <% else %>
+    <div class = "lb text-center">
+    	<div class="alert">
+        <strong>对不起，没有找到任何用户！</strong> 
+      </div>
+    </div>
+  <% end %>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $('div[data-type=FollowShip]').follow();
+    });
+  </script>
+	<div class="clearfix"></div>
+</div>
+<div class="bk_t bk_d"></div>

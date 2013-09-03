@@ -1,0 +1,73 @@
+//
+// 微博
+//
+// require jquery
+// require jquery.widget
+// require weibo
+
+(function($) {
+	$.widget('weibo.follow', {
+    	_create: function(){
+    		var self = this;
+    		$(this.element).on('click', 'a[data-action=follow]', function(){
+    			var follow_type = $(this).attr('data-value');
+                    self._follow(follow_type, '已关注', 'gz_dx');
+    		}).on('click', 'button[data-action=follow]', function(){
+                var follow_type = $(this).attr('data-value');
+                self._follow(follow_type, '已关注', 'gz_dx');
+            }).on('click', 'a[data-action=qqfollow]', function(){
+    			var follow_type = $(this).attr('data-value');
+    			self._follow(follow_type, '悄悄关注', 'gz_qq');
+    		}).on('click', 'a[data-action=tbfollow]', function(){
+    			var follow_type = $(this).attr('data-value');
+    			self._follow(follow_type, '特别关注', 'gz_tb');
+    		}).on('click', 'a[data-action=unfollow]', function(){
+    			self._unfollow();
+    		}).on('click', 'a[data-action="expert-follow"]', function(){
+                var follow_type = $(this).attr('data-value');
+                if($(this).attr('data-value') == "0"){
+                    self._follow(follow_type, '取消关注');
+                }else{
+                	self._unfollow();
+                }
+            });
+    	},
+    	
+    	_follow: function(follow_type, text, _class){
+    		var self = this;
+    		var _userid = $(this.element).attr('data-id');
+    		WEIBO.follow(_userid, follow_type, {
+     			success : function() {
+                    if($('a[data-action="expert-follow"]', self.element).length > 0){
+                        $('a[data-action="expert-follow"]', self.element).attr('data-value', "1").removeClass('btn-warning').html('<i class="icon-minus"></i>' + text);
+                    }else{
+     					$('div[data-name=followed] span',self.element).text(text);
+     					$('div[data-name=followed]',self.element).find('.gz_yj').removeAttr('class').addClass('gz_yj ' + _class).end().show();
+         				$('div[data-name=follow]',self.element).hide();
+         			}
+     			},
+     			error : WEIBO.ui.errorHandler
+   			});
+    	},
+    	
+    	_unfollow: function(){
+    		var self = this;
+    		var _userid = $(this.element).attr('data-id');
+    		WEIBO.ui.confirm('您确认取消关注TA吗？', function(ensure) {
+     			if (ensure) {
+       				WEIBO.unfollow(_userid, {
+         				success : function() {
+         					if($('a[data-action="expert-follow"]', self.element).length > 0){
+                        		$('a[data-action="expert-follow"]', self.element).attr('data-value', "0").addClass('btn-warning').html('<i class="icon-plus"></i>关注');
+                  			}else{
+         						$('div[data-name=followed]',self.element).hide();
+         						$('div[data-name=follow]',self.element).show();
+         					}
+		         		},
+         				error : WEIBO.ui.errorHandler
+       				});
+     			}
+   			});
+    	}
+  	});
+})(jQuery);

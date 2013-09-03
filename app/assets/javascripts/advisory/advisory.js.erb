@@ -1,0 +1,28 @@
+
+(function($) {
+	$.widget('advisory.question', {
+  		options: {
+    	},
+    	_create: function(options) {
+      		var self = this;
+      		/* render audio */
+      		this.element._attachmentsContainer = this.element.find("[data-role=rtext-attachments]");
+      		this.element._attachmentsContainer.rtextAttachments({ message: this });
+    	}
+    	//_create end
+ 	}); // widget: question
+ 	
+ 	
+ 	
+	$.widget('advisory.answer', {
+  		options: {
+    	},
+    	_create: function(options) {
+      		var self = this;
+      		/* render audio */
+      		this.element._attachmentsContainer = this.element.find("[data-role=rtext-attachments]");
+      		this.element._attachmentsContainer.rtextAttachments({ message: this });
+    	}
+    	//_create end
+  	}); // widget: answer
+})(jQuery);

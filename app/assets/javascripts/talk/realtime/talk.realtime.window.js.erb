@@ -1,0 +1,768 @@
+// require jquery
+// require jquery.ui.widget
+// require libs/jquery/ui/jquery.ui.effect-transfer
+// require jquery.ui.draggable
+
+(function($, Session) {
+  $.widget("talk.talkWindow", {
+    _create: function() {
+      this._displays = {};
+      this._sessions = [];
+      this._current = null;
+
+      this._zw = this.element.find(".msg_zw");
+      this._kj = this.element.find(".msg_kj");
+
+      this._on({
+        "click .msg_x": function() { this.minimize() }, // 最小化按钮
+        "click .msg_d": function() { this.close() } // 关闭按钮
+      });
+
+      // 会话列表
+      this._sessionsList = $.talk.talkWindowSessionsList.create().insertAfter(this._kj);
+      this._on(this._sessionsList, {
+        talkwindowsessionslistactive: function(_, session) {
+          this._attach(session);
+        },
+        talkwindowsessionslistremove: function(_, session) {
+          this._remove(session);
+        }
+      });
+
+      // 消息编辑器
+      this._editor = $.talk.talkWindowMessageEditor.create().appendTo(this._zw);
+      
+      // 拖动
+      this.element.draggable({
+        addClasses: false,
+        opacity: 0.9,
+        scroll: false,
+        handle: this._kj
+      });
+    },
+    
+    _destroy: function() {
+      if (this._min) {
+        this._min.clearSessions();
+        this._min.remove();
+      };
+      this._clearSessions();
+      this._sessionsList.remove();
+      this._editor.remove();
+      this.element.draggable("destroy");
+    },
+    
+    // 隐藏 最小化/聊天窗
+    hide: function() {
+      if (this._min) {
+        this._min.hide();
+      }
+      this.element.hide();
+      if (this._current) {
+        this._current.disallowResetUnreadCount();
+      }
+      return this;
+    },
+    
+    // 显示 最小化/聊天窗
+    show: function() {
+      if (this._state === "minimize") {
+        this._min.show();
+      } else {
+        if (this._beCurrent && (this._beCurrent != this._current)) {
+          this._attach(this._beCurrent);
+        } else if (this._current) {
+          this._current.allowResetUnreadCount();
+          this._current.pull();
+        }
+        this.element.show();
+      }
+      return this;
+    },
+    
+    // 关闭
+    close: function() {
+      this._clearSessions();
+      this._editor.talkWindowMessageEditor("reset");
+      this.hide();
+      return this;
+    },
+
+    // 最小化
+    minimize: function(animate) {
+      if (this.element.parent().length == 0) {
+        return this;
+      }
+    
+      if (!this._min) {
+        this._min = $.talk.talkWindow.Min.create()
+          .appendTo(this.element.parent());
+        this._min.addSession(this._sessions);
+        this._on(this._min, {
+          click: function() {
+            this.normalize();
+          }
+        });
+      }
+
+      this._min.show(); // transfer 参与者必须可见
+      
+      if (!(arguments.length == 1) && !animate) {
+        this.element.effect( "transfer", { to: this._min }, 200);
+      }
+      
+      this.element.hide();
+
+      if (this._current) {
+        this._current.disallowResetUnreadCount();
+      }
+      
+      this._state = "minimize";
+      return this;
+    },
+    
+    // 常规化（最小化反转）
+    normalize: function(animate) {
+      this.element.show();
+      
+      if (this._min) {
+        if (animate !== false) {
+          if (this._state == "minimize") {
+            this._min.effect( "transfer", { to: this.element }, 200);
+          }
+        }
+
+        this._min.hide();
+      }
+
+      this._state = "open";
+
+      if (this._beCurrent && (this._beCurrent != this._current)) {
+        this._attach(this._beCurrent);
+      } else if (this._current) {
+        // 解除因最小化而锁定的会话
+        this._current.allowResetUnreadCount();
+        this._current.pull();
+      }
+
+      return this;
+    },
+    
+    // 打开会话并显示
+    open: function(session) {
+      if (session) {
+        this.add(session);
+      }
+      this.normalize();
+      return this;
+    },
+    
+    _open: function(session) {
+      if (this._state == "minimize") {
+        this._beCurrent = session;
+      } else {
+        this._attach(session);
+      }
+    },
+
+    // 添加会话
+    add: function(session, beCurrent) {
+      if ($.inArray(session, this._sessions) == -1) {
+        this._sessions.push(session);
+        this._sessionsList.talkWindowSessionsList("add", session);
+        if (this._min) {
+          this._min.addSession(session);
+        }
+        // 设置为当前会话
+        if (beCurrent !== false) {
+          this._open(session);
+        }
+      }
+      return this;
+    },
+    
+    remove: function(session) {
+      this._remove(session);
+      this._sessionsList.talkWindowSessionsList("remove", session);
+      return this;
+    },
+    
+    // 切换 display
+    _attach: function(session) {
+      if (session != this._current) {
+        session.active(); // 激活会话
+        session.makeCurrent(); // 设置为当前会话
+
+        var _display = this._displays[session.id] || this._createDisplay(session);
+
+        if (this._current) {
+          // 分离当前消息列表
+          var _currentDisplay = this._displays[this._current.id];
+
+          if (_currentDisplay) {
+            _currentDisplay.talkWindowMessagesDisplay("detached");
+            _currentDisplay.hide();
+          }
+        }
+
+        _display.talkWindowMessagesDisplay("attached", this).show();
+        this._current = session;
+
+        this._sessionsList.talkWindowSessionsList("active", session);
+        this._editor.talkWindowMessageEditor("option", "session", session);
+      }
+      
+      this._beCurrent = null;
+    },
+
+    // 删除会话，如果能选中下一个会话，则自动选中下一个会话，
+    // 否则，隐藏 window
+    _remove: function(session) {
+      session.disactive();
+
+      var _display = this._displays[session.id];
+
+      if (_display) {
+        _display.talkWindowMessagesDisplay("detached");
+        // 当 widget 被 remove 时自动调用 destroy, 以下代码不再需要
+        //_display.talkWindowMessagesDisplay("destroy");
+        this._displays[session.id] = null;
+        _display.remove();
+      }
+
+      var _idx = $.inArray(session, this._sessions);
+
+      if (_idx > -1) {
+        this._sessions.splice(_idx, 1);
+        _idx -= 1;
+      }
+
+      if (this._sessions.length > 0) {
+        if (this._current == session) {
+          // 关闭了当前会话，选择下一个/上一个会话并选中
+          var next = (this._sessions[ _idx ] || this._sessions[ _idx + 1 ]);
+          this._open(next);
+        }
+      } else { // 关闭的是最后一个会话，且一定是 _current/_beCurrent 会话
+        session.unmakeCurrent();
+        this._beCurrent = this._current = null;
+        this.hide();
+      }
+
+      if (this._min) {
+        this._min.removeSession(session);
+      }
+      return this;
+    },
+    
+    _clearSessions: function() {
+      var self = this;
+      $.each(this._sessions, function(_, _session) {
+        _session.disactive();
+        var _display = self._displays[_session.id];
+        if (_display) {
+          _display.talkWindowMessagesDisplay("detached");
+          self._displays[_session.id] = null;
+          _display.remove();
+        }
+      });
+      // 清空所有会话
+      this._sessions.splice(0);
+      this._current = null;
+      this._beCurrent = null;
+      Session.clearCurrent();
+      this._sessionsList.talkWindowSessionsList("clear");
+    },
+    
+    // 创建显示列表
+    _createDisplay: function(session) {
+      var _display = $.talk.talkWindowMessagesDisplay.create(session);
+      this._displays[session.id] = _display;
+      this._zw.prepend(_display);
+      return _display;
+    }
+  });
+  
+  var Window = $.talk.talkWindow;
+  var _window;
+  
+  Window.TMPL = ''
+    + '<div class="msg_k">'
+      + '<div class="msg_kj">'
+        + '<a href="javascript:void(0)" class="msg_d"></a>'
+        + '<a href="javascript:void(0)" class="msg_x"></a>'
+      + '</div>'
+      + '<div class="msg_zw"></div>'
+    + '</div>';
+  
+  Window.instance = function() {
+    if (!_window) {
+      _window = $(Window.TMPL)
+        .talkWindow()
+        .appendTo($.talk.talkW.instance());
+    }
+    return _window;
+  };
+  
+  Window.init = function() {
+    // 预加载背景图片
+    $("<img src=\"<%= image_path('images/msg_k.png') %>\" class=\"hide\" />").appendTo(document.body);
+  };
+  
+  Window.open = function(session) {
+    Window.instance()
+      .talkWindow("open", session);
+  };
+  
+  Window.Min = function(widget) {
+    var _unreadCount = 0;
+    var context = this;
+    var _sessions = [];
+    
+    _blink = function() {
+      widget.blink();
+    };
+    
+    _setTip = function(count) {
+      if (count == 0) {
+        widget.html("没有未读消息");
+      } else {
+        widget.html("您有 " + count + "条未读信息");
+      }      
+    };
+  
+    _setUnreadCount = function(count) {
+      if (_unreadCount != count) {
+        _unreadCount = count;
+        _setTip(_unreadCount);
+      }
+    };
+  
+    _addUnreadCount = function(count) {
+      _setUnreadCount( _unreadCount + count );
+    };
+
+    _onSessionUnreadCountChanged = function(newValue, oldValue) {
+      _addUnreadCount( newValue - oldValue );
+      if (newValue > oldValue) {
+        _blink();
+      }
+    };
+    
+    widget.addSession = function(session) {
+      if ($.isArray(session)) {
+        var self = this;
+        $.each(session, function(_, _session) {
+          self.addSession(_session);
+        });
+      } else {
+        var i = $.inArray(session, _sessions);
+        if (i < 0) { // 不存在
+          session.listen("unread_count-changed", _onSessionUnreadCountChanged)
+          _addUnreadCount(session.unread_count);
+          _sessions.push(session);
+        }
+      }
+      return this;
+    };
+    
+    widget.removeSession = function(session) {
+      if ($.isArray(session)) {
+        var self = this;
+        $.each(session, function(_, _session) {
+          self.removeSession(_session);
+        });
+      } else {
+        var i = $.inArray(session, _sessions);
+        if (i >= 0) { // 存在
+          session.unlisten("unread_count-changed", _onSessionUnreadCountChanged)
+          _addUnreadCount( - session.unread_count);
+          _sessions.splice(i, 1);
+        }
+      }
+      return this;
+    };
+    
+    widget.clearSessions = function() {
+      $.each(_sessions, function(_, _session) {
+        _session.unlisten("unread_count-changed", _onSessionUnreadCountChanged);
+      });
+      _setUnreadCount(0);
+      _sessions.splice(0);
+      return this;
+    };
+    
+    _setTip(_unreadCount);
+    return widget;
+  },
+  
+  Window.Min.create = function() {
+    var _min = $('<div class="msg_xh" style="margin-right:130px;"></div>');
+     return Window.Min(_min);
+  };
+
+  //
+  $.widget("talk.talkWindowSessionsList", {
+    _create: function() {
+      this._sessions = {};
+      this._current = null;
+      this._list = this.element.find("ul");
+      
+      this._on(this._list, {
+        "click li": this._onItemClick,
+        "click li>.msg_close": this._onItemClose
+      });
+    },
+    
+    _onItemClick: function(e) {
+      var _session = $(e.target).tmplItem().data;
+      if (_session) {
+        this.active(_session);
+        // SO：只有用户点击是才触发 active
+        this._trigger("active", null, _session);
+        e.preventDefault();
+      }
+    },
+    
+    _onItemClose: function(e) {
+      var _tmpl = $(e.target).parent().tmplItem();
+      if (_tmpl) {
+        var _session = _tmpl.data;
+        this.remove(_session);
+        this._trigger("remove", null, _session);
+        e.preventDefault();
+        // FIXED: 停止冒泡，否则会出发上级的 item click 事件
+        e.stopPropagation();
+      }
+    },
+    
+    add: function(session) {
+      var _item = new $.talk.talkWindowSessionsList.Item(session);
+      this._sessions[session.id] = _item;
+      _item.prependTo(this._list);
+      return this;
+    },
+    
+    remove: function(session) {
+      var _item = this._sessions[session.id];
+      if (_item) {
+        if (this._current == session) {
+          this._current = null;
+        }
+        _item.remove();
+        this._sessions[session.id] = null;
+      }
+      return this;
+    },
+    
+    clear: function() {
+      this._sessions = {};
+      this._list.empty();
+      this._current = null;
+      return this;
+    },
+    
+    current: function() {
+      if (this._current) {
+        return this._current.tmplItem().data;
+      }
+      return null;
+    },
+    
+    active: function(session) {
+      if (this._current) {
+        this._current.removeClass("on");
+      }
+      var _item = this._sessions[session.id];
+      if (!_item) {
+        this.add(session);
+        _item = this._sessions[session.id];
+      }
+      _item.addClass("on");
+      this._current = _item;
+      return this;
+    }
+  });
+  
+  $.talk.talkWindowSessionsList.Item = function(session) {
+    var _item = $.tmpl(''
+      + '<li>'
+        + '<img src="${avatar_url}" />'
+        + '<span class="badge badge-important hide">0</span>'
+        + '<a class="msg_name" href="javascript:void(0);" data-toggle="tooltip" title="${title}">${title}</a>'
+        + '<div class="msg_close"></div>'
+      + '</li>', session);
+
+    _item.setUnreadCount = function(count) {
+      this.find(".badge").html(count)[ (count > 0) ? "show" : "hide" ]();
+      return this;
+    };
+    
+    _item.setUnreadCount(session.unread_count);
+    
+    function onUnreadCountChanged(value, old) {
+      _item.setUnreadCount(value);
+    }
+    
+    //
+    session.listen("unread_count-changed", onUnreadCountChanged);
+    
+    _item.bind("remove", function() {
+      session.unlisten("unread_count-changed", onUnreadCountChanged);
+    });
+
+    return _item;
+  };
+  
+  $.talk.talkWindowSessionsList.create = function() {
+    var _widget = $(''
+      + '<div class="msg_lb">'
+        + '<ul></ul>'
+      + '</div>').talkWindowSessionsList();
+    return _widget;
+  };
+  
+  $.widget("talk.talkWindowMessagesDisplay", {
+    _create: function() {
+      // FIXED：不可通 options 方式传入 session 对象，
+      // 因为传入的 options 参数会被复制，进而产生一些错误
+      this._session = this.element.tmplItem().data;
+      this._nr = this.element.find(".msg_nr");
+      
+      this._on({
+        "click .rtm-attachments .picture>.thumb": this._onPictureClick
+      });
+
+      this._onMessageSent_proxy = $.proxy(this._onMessageSent, this);
+      this._session.listen("message-send-success", this._onMessageSent_proxy);
+
+      // FIXED: 因为 jQuery Widget 通过原型继承的方式创建 Widget 实例，
+      // 所以 Widget 方法共享，通过 this._onMessagesComming.proxy 的方式是错误的
+      this._onMessagesComming_proxy = $.proxy(this._onMessagesComming, this);
+      this._session.listen("new-messages-is-comming", this._onMessagesComming_proxy);      
+    },
+    
+    _destroy: function() {
+      //console.log("destroy");
+      this._session.unlisten("message-send-success", this._onMessageSent_proxy);
+      this._session.unlisten("new-messages-is-comming", this._onMessagesComming_proxy);
+    },
+    
+    _onMessageSent: function(message) {
+      this.append(message);
+    },
+    
+    _onMessagesComming: function(messages) {
+      this.append(messages);
+    },
+    
+    attached: function(window) {
+      //console.log("attached");
+      this._attached = true;
+      this._session.pullMessages();
+      this.scrollToBottom();
+      return this;
+    },
+    
+    detached: function() {
+      // console.log("detached");
+      this._attached = false;
+      return this;
+    },
+    
+    isAttached: function() {
+      return this._attached;
+    },
+    
+    append: function(message, scrollToBottom) {
+      if ($.isArray(message)) {
+        var self = this;
+        $.each(message, function(_, _message) {
+          self.append(_message, false);
+        });
+      } else {
+        if (this._nr.find("[data-id=" + message.id + "]").length == 0) {
+          this._wrapMessage( $(message.html) ).appendTo(this._nr);
+        }
+      }
+      if ((arguments.length == 1) || scrollToBottom) {
+        this.scrollToBottom();
+      }
+      return this;
+    },
+    
+    scrollToBottom: function() {
+      this._nr.animate({ "scrollTop": this._nr[0].scrollHeight }, "fast");
+      return this;
+    },
+    
+    // 查看图片原图
+    _onPictureClick: function(e) {
+      var target = $(e.currentTarget).closest(".picture[data-origin-src]");
+      if ( target.length ) {
+        window.open( target.attr("data-origin-src") );
+        e.preventDefault();
+      }
+    },
+    
+    _wrapMessage: function(msg) {
+      // 语音
+      var audio = msg.find(".rtm-attachments .audio");
+      $.rtext.rtextAttachments.embedAudioPlayerFlash( audio );
+      return msg;
+    }
+  });
+  
+  $.talk.talkWindowMessagesDisplay.create = function(session) {
+    var _widget = $.tmpl(''
+      + '<div>'
+        + '<div class="msg_nsb f13">'
+          + '<img src="${avatar_url}" />'
+          + '<div class="msg_name" style="clear: right;" title="${title}">${title}</div>'
+          + '<div class="msg_subtitle f12" title="${subtitle}">'
+            + '<a href="' + (session.p2p ? 'javascript:void(0)' : '/talk/sessions/${id}/members') +'" class="subtitle" data-skip-pjax="true">${subtitle}</a>'
+            + ( session.p2p ? "" : '<a href="/talk/sessions/${id}/members" class="msg_add" data-skip-pjax="true" title="查看成员"></a>' )
+          + '</div>'
+        + '</div>'
+        + '<div class="msg_nr">'
+          + '<div class="msg_more f13">'
+            + '<a href="/talk/sessions/${id}" data-skip-pjax>查看消息记录</a>'
+          + '</div>'
+        + '</div>'
+      + '</div>', session).talkWindowMessagesDisplay();
+    return _widget;
+  };
+  
+  $.widget("talk.talkWindowMessageEditor", $.rtext.rtextEditor, {
+    options: {
+      allowBlank: true,
+      textMaxLength: <%= Talk::Message::User::TEXT_MAXLEN %>,
+      tools: ["audio", "emotion", "picture", "file"],
+      inputMention: false,
+      preset: "",
+      placeHolder: "",
+      session: null, // required,
+      remainCounterOptions: {
+        formater: {
+          remain: function(remainCount, maxCount) {
+            return '<span class="remain">' + remainCount + '</span>';
+          },
+          over: function(overCount, maxCount) {
+            return '<span class="over"> -' + overCount + '</span>';
+          }
+        }
+      },
+      toolbarOptions: {
+        tip: {
+          csses: {
+            position: "fixed",
+            zIndex: 1045
+          },
+          direction: "top"
+        }
+      }
+    },
+
+    _create: function() {
+      this._super();
+      
+      this._on(this._texter, {
+        focus: this._onTexterFocus,
+        blur: this._onTexterBlur
+      });
+      
+      this._onTexterKeyPress_isBind = false;
+    },
+    
+    _onTexterFocus: function() {
+      if (!this._onTexterKeyPress_isBind) {
+        this._on(this._texter, { keypress: this._onTexterKeyPress });
+        this._onTexterKeyPress_isBind = true;
+      }
+    },
+    
+    _onTexterBlur: function() {
+      if (this._onTexterKeyPress_isBind) {
+        this._off(this._texter, "keypress");
+        this._onTexterKeyPress_isBind = false;
+      }
+    },
+    
+    // enter 提交
+    _onTexterKeyPress: function(e) {
+      if ((e.target == this._texter[0]) && (e.which == 13)) {
+        // e.ctrlKey && ((e.which == 13) || (e.which == 10))) {
+        this.submit();
+        e.preventDefault();
+      }
+    },
+    
+    /*销毁*/
+    _destroy: function() {
+      if (this._pictureUploader) {
+        this._pictureUploader.pictureUploader("destroy");
+      }
+      if(this._audioRecorder) {
+        this._audioRecorder.audioRecorder("destroy");
+      }
+      this._super();
+    },
+    
+    _setOption: function(key, value) {
+      if ("session" === key) {
+        if (this.options.session !== value) {
+          this.reset();
+        }
+      }
+      return this._superApply(arguments);
+    },
+    
+    _validate: function(unlockIfError) {
+      if ( !this._super() ) {
+        return false;
+      }
+
+      if ($.isBlank( this._texter.val() ) 
+        && !( this._audio || this._picture || this._file || this._selectedFile )) {
+         this._texter.blink(unlockIfError);
+        return false;
+      }
+      return true; 
+    },
+    
+    /*发送*/
+    _submit: function(text, done) {
+      var self = this;
+
+      var _done = function() {
+        self.reset();
+        done.apply(self);
+        // 在 IE 中选中隐藏/禁用的文本框会报错，
+        // 因此，在 focus 之前先调用 done
+        self._texter[0].focus();
+      };
+      
+      this.options.session.send(text, {
+        audio: this._audio,
+        picture: this._picture,
+        file: (this._file || this._selectedFile),
+        success: $.proxy(this.reset, this),
+        error: App.error.handleXHRError,
+        complete: _done
+      });
+    }
+  });
+  
+  $.talk.talkWindowMessageEditor.create = function() {
+    var _widget = $(''
+      + '<div>'
+        + '<div class="dhk_gn toolbar"></div>'
+        + '<div class="msg_dhk"><textarea class="texter"></textarea></div>'
+        + '<div class="msg_tp">'
+          + '<a class="btn btn-danger bn submiter" href="javascript:void(0);" title="按 Enter 发送">发 送</a>'
+          + '<span class="remain_counter">0</span>'
+        + '</div>'
+      + '</div>').talkWindowMessageEditor();
+    return _widget;
+  };
+})(jQuery, Talk.realtime.Session);

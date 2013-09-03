@@ -1,0 +1,9 @@
+<% content_for :title do%>新建工作组<%end%>
+
+<ul class="nav nav-tabs">
+  <li><%= link_to raw('<i class="icon-home"></i>工作组主页'),home_admin_groups_path%> </li>
+  <li><%= link_to raw('<i class="icon-list"></i>工作组列表</a>'),admin_groups_path%></li>
+  <li class="active"><%= link_to raw('<i class="icon-plus"></i>新建工作组</a>'),new_admin_group_path%></li>
+</ul>
+
+<%= render :partial => 'form' %>

@@ -1,0 +1,10 @@
+<%# encoding:utf-8 %>
+<% content_for :title do%>数据导入<%end%>
+<form method="post" class="form" action='<%= url_for :controller=>"setup",:action=>"execute" %>' enctype="multipart/form-data">
+<input type="hidden" value="✓" name="utf8">
+请选择excel文件:<br/>
+<input type="file" name="excel[file]"/>
+<br/>
+<input type="submit" value="确认导入" />
+</form>
+

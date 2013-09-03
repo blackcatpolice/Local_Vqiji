@@ -1,0 +1,102 @@
+<%= form_for([:admin, @user], :html=>{:class=>"form-horizontal"}) do |f| %>
+<div class="control-group">
+	<label class="control-label" for="user_email">电子邮箱</label>
+ 	<div class="controls">
+    	<%= f.text_field :email %>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="user_password">密码</label>
+ 	<div class="controls">
+      	<%= f.password_field :password %>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="user_password_confirmation">确认密码</label>
+ 	<div class="controls">
+      	<%= f.password_field :password_confirmation %>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="user_name">姓名</label>
+ 	<div class="controls">
+      	<%= f.text_field :name %>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label">性别</label>
+ 	<div class="controls">
+      	<label class="radio inline"><%= radio_button("user", "gender", "0")  %>男</label>
+      	<label class="radio inline"><%= radio_button("user", "gender", "1")  %>女 </label>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label">头像</label>
+ 	<div class="controls">
+ 		<%= image_tag(@user.avatar,:size => "80x80", :alt => "Edit Entry") if @user.avatar?  %>
+      	<%= f.file_field :avatar %>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="user_id_number">身份证</label>
+ 	<div class="controls">
+      	<%= f.text_field :id_number %>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="">部门</label>
+ 	<div class="controls">
+ 		<select name="user[department_id]">
+ 			<option value="">---请选择---</option>
+ 			<% @departments.each do |dep|%>
+ 			<option value="<%= dep.id%>" <%= 'selected="selected"' if @user.department_id == dep.id%>><%= dep.name%></option>
+ 			<% end %>
+ 		</select>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="user_job_no">员工号</label>
+ 	<div class="controls">
+      	<%= f.text_field :job_no %>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="user_job">职位</label>
+ 	<div class="controls">
+      	<%= f.text_field :job %>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label" for="user_jifen">积分</label>
+ 	<div class="controls">
+      	<%= f.text_field :jifen %>
+	</div>
+</div>
+<div class="control-group">
+	<label class="control-label">状态</label>
+ 	<div class="controls">
+      	<label class="radio inline"><%= radio_button("user", "status", "1")  %>启用</label>
+      	<label class="radio inline"><%= radio_button("user", "status", "0")  %>禁用</label>
+	</div>
+</div>
+<div class="control-group">
+ 	<div class="controls">
+      	<label class="checkbox">
+      		<%= f.check_box :release_public_knowledge %> 可发布公开文档
+    	</label>
+	</div>
+</div>
+<div class="control-group">
+ 	<div class="controls">
+      	<label class="checkbox">
+      		<%= f.check_box :is_admin %> 管理员
+    	</label>
+	</div>
+</div>
+<div class="control-group">
+ 	<div class="controls">
+      	<%= f.submit "保存", :class => "btn btn-success"%>&nbsp;&nbsp;&nbsp;
+		<a href="javascript:window.history.back();" class="btn">返回</a>
+	</div>
+</div>
+<% end %>

@@ -1,0 +1,106 @@
+// require jquery
+// require jquery.ui.widget
+// require jquery.spin
+
+/*
+ * 异步插件
+ */
+(function($, undefined) {
+  $.widget("ui.asynchWidget", {
+    _getCreateOptions: function() {
+      var url = this.element.attr("aw-url");
+      if (!url) {
+        $.error("Option url required!");
+      }
+      return {
+        url: url,
+        title: this.element.attr("aw-title")
+      };
+    },
+
+    _create: function() {
+      this._load();
+    },
+    
+    _load: function() {
+      if (this._isLoading) {
+        return;
+      }
+      
+      var self = this;
+      this.element.attr("aw-state", "loading");
+
+      // 加载插件脚本
+      this._isLoading = true;
+      this.element.spin("small");
+      
+      $.ajax(this.options.url, {
+        method: "GET",
+        dataType: "text",
+        success: function(script) {
+          self.element.attr("aw-state", "loaded");
+
+          (function() {
+            try {
+              eval(script);
+            } catch(e) {
+              self.element.spin(false);
+              self.element.text( "加载" + self.options.title + "失败！" );
+              // jQuery.error( "加载插件失败！" );
+              throw e;
+           }
+          }).apply({
+            element: self.element,
+            createCss: createCss,
+            
+            done: function(widget) {
+              // 初始话完成后回调done，并返回 widget
+              self._widget = widget;
+              self.element.spin(false);
+            }
+          });
+        },
+        error: function(jqXHR, httpStatus, throwErrors) {
+          self.element.attr("aw-state", "error");
+          self.element.spin(false);
+          self.element.text(
+            App.error.XHRError.call(self, jqXHR, httpStatus, throwErrors, 
+              "加载" + self.options.title + "失败！"));
+        },
+        complete: function() {
+          this._isLoading = false;
+        }
+      });
+    },
+    
+    _destroy: function() {
+      if (this._widget) {
+        if( $.isFunction(this._widget.destroy) ) {
+          this._widget.destroy();
+        } else {
+          $.error("destroy is unsupport!");
+        }
+        this._widget = null;
+      }
+    }
+  });
+  
+  $(document).ready(function() {
+    $("[asynch-widget]").asynchWidget();
+  });
+  
+  function createCss(cssText) {
+    var head = document.getElementsByTagName('head')[0]
+      , style = document.createElement('style');
+
+    style.type = 'text/css';
+
+    if (style.styleSheet) {
+      style.styleSheet.cssText = cssText;
+    } else {
+      var styleNode = document.createTextNode(cssText);
+      style.appendChild(styleNode);
+    }
+    head.appendChild(style);
+  }
+})(jQuery);

@@ -1,0 +1,34 @@
+
+<ol style="list-style-type:decimal;line-height:30px;">
+<% @tests.each do |test|%>
+  <li>
+    <span style="line-height:30px;">[<%= test.type_desc %>]<%=test.question%></span>
+    <div class="px_xx">
+    <% if test.objective %><!-- 选择题 -->
+      <ol style="list-style-type:upper-latin;" ><!-- ul -->
+        <% test.options.each do |option|%>
+        <% next if option.blank? %>
+        <li>
+        <label>
+          <input name="<%= test.id %>[]" type="<%= test.type %>" value="<%= option %>" /><%= option %>
+        </label>
+        </li>
+        <%end%>
+      </ol>
+    <%else%><!-- 主观题 -->
+    <span class="text-warning" style="line-height:25px;">请回答:</span><br/>
+        <% if test.type == "textarea"%>
+          <textarea rows="4" cols="106" style="width:320px;" name="<%= test.id %>[]"></textarea>
+        <%else%>
+          <textarea rows="2" cols="106" style="width:320px;" name="<%= test.id %>[]"></textarea>
+        <%end%>
+      <%end%>
+      </div>
+  </li>
+<%end%>
+</ol>
+
+
+<!-- 
+
+-->

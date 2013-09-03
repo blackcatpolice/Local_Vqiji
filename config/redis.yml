@@ -1,0 +1,4 @@
+development: redis://127.0.0.1:6379/0
+test: redis://127.0.0.1:6379/1
+staging: redis://127.0.0.1:6379/2
+production: redis://127.0.0.1:6379/3

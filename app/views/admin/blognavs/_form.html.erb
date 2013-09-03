@@ -1,0 +1,30 @@
+<div class="span8">
+ <fieldset>
+	  <div class="control-group">
+			 <label class="control-label" for="input">标题</label>
+			<%= form.text_field :title %>
+	  </div>
+
+		<div class="control-group">
+			<label class="control-label" for="input">内容</label>
+			<%= form.kindeditor :detail, :width => 700, :height => 300 %>
+		</div>
+		
+		<div class="control-group">
+			 <label class="control-label" for="input">位置</label>
+			<select name="blog_subject[position]">
+				<% if subject.position.blank? %>
+					<%= nav_position_options(nil) %>
+				<% else %>
+					<%= nav_position_options(subject.position) %>
+				<% end %>	
+			</select>
+	  </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">提交</button>&nbsp;&nbsp;&nbsp;
+      <button class="btn">取消</button>
+   </div>
+   
+ </fieldset>
+</div>

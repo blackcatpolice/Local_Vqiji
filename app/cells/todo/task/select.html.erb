@@ -1,0 +1,6 @@
+<select name="<%= @name %>">
+ <option value ="">---请选择---</option>
+  <% @tasks.each do |sup|%>
+    <option value="<%= sup.id.to_s %>"><%= sup.title %></option>
+  <%end%>
+ </select>

@@ -1,0 +1,45 @@
+<% content_for :title do %>专题列表 <% end %>
+<% content_for :menu_url do %><%= url_for admin_subjects_path %><% end %>
+
+<div span="8" class = "form-inline">
+<%= form_tag (search_admin_subjects_path), :method => :get do %>
+	<%=select("blog_subject","spheres", @blog_types.collect {|p| [ p.name, p.id ] }, {:include_blank=>"请选择类别"}, :style=> "width:110px")%>
+    &nbsp;
+    <input type="text" name="blog_name" class="inpull-small" placeholder="标题"/>&nbsp;
+    &nbsp;
+		<button type="submit" class="btn btn-primary">筛选问题</button>
+<% end %>
+</div>
+
+	 <table class="table table-bordered" >
+	 <thead>
+	 <tr>
+		<th>标题</th>
+		<th>状态</th>
+		<th>创建时间</th>
+		<th>操作</th>
+		</tr>
+		</thead>
+		<tbody>
+	<% if not @subjects.blank? %>
+		<% @subjects.each do |subject|%>
+		<tr>
+		<td><%= link_to truncate(subject.title), blog_subject_path(subject), :title => "查看详细页", :target => "_blank" %></td>
+		<td><%= subject.visible %></td>
+		<td><%= format_time(subject.created_at, "%Y-%m-%d %H:%M:%S") -%></td>
+		<td>
+	<a href="/admin/subjects/destroy/<%=subject.id%>" onclick="return confirm('您确定要删除吗？');" >删除</a>	
+	
+  <%= link_to '更新', edit_admin_subject_path(subject) %>&nbsp;
+
+		<%=link_to_if(subject.visible?, "取消显示", visible_admin_subject_path(subject), :visible => "f", :title => "取消页面显示") do link_to("显示", visible_admin_subject_path(subject), :title => "页面显示此")  end%>		
+		
+		</td>
+		</tr>
+	<% end %>	
+	<% end %>
+	</tbody>
+</table>	
+ <%= will_paginate @subjects %>
+
+

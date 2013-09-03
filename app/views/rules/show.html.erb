@@ -1,0 +1,19 @@
+<% content_for :title do %>综合服务<%end%>
+<div class="sz_nav f14"><b>制度大厅</b> &raquo; <%= @rule.title%></div>
+<div class="adv">
+	<div class="adv_t"></div>
+	<div class="adv_dhk">
+		<div class="ts_tt f18 blue_82 ts_tt1"><%= truncate(@rule.title, :length => 30)%></div>
+		<div class="zd_nr">
+			<%=raw @rule.content%>
+		</div>
+		<div class="zd_nr_bt">
+			<% unless Isread.isread?(@rule.id,current_user.id,"Rule")%>
+			<a href="<%=read_rule_path(@rule) %>"><img src="<%=asset_path 'fw_yy.png' %>" /></a>
+			<% else %>
+			<img src="<%=asset_path 'fw_yy1.png' %>" title="您已阅读过了"/>
+			<% end %>
+		</div>
+	</div>
+	<div class="adv_t adv_d"></div>
+</div>

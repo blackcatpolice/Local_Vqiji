@@ -1,0 +1,33 @@
+<div class="bk" node-type="Answer">
+	<div class="bk_t"></div>
+	<div class="bk_c">
+		<div class="tx_tit red_dc5 f13">
+			<% if answer.is_expert%>
+			<div class="zj_jy red_a_dc5">专家建议</div>
+			<% end %>
+			<div class="tx <%= "tx_ys" if answer.is_expert%>">
+				<% if answer.is_expert %>
+				<%= link_to(image_tag(answer.replier.avatar_url('v50x50')), user_path(answer.replier))%>
+				<% else %>
+				<%= (answer.incognito && answer.replier_id != current_user.id) ? incognito_avatar_tag("v50x50") : link_to(image_tag(answer.replier.avatar_url('v50x50')), user_path(answer.replier))%>
+				<% end %>
+			</div>
+			<% if answer.is_expert %>
+			<%= link_to "#{answer.replier.name} #{answer.replier.expert.post}", user_path(answer.replier), :class=>"#{answer.is_expert ? 'mz_ys' : ''}" %>
+			<% else %>
+			<%= (answer.incognito && answer.replier_id != current_user.id) ? "匿名用户" : link_to(answer.replier.name, user_path(answer.replier))%>
+			<% end %>
+		</div>
+		<div class="wz1">
+			<%= answer.text%>
+			<div data-role="rtext-attachments">
+			<% if answer.audio %>
+				<%= render :partial => '/attachments/audio', :object => answer.audio %>
+			<% end %>
+			</div>
+		</div>
+		<div class="bt bt_date red_dc5"><%= timemsg answer.created_at%></div>
+		<div class="clearfix"></div>
+	</div>
+	<div class="bk_t bk_d"></div>
+</div>

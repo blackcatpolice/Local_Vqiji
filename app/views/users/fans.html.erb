@@ -1,0 +1,21 @@
+<%= render '/users/profile' %>
+
+<div class="bk_t"></div>
+<div class="bk_c">
+  <% unless @ships.empty? %>
+	  <%= render :collection => @ships, :as => :ship, 
+	    :partial => '/users/user', :locals => { :followed_tmpl => false } %>
+
+    <div class="lb text-center">
+      <%= will_paginate @ships %>
+    </div>
+  <% else %>
+    <div class="empty">
+      <div><span>TA 还没有粉丝哦～</span></div>
+    </div>
+  <% end %>
+  
+	<div class="clearfix"></div>
+</div>
+
+<div class="bk_t bk_d"></div>

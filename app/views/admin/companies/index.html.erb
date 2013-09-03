@@ -1,0 +1,16 @@
+<% content_for :title do%>公司列表<%end%>
+<table class="table" >
+<thead>
+	<tr>
+    <th>公司名称</th>
+    <th>操作</th>
+  </tr>
+</thead>
+  
+<% @companies.each do |company| %>
+  <tr>
+    <td><%= company.name %></td>
+    <td></td>
+  </tr>
+<% end %>
+</table>

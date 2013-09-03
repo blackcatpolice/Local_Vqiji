@@ -1,0 +1,40 @@
+<% content_for :title do%><%= @group.name%><%end%>
+<ul class="breadcrumb">
+<li><a href="#">首页</a> <span class="divider">/</span></li>
+<li><%= link_to "工作组列表",admin_groups_path%> <span class="divider">/</span></li>
+<li class="active"><%= @group.name%></li>
+</ul>  
+
+<ul class="nav nav-tabs">
+  <li class="active"> <%= link_to "基本信息",admin_group_path(@group) %> </li>
+  <li><%= link_to "修改资料",edit_admin_group_path(@group)%></li>
+  <li><%= link_to "成员列表", admin_group_members_path(@group) %></li>
+  <li><%= link_to "新增成员",new_admin_group_member_path(@group)%> </li>
+</ul>
+
+<table class="table table-bordered table-condensed">
+<thead>
+<tr><td colspan="2">详细信息</td></tr>
+</thead>
+<tr>
+<td><label>名 称:</label></td>
+<td><label><%= @group.name %></label></td>
+</tr>
+<tr>
+<td><label>简 介:</label></td>
+<td><label><%= @group.name %></label></td>
+</tr>
+<tr>
+<td><label>公 告:</label></td>
+<td><label><%= @group.notice %></label></td>
+</tr>
+<tr>
+<td><label>微 博:</label></td>
+<td><label><%= @group.tweets_count %></label></td>
+</tr>
+<tr>
+<td><label>成 员:</label></td>
+<td><label><%= @group.members_count %></label></td>
+</tr>
+</table>
+

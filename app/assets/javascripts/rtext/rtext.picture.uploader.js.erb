@@ -1,0 +1,182 @@
+//
+// 图片上传
+//
+// require jquery
+// require jquery.ui.widget
+// require jquery.tmpl
+// require weibo
+
+$.widget("rtext.pictureUploader", {
+  options: {
+  },
+  
+  _create: function() {
+    this._initView();
+  },
+  
+  _triggerResize: function() {
+    this.element.triggerHandler("resize");
+  },
+  
+  _initView: function() {
+    this.element.empty();
+    this._waitingView = this._createWaitingView();
+    this.element.append(this._waitingView);
+  },
+  
+  reset: function() {
+    if (this._uploadingView) {
+      this._uploadingView.remove();
+      this._uploadingView = null;
+    }
+    if (this._previewView) {
+      this._previewView.remove();
+      this._previewView = null;
+    }
+    if (this._uploadFaildView) {
+      this._uploadFaildView.remove();
+      this._uploadFaildView = null;
+    }
+    this._picture = null;
+    this._waitingView.show();
+    this._triggerResize();
+  },
+  
+  _createWaitingView: function() {
+     var _view = $('' +
+      '<div class="waiting">' +
+        '<span class="file-button">' +
+          '<input type="file" name="picture[file]" size="1"/>' +
+          '<a href="javascript:void(0);">上传图片</a>' +
+        '</span>' +
+        '<p class="notice">' +
+          '支持上传单张<b>5M</b>以下的<b>gif</b>、<b>jpg</b>、<b>png</b>图片' +
+        '</p>' +
+      '</div>' +
+     '');
+
+    $("input[type=file]", _view).fileupload({
+       url: '/attachments/picture.json',
+       type: 'POST',
+       dataType: 'json',
+       dropZone: _view,
+       sequentialUploads: true
+     })
+     .bind("fileuploadsubmit", $.proxy(this._onfileuploadsubmit, this))
+     .bind("fileuploaddone", $.proxy(this._onfileuploaddone, this))
+     .bind("fileuploadfail", $.proxy(this._onfileuploadfail, this))
+     .bind("fileuploadalways", $.proxy(this._onfileuploadalways, this));
+    return _view;
+  },
+  
+  _onfileuploadsubmit: function (e, data) {
+    this._waitingView.hide();
+    this._uploadingView = this._createUploadingView()
+     .appendTo(this.element).show();
+    this._triggerResize();
+  },
+  
+  _onfileuploaddone: function (e, data) {
+    var _picture = data.result;
+    // FIXED：在 IE 中，通过 iframe 上传文件不能准确判断上传结果
+    if (_picture && (_picture._type === "Attachment::Picture")) {
+      this._uploadingView.remove();
+      this._uploadingView = null;
+      if (this._previewView) {
+        this._previewView.remove();
+      }
+      this._previewView = this._createPreviewView(_picture)
+        .appendTo(this.element).show();
+      this._triggerResize();
+      this._picture = _picture;
+      this._trigger("uploaded", null, _picture);
+    } else { // it's an error from iframe!
+      var error = App.error.Error(_picture);
+      this._fileuploadFail(error);
+    }
+  },
+  
+  _onfileuploadfail: function (e, data) {
+    var error = App.error.parseError(data.jqXHR.responseText);
+    this._fileuploadFail(error);
+  },
+  
+  _fileuploadFail: function(error) {
+     this._uploadingView.remove();
+     this._uploadingView = null;
+     this._uploadFaildView = this._createUploadFaildView(error)
+      .appendTo(this.element).show();
+     this._triggerResize();
+  },
+  
+  _onfileuploadalways: function (e, data) {
+    //this._uploadingView.remove();
+    //this._uploadingView = null;
+  },
+  
+  _createUploadingView: function() {
+    var _view = $("" +
+      "<div class=\"uploading\">" +
+        "<p>" +
+          '<%= image_tag 'loading.gif' %> 正在上传，请稍后' +
+        "</p>" +
+      "</div>");
+    return _view;
+  },
+  
+  _createPreviewView: function(picture) {
+    var self = this;
+    var _previewViewTmpl = '' +
+      '<div class="preview">' +
+        '<div class="img-container">' +
+          '<div class="inner">' +
+            '<img src="${file.thumb.url}" />' +
+          '</div>' +
+        '</div>' +
+        '<div class="actions">' +
+          '<div class="inner">' +
+            '<a class="btn" data-action="delete" href="javascript:void(0);">删除</a>' +
+            '<a class="btn" data-action="finish" href="javascript:void(0);">完成</a>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    var _view = $.tmpl(_previewViewTmpl, picture)
+      .on("click", "[data-action=delete]", function() {
+        Rtext.api.deleteAttachment(picture.id);
+        _view.remove();
+        self._waitingView.show();
+        self._triggerResize();
+        self._trigger("deleted");
+      }).on("click", "[data-action=finish]", function() {
+        self._trigger("finish");
+      });
+    return _view;
+  },
+  
+  _createUploadFaildView: function(errorMsg) {
+    var self = this;
+    var _view = $.tmpl(''
+      + '<div class="error">'
+        + '<table><tr><td>'
+          + '${errorMsg}'
+          + '&nbsp;<a data-action="back" href="javascript:void(0);">返回</a>'
+        + '</td></tr></table>'
+      + '</div>', {
+        errorMsg: $.msie() ? "上传图片发生错误！请确保图片文件格式正确并且大小在限制内" : errorMsg
+      });
+    
+    $("a[data-action=back]", _view)
+      .click(function() {
+        self._waitingView.show();
+        _view.remove();
+        self._triggerResize();
+      });
+    return _view;
+  },
+  
+  // 获取上传的临时图片
+  picture: function() {
+    return this._picture;
+  }
+});

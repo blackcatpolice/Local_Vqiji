@@ -1,0 +1,21 @@
+<%= render '/users/profile' %>
+
+<div class="bk_t"></div>
+<div class="bk_c">
+  <% if @tweets.any? %>
+	  <%= render :collection => @tweets, :partial => '/tweets/tweet' %>
+    <div class="lb text-center">
+      <%= will_paginate @tweets,inner_window: 1, outer_window: 0 %>
+    </div>
+  <% else %>
+    <div class="empty">
+      <div><span>TA 还没有发送或转发任何微博哦～</span></div>
+    </div>
+  <% end %>
+	<div class="clearfix"></div>
+</div>
+<div class="bk_t bk_d"></div>
+
+<script type="text/javascript">
+  $("div[data-type=Tweet]").tweet();
+</script>

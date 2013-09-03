@@ -1,0 +1,15 @@
+<% active = 'class=active'%>
+<ul class="nav nav-tabs">
+<li <%= active if action_name == 'home' %> >
+ <%= link_to raw('<i class="icon-home"></i>培训主页'), home_admin_elearning_trainings_path %>
+</li>
+<li <%= active if controller_name == 'trainings' && action_name == 'index' %>>
+ <%= link_to raw('<i class="icon-list"></i>培训列表'), admin_elearning_trainings_path %>
+</li>
+<li <%= active if controller_name== "trainings" && action_name == 'new' %> >
+ <%= link_to raw('<i class="icon-plus"></i>新建培训'), new_admin_elearning_training_path %>
+</li>
+<li <%= active if controller_name == "types" %>>
+	<%= link_to raw('<i class="icon-folder-open"></i>分类管理'), admin_elearning_types_path %>
+</li>
+</ul>

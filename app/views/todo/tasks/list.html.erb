@@ -1,0 +1,24 @@
+<% provide(:title, @list_title) %>
+<div class="rw_zx">
+	<%= render :partial =>"todo/top_nav"%>
+	<div class="rw_xjt rw_lbt1 f18"><%= @list_title%></div>
+	<div class="rw_zx_lb">
+	  <% if @tasks.any? %>
+		  <%= render :collection => @tasks,:as=>"task", :partial => '/todo/tasks/item', :locals => { :my_create => (params[:action] == "mycreate" ? true : false) } %>
+      <div class="clearfix"></div>
+      <div class="lb text-center">
+        <%= will_paginate @tasks,inner_window: 1, outer_window: 0 %>
+      </div>
+    <% else %>
+      <div class="empty"><span>暂时没有任务哦～</span></div>
+    <% end %>
+	</div>
+</div>
+
+<script script="text/javascript">
+	$(document).ready(function(){
+		try {
+			$(".knob").knob();
+		} catch(e) {}
+	});
+</script>

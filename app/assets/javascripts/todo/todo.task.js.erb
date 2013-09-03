@@ -1,0 +1,48 @@
+(function($, undefined) {
+	$.widget("todo.task", $.rtext.rtextEditor, {
+	    options: {
+	    	allowBlank: true,
+	    	placeHolder: "请输入任务描述",
+	    	newChildTask: null, //新建子任务
+      	tools: ['picture', 'file']
+	    },
+	    
+	    _create: function() {
+	      	$.rtext.rtextEditor.prototype._create.call(this);
+	      	
+	      	if(this.options.newChildTask){
+	      		this._toolbar = $(".toolbar", this.element).toolbar();
+	      		var newChildTaskButton = $('<a href="' + this.options.newChildTask + '" title="子任务" class="cj tool"></a>');
+	      		this._toolbar.toolbar("addTool", newChildTaskButton);
+	      	}
+	      	
+	      	this.option("submit", this._submit);
+	    },
+	     
+	    _submit: function (text, done) {
+	    	var self = this;
+	    	if(this._file){
+	    		$('#todo_file_id').val(this._file.id);
+	    	}else{
+	    		$('#todo_file_id').val('');
+	    	}
+
+	    	/* 附件选择网盘文件 */
+      		if(!this._file && self._chooseFiles && $(self._chooseFiles.find(":checkbox:checked")).length > 0){
+      			$('#todo_file_id').val($(self._chooseFiles.find(":checkbox:checked")).val());
+      		}
+	    	if(this._picture){
+	    		$('#todo_picture_id').val(this._picture.id);
+	    	}else{
+	    		$('#todo_picture_id').val('');
+	    	}
+	    	done();
+	    	$('form', this.element).submit();
+	    },
+	    
+	    reset: function() {
+	    	$.rtext.rtextEditor.prototype.reset.call(this);
+   		}
+	});
+  
+})( jQuery );

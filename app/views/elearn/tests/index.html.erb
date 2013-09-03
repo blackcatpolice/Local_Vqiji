@@ -1,0 +1,30 @@
+<% provide :title, '综合测试' %>
+
+<div class="main_zx">
+  <div class="zx_hd">
+    <a class="tit t_px" href="/elearn/trainings">我的培训</a> &gt;&gt;
+    <%= link_to @training.name,elearn_training_path(@training)%>
+  </div>
+  
+  <div class="zx_bd">
+    <div class="bk_t"></div>
+    <div class="bk_c">
+      <div class="px_t">
+	      <%= image_tag "logo.png"%>
+      </div>
+      <form accept-charset="UTF-8" id="test_form" action="<%= check_elearn_training_tests_path(:training_id=>@training.id) %>" method="post">
+      <div class="px_wz f13">
+        <h4><%= @training.name %>测试</h4>
+        <%= render 'list'%>
+      </div>
+      <!-- <div class="px_txt">请回答：<br><textarea name="" cols="" rows=""></textarea></div> -->
+      <div class="px_btn">
+	      <input type="submit" value="提交试卷" class="btn btn-danger" />
+      </div>
+      </form>
+    </div>
+
+    <div class="bk_t bk_d"></div>
+  </div>
+  <div class="zx_db"></div>
+</div>

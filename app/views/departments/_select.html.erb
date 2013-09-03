@@ -1,0 +1,32 @@
+<% @tops = Department.top_scope %>
+
+<select id="<%= id %>" name="<%= name %>">
+  <% if default %>
+    <option value="">-- 请选择部门 --</option>
+  <% end %>
+  
+  <% @tops.each do |t|%>
+    <option value="<%= t.id %>" class="opt_top" title="大部门"  ><%= t.name %></option>
+    <% if level >= 1 %>
+      <% t.subs.each do |f|%>
+	      <% selected = 'selected="selected"'  %>
+
+	      <option value="<%= f.id %>" class="opt_first" title="一级部门">
+		      &nbsp;&nbsp;<%= f.name %>
+	      </option>
+	      
+	      <% if level == 2%>
+		      <% f.subs.each do |s|%>
+		        <option value="<%= s.id %>" class="opt_second" title="二级部门">
+			        &nbsp;&nbsp;&nbsp;&nbsp;<%= s.name %>
+		        </option>
+		      <% end %>
+	      <% end %>
+
+      <% end %>
+    <% end %>
+  <% end %>
+</select>
+<script type="text/javascript">
+  $("#<%= id %>").val("<%= select %>");
+</script>

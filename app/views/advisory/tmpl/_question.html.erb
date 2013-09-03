@@ -1,0 +1,35 @@
+<div class="bk">
+	<div class="bk_t"></div>
+	<div class="bk_c">
+		<div class="tx_tit red_dc5 f13">
+			<div class="tx">
+				<%= (question.owner_id != current_user.id && question.incognito) ? incognito_avatar_tag("v50x50") : link_to(image_tag(question.owner.avatar_url('v50x50')), user_path(question.owner))%>
+			</div>
+			<% if question.solved %>
+			<div class="<%= question.review == Question::REVIEW_GREAT ? "zt" : "zt zt1"%>"></div>
+			<% end %>
+			<%= (question.owner_id != current_user.id && question.incognito) ? "匿名用户" : link_to(question.owner.name, user_path(question.owner))%>
+			<% if (question.owner_id == current_user.id && question.expert_replys > 0) || (question.expert.user.id == current_user.id && question.owner_replys > 0) %>
+			<div class="new"><a href="<%= advisory_question_path(question) + (!qtype.blank? ? "?qtype=#{qtype}" : "")%>">查看新回复</a></div>
+			<% elsif question.expert_read == false && question.expert.user.id == current_user.id%>
+			<div class="new"><a href="<%= advisory_question_path(question) + (!qtype.blank? ? "?qtype=#{qtype}" : "")%>">新问题</a></div>
+			<% end %>
+		</div>
+		<div class="bt red_dc5">
+			<%= link_to "#{question.solved ? '『 已解决 』' : ''}#{truncate_u(question.title,16)}", advisory_question_path(question) + (!qtype.blank? ? "?qtype=#{qtype}" : "") %>
+			<span><%= timemsg question.created_at%></span>
+		</div>
+		<div class="nr">
+			<div class="ti f12 red_a_dc5">
+				<%= question.clicks%>
+				<br>
+				浏览
+			</div>
+			<div class="wz">
+				<%= question.text%>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+	</div>
+	<div class="bk_t bk_d"></div>
+</div>

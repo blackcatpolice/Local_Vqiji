@@ -1,0 +1,26 @@
+
+<table class="table">
+<thead>
+<tr>
+<th>文件名</th>
+<th>SIZE</th>
+<th>TYPE</th>
+<th>Target</th>
+<th>上传者</th>
+</tr>
+</thead>
+<tbody>
+<% @attachments.each do |attachment|%>
+<tr>
+<td>
+<%= link_to attachment.name || attachment.filename ,download_admin_attachment_path(attachment.id)%>
+</td>
+  <td>#<%= attachment.used %></td>
+  <td title=""><%= attachment._type %></td>
+  <td><%= attachment.target._type if attachment.target%></td>
+  <td><%= attachment.uploader.name if attachment.uploader   %></td>
+</tr>
+<%end%>
+</tbody>
+</table>
+<%= will_paginate @attachments %>

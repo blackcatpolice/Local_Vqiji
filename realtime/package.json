@@ -1,0 +1,25 @@
+{
+  "name": "vqiji-realtime",
+  "version": "0.0.0",
+  "description": "vqiji realtime server",
+  "dependencies": {
+    "debug": "*",
+    "socket.io": "~0.9.14",
+    "redis": "~0.8.3",
+    "winston": "~0.7.1"
+  },
+  "optionalDependencies": {
+    "forever": "~0.10.7"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "expect.js": "*",
+    "supertest": "*"
+  },
+  "contributors": [
+    {
+      "name": "BMM",
+      "email": "xiaofuhai0@gmail.com"
+    }
+  ]
+}

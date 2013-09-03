@@ -1,0 +1,64 @@
+<table class="table table-bordered table-condensed" >
+<thead>
+    <tr>
+    <th>工作组名称</th>
+    <th>微博</th>
+    <th>成员</th>
+    <th>创建时间</th>
+    <th>成员退出</th>
+    <th>所属部门</td>
+    <th>创建人</th>
+    <th>操作</th>
+  </tr>
+</thead>
+<tbody>
+<% @groups.each do |group| %>
+<tr>
+<td title="<%= group.pinyin_name %>">
+ <%= link_to group.name, admin_group_path(group) %>
+ <i class="icon-list-alt" data-notice="<%= group.notice %>" data-summery="<%= group.summary %>" data-animation="true"></i>
+</td>
+<td><%= group.tweets_count %></td>
+<td><%= link_to group.members.count,admin_group_members_path(group)%></td>
+<td><%= group.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+<td><%= group.quitable ? "允许" : "不允许"%></td>
+<td><%= group.department.name if group.department %></td>
+<td><%= group.creator.name if group.creator %></td>
+<td>
+    <div class="btn-group">
+        <%= link_to "查看", admin_group_path(group),:class=>"btn" %>
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        <li>
+            <%= link_to raw("<i class='icon-edit'></i>修改"),edit_admin_group_path(group)%>
+        </li>
+        <li>
+            <%= link_to raw("<i class='icon-trash'></i>删除"),admin_group_path(group),confirm: 'Are you sure?',:method => :delete%>
+        </li>
+        <li><a href="#"><i class="icon-ban-circle"></i> 禁止</a></li>
+        <li class="divider"></li>
+         <li>
+            <%= link_to raw("<i class='icon-plus'></i>新增成员"),new_admin_group_member_path(group)%>
+         </li>
+      </ul>
+    </div>
+    </td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<%= will_paginate @groups %>
+
+<script type="text/javascript">
+$(function(){
+/*显示公告和简介*/
+$(".icon-list-alt").each(function(index,element){
+    var notice = $(element).attr("data-notice");
+    var summary = $(element).attr("data-summery");
+    var title = "简介: "+summary;
+    var content = "公告: "+notice;
+    $(element).popover({title:title,trigger:"hover",content:content,delay: { show: 100, hide: 100 }});
+});
+
+});
+</script>

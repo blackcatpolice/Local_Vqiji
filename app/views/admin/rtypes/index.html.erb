@@ -1,0 +1,25 @@
+<% content_for :title do%>制度类型列表<%end%>
+<%= link_to '新建制度类型', new_admin_rtype_path,:class=>"btn btn-primary" %>
+<table class="table">
+<thead>
+<tr>
+  <th>类型名称</th>
+  <th>制度数量</th>
+  <th>简介</th>
+  <th>编辑</th>
+</tr>
+</thead>
+<tbody>
+<% @rtypes.each do |type| %>
+<tr>
+  <td><%= type.name %></td>
+  <td><%= type.count %></td>
+  <td><%= type.summary %></td>
+  <td>
+    <%= link_to '编辑' ,edit_admin_rtype_path(type)%>
+  </td>
+</tr>
+<% end %>
+</tbody>
+</table>
+<%= will_paginate @rtypes %>

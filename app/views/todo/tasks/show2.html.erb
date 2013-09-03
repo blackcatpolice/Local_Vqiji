@@ -1,0 +1,93 @@
+<% provide(:title, '任务详细') %>
+
+<div class="bk">
+<div class="bk_t"></div>
+<div class="bk_c">
+<div class="gz_t f18"><%= link_to "任务中心",myexecute_todo_tasks_path() %></div>
+
+<% if @service.msgs[:notice]%>
+<div class="alert alert-info">
+	<strong><%= @service.msgs[:notice] %></strong> 
+</div>
+<% end %>
+<fieldset>
+<legend>任务详细</legend>
+<table class="table table-bordered">
+<thead>
+	<tr>
+		<th>标题:</th>
+		<th colspan="3"><%= @task.title %></th>
+	</tr>
+</thead>
+<tbody>
+	<tr>
+		<td>详细:</td>
+		<td colspan="3"><%= @task.details %></td>
+	</tr>
+	<tr>
+		<td>当前进度:</td><td><%= @task.value_str %></td>
+		<td>优先级:</td><td><%= Todo::Task::LS[@task.level.to_s] %></td>
+	</tr>
+<% if @task.sup %>
+	<tr>
+		<td>上级任务:</td>
+		<td colspan="3"><%= link_to @task.sup.title, todo_task_path(@task.sup)%></td>
+	</tr>
+<%end%>
+
+	<tr>
+		<td>开始日期:</td><td><%= @task.start_date %></td>
+		<td>截止日期:</td><td><%= @task.end_date %></td>
+	</tr>
+	<tr>
+		<td>负责人:</td><td><%= user_tag @task.executor %></td>
+		<td>创建人:</td><td> <%= user_tag @task.creator %></td>
+	</tr>
+</tbody>
+<tfoot>
+	<tr>
+		<td>操作:</td>
+		<td colspan="3">
+		<% if @task.creator == current_user %>
+		<%= link_to "删除任务",todo_task_path(@task),:method => :delete, :confirm => "确认删除吗" %>
+		<%= link_to "编辑任务", edit_todo_task_path(@task) %>
+		<%end %>
+		<%= link_to "新建子任务", new_todo_task_path(:sup_id=>@task.id) %>
+		</td>
+	</tr>
+</tfoot>
+</table>
+</fieldset>
+<!-- -->
+<% if @task.value < 100 %>
+<fieldset>
+<legend>调整进度</legend>
+	<%= render_cell Todo::Task, :value_form,:service => @service,:task => @task  %>
+</fieldset>
+<%else%>
+
+<%= render_cell Todo::Task, :confirm_form,:service => @service,:task => @task %>
+<%end%>
+<!-- -->
+<fieldset>
+<legend>任务日志</legend>
+	<%= render_cell Todo::Task, :logs,:task=>@task  %>
+</fieldset>
+
+
+<fieldset>
+<legend>下级任务</legend>
+<ol>
+<% @task.subs.each do |sub| %>
+	<li><%= link_to sub.title, todo_task_path(sub) %></li>
+<% end %>
+</ol>
+</fieldset>
+
+
+<div class="clearfix"></div>
+</div>
+<div class="bk_t bk_d"></div>
+</div>
+
+

@@ -1,0 +1,32 @@
+<% content_for :title do%>查看建议<%end%>
+<div>
+	标题：
+	<%= @suggest.title %>
+</div>
+
+<div>
+	详情：
+	<%= @suggest.content %>
+</div>
+
+<div>
+	建议人信息：
+	<%= @suggest.sender.nickname%>-- <%= @suggest.sender.profile.jobdepartment%>
+</div>
+
+<div>
+	建议时间：
+	<%= format_time(@suggest.created_at, "%Y-%m-%d %H:%M:%S") -%>
+</div>
+
+
+<br/>
+
+<%=form_for @suggest, :url => check_admin_proposal_path do |f|%>
+	<lable>审核意见:</lable><br/>
+	<%= f.text_area :mycomment, :cols => 30, :rows => 10%><br/>
+	<%= f.select(:check, [['审核通过', 1], ['审核不通过', 0]]) %><br/>
+	<input type="hidden" name="proposal_suggest[finisher_id]" value="<%= current_user.id%>">
+	<%= f.submit "提交审核结果"%>
+<% end %>
+

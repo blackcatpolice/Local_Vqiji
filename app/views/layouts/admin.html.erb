@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <title><%= yield :title %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%= stylesheet_link_tag    "admin" %>
+  <%= javascript_include_tag "admin" %>
+</head>
+<body>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <a class="brand" href="<%= admin_root_path %>">后台管理</a>
+        <div class="nav-collapse">
+	       <%= render "/admin/navbar" %>
+        </div><!--/.nav-collapse  administrator -->
+        <div class="btn-group pull-right">
+          <a class="btn" href="#"><i class="icon-user"></i><%= current_user.name %></a>
+          <a class="btn" href="<%= sign_out_path %>" title="退出系统"><i class="icon-off"></i>退出</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+	  <%= yield %>
+  </div>
+</body>
+</html>

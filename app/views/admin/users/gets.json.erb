@@ -1,0 +1,7 @@
+{"count":<%= @users.length %>,
+"users":[ <%i =0%>
+<% @users.each do |user|%><% i = i+1 %>
+{"id":"<%= user.id%>","name":"<%= user.name || user.nickname %>"}<%= "," if i < @users.length%>
+<%end%>
+]
+}

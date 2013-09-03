@@ -1,0 +1,89 @@
+// require jQuery
+// require jQuery.ui.widget
+
+(function($){
+  $.widget("rtext.rtextAttachmentViewer", {
+    options: {
+      autoOpen: false
+    },
+    
+    _create: function() {
+      this._initWidget();
+    },
+    
+    _initWidget: function() {
+      var context = this;
+      
+      var _toolsbar = this._toolsbar = $('<div class="toolsbar" />');
+      // 按钮
+      var _buttons = $.extend({
+        "收起": {
+          /* FUCK IE */
+          // class => class_
+          class_: "sq",
+          click: function() {
+            context.close();
+          }
+        }
+      }, this.options.buttons);
+      
+      $.each(_buttons, function(name, options) {
+        _toolsbar.append(context._createButton(name, options));
+      });
+      
+      // 主面板
+      this._main = $('<div />');
+      //
+      this._widget = $('<div class="rtext-attachment-viewer" />')
+       .hide()
+       .insertAfter(this.element)
+       .append(_toolsbar)
+       .append( this._main.append(this.element) );
+    },
+    
+    _createButton: function(name, options) {
+      return $('<a href="javascript:void(0);">' + name + '</a>')
+        .addClass(options.class_)
+        .bind("click", $.proxy(options.click, this));
+    },
+    
+    _init: function() {
+      if (this.options.autoOpen) this.open();
+    },
+    
+    widget: function() {
+      return this._widget;
+    },
+    
+    isOpen: function() {
+      return this._isOpen;
+    },
+    
+    open: function() {
+      if (!this.isOpen()) {
+        this._widget.show();
+        this._isOpen = true;
+        this._trigger("open");
+      }
+      return this;
+    },
+    
+    close: function() {
+      if (this.isOpen()) {
+        this._widget.hide();
+        this._isOpen = false;
+        this._trigger("close");
+      }
+      return this;   
+    },
+    
+    _destroy: function() {
+      this.element
+        .hide()
+        .insertBefore(this._widget); // 还原 this.element
+      // 删除 widget 创建的内容
+      this._widget.remove();
+    }
+  });
+
+})(jQuery);

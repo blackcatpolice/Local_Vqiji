@@ -1,0 +1,30 @@
+<% content_for :title do%>培训用户<%end%>
+
+<table class="table">
+<thead>
+<tr>
+  <th>用户</th>
+  <th>状态</th>
+  <th>得分</th>
+  <th>培训页</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>
+    <%= link_to @tu.user.name || @tu.user.nickname ,
+      admin_elearning_training_user_path(:training_id=>@tu.training_id,:id=>@tu.id) 
+    %>
+  </td>
+  <td><%= @tu.status %></td>
+  <td><%= @tu.score %></td>
+  <td><%= @tu.page.title if @tu.page_id %></td>
+</tr>
+<tr>
+<td colspan="5">
+    <% @tu.qas %>
+</td>
+</tr>
+</tbody>
+</table>
+

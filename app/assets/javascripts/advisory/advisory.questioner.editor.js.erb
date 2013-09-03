@@ -1,0 +1,48 @@
+(function($, undefined) {
+  $.widget("advisory.questionEditor", $.rtext.rtextEditor, {
+      options: {
+        placeHolder: "请在这里输入您要咨询的内容",
+        caseHistory: false,
+        tools: ["bigAudio"]
+      },
+      
+      _create: function() {
+      	this._super();
+      	var self = this;
+ 
+      	if(this.options.caseHistory) {
+      		//病历
+      		var historyButton = $('<a class="bl tool" title="病历"></a>');
+      		this._toolbar.toolbar("addTool", historyButton,function () {
+          	self._historySelector = $("<div style='width: 250px;'/>").historySelector({
+          		changed: function() {
+          		  var on = ( self._historySelector.historySelector("filesCount") > 0 );
+          		  historyButton[ on ? "addClass" : "removeClass" ]("on");
+          		}
+          	});
+          	return self._historySelector;
+      		});
+      	}
+      },
+      
+      audio: function() {
+        return this._audio;
+      },
+      
+      files: function() {
+        if (this._historySelector) {
+          return this._historySelector.historySelector("files");
+        }
+        return null;
+      },
+
+      _submit: function (text, done) {
+      	if(this._audio) {
+      		$('#question_audio').val(this._audio.id);
+      	}
+      	this.enable();
+      	//$('form', this.element).submit();
+      	done();
+      }
+  });
+})( jQuery );

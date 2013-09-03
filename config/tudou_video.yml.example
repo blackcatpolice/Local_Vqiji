@@ -1,0 +1,1 @@
+app_key: <%= ENV['TODOU_APP_KEY'] %>

@@ -1,0 +1,38 @@
+<%= form_for(@store_product_type,:url => {:controller => "product_types",:action=>@action },:html=>{:onsubmit=>"return validate(this);"}) do |f| %>
+  <% if @store_product_type.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@store_product_type.errors.count, "error") %> prohibited this store_product_type from being saved:</h2>
+      <ul>
+      <% @store_product_type.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :类别名称 %>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :上一级 %>
+    <%= f.select "parent", product_type_base_help(@store_product_type) %> <span>“默认”表示 一级类别</span>
+  </div>
+  <div class="field">
+    <%= f.label :优先级 %>
+    <%= f.number_field :priority %>
+  </div>
+  <div class="actions">
+    <%= f.submit "保存" %>
+  </div>
+<% end %>
+<script type="text/javascript">
+function validate(form){
+var type_name = $("#store_product_type_name").val();
+if(!type_name.replace(/\s/g,'')){
+  alert("请输入类别名称");
+  return false;
+}
+return true;
+}
+</script>

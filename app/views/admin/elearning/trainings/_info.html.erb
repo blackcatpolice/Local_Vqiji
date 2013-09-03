@@ -1,0 +1,88 @@
+<% if @training.errors.any?%>
+<div class="alert">
+<strong>提示信息:</strong>
+<span id="span_alert"><%= @training.errors.count %>
+<ul>
+  <% @training.errors.full_messages.each do |msg| %>
+  <li><%= msg %></li>
+  <% end %>
+</ul>
+</span>
+</div>
+<%end%>
+<table class="table table-bordered table-condensed">
+<thead>
+    <tr>
+       <th colspan="6">培训详细</th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+  <td style="width:16%;">培训标题 / 类型:</td>
+  <td colspan="5"><%= @training.name %> / <%= @training.type.name %></td>
+</tr>
+<tr>
+  <td>培训状态:</td>
+  <td colspan="5"><%= @training.released ? "已发布" : "未发布"%>
+  <% if @training.released? %>
+     <%= link_to "[取消]",cancel_admin_elearning_training_path(@training),:onclick=>"return confirm('确定取消当前培训');" if @training.released%>
+   <%else%>
+     <%= link_to "[发布]",release_admin_elearning_training_path(@training),:onclick=>"return confirm('确定发布当前培训');" unless @training.released%>
+  <%end%>
+  </td>
+</tr>
+<tr>
+  <td>分页数量:</td>
+  <td>
+    <%= link_to "#{@training.pages_count} 页", admin_elearning_training_pages_path(@training)%>
+  </td>
+   <td>题目数量:</td>
+  <td>
+     <%= link_to "#{@training.tests_count} 道", admin_elearning_training_tests_path(@training)%>
+  </td>
+  <td>参与人数:</td>
+  <td>
+    <%= link_to "#{@training.users_count} 人", admin_elearning_training_users_path(@training)%>
+  </td>
+</tr>
+
+<!-- -->
+<tr>
+  <td style="width:16%;">通过分数:</td>
+  <td colspan="5">
+    <%= @training.pass_score %>分
+  </td>
+</tr>
+<tr>
+  <td style="width:16%;">培训简介:</td>
+  <td colspan="5">
+    <%= @training.summary %>
+  </td>
+</tr>
+<%if @training.context %>
+<tr>
+  <td style="width:16%;">培训内容:</td>
+  <td colspan="5">
+    <%= @training.context.html_safe %>
+  </td>
+</tr>
+<%end%>
+</tbody>
+</table>
+
+<!--
+<input type="button" onclick="tt();" />
+<div id="d"></div>
+<textarea id="spt">
+ 
+    alert("");
+</textarea>
+
+<script type="text/javascript">
+  function tt(){
+    eval($("#spt").text());
+  }
+</script>
+-->
+
+

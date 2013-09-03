@@ -1,0 +1,99 @@
+// require jquery
+// require jquery_ui
+// require jquery.fileupload
+// require jquery.blink
+// require rtext.emchooser
+// require rtext.picture.uploader
+// require rtext.file.uploader
+
+(function($, undefined) {
+
+  $.widget("pro.suggestEditor", $.rtext.rtextEditor, {
+  	options: {
+      placeHolder: "在这里输入您想说的话",
+      allowBlank: false,
+      textMaxLength: <%= Tweet::TEXT_MAXLEN %>,
+      tools: ["audio","picture"]
+    },
+     _create: function() {
+      
+      var self = this;  
+      $.rtext.rtextEditor.prototype._create.call(this);
+
+	  var attachment1Button = $("<a class=\"say_fj\">附件</a>");
+		// 附件上传
+      this._toolbar.toolbar("addTool", attachment1Button,
+        function () {
+          self._attachment2Uploader = $("<div />").fileUploader();
+          return self._attachment2Uploader;
+        }
+      );
+      
+      $('.submiter', this.element).click(function(){
+      	if ($("#title").val().match(/^\s*$/)) {
+	 		$("#title").blink();
+	 		return false;
+	 	};
+	 	if ($("#content").val().length > 140) {
+	 		alert('建议内容不能超过140个字~!');
+	 		return false;
+	 	};
+      });
+		  
+	  this.option("submit", this._submit);
+ 			
+    },//_create
+    
+    _submit: function(text,done){
+    	var self = this;
+    	if ($("#title").val().match(/^\s*$/)) {
+    		$("#title").blink();
+    		done();
+	 		return false;
+	 	};
+	 	
+	 	if(self._audio != null ){
+	 		$("#audioId").attr("value", self._audio.id);
+	 	}
+	 	
+	 	//图片
+		if(self._picture != null) {
+			$("#pictureId").attr("value", self._picture.id);
+		};	
+			
+		if (self._attachment2Uploader) {
+        	attachment = self._attachment2Uploader.fileUploader("file");
+        	$("#attachmentId").attr("value", attachment.id);
+      	}
+	 	
+	 	$.confirm("请确认提交您的建议，通过审核将会获取相应积分奖励，请耐心等待", function(ensure){
+			if(ensure){
+				done();
+				$("#peForm").submit();
+			}else{
+				done();
+			};
+		});
+    },
+    
+    reset: function() {
+    // 重置图片上传器
+    if (this._pictureUploader) {
+      this._pictureUploader
+       .pictureUploader("reset");
+    }
+    
+    // 重置录音机
+    if (self._audioRecorder) {
+       self._audioRecorder.audioRecorder("reset");
+     }
+     
+    // 删除附件
+    this._attachment = null;
+    $.rtext.rtextEditor.prototype.reset.call(this);
+    },
+    
+  });
+
+
+})(jQuery);

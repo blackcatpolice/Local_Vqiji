@@ -1,0 +1,34 @@
+<div class="navbar navbar-fixed-top" id="topnav">
+  <div class="navbar-inner">
+    <a class="brand" href="/"><%= image_tag 'logo.png' %></a>
+
+    <ul class="nav nav1">
+    	<li><a href="/" data-skip-pjax="true">首页</a><span class="divider">|</span></li>
+    	<li><a href="#" data-skip-pjax="true">福利商城</a><span class="divider">|</span></li>
+    	<li><a href="#" data-skip-pjax="true">专题</a><span class="divider"></span></li>
+
+      <% if current_user.is_admin %>
+        <li>
+          <span class="divider">|</span>
+          <a href="<%= admin_root_path %>" data-skip-pjax="true" target="_blank">管理</a>
+        </li>
+      <% end %>
+    </ul>
+
+    <div class="nav_s ip">
+      <form action="/users/search" method="get" class="form-search">
+        <input placeholder="找人" class="search-query" name="q" type="text" autocomplete="off" /><%= image_submit_tag('top_ser_bt.png') %>
+      </form>
+    </div>
+
+    <ul class="nav nav2">
+      <li><%= link_to current_user.name, user_path(current_user) %><span class="divider">|</span></li>
+      <li>
+        <a href="javascript:void(0)" data-action="toggle_notifications_board">通知</a>
+        <span class="divider">|</span>
+      </li>
+      <li><a href="/settings" data-skip-pjax="true">设置</a><span class="divider">|</span></li>
+      <li><a href="/sign_out" data-action="sign_out">退出</a></li>
+    </ul>
+  </div>
+</div>

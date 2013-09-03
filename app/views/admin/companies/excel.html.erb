@@ -1,0 +1,8 @@
+<%# encoding:utf-8 %>
+<% content_for :title do%>公司导入<%end%>
+<form method="post" action='<%= url_for :controller=>"companies",:action=>"import" %>' enctype="multipart/form-data">
+<input type="hidden" value="✓" name="utf8">
+请选择excel文件:<input type="file" name="file"/>
+<input type="submit" value="导入" />
+</form>
+

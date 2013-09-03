@@ -1,0 +1,90 @@
+<% content_for :title do%>培训结果<%end%>
+ <%= link_to "返回列表", admin_elearning_training_users_path(@training)%>
+ <form action="<%=score_admin_elearning_training_user_path(:training_id=>@tu.training_id,:id=>@tu.id)%>" method="post">
+<table class="table" border="1">
+<thead>
+<tr>
+  <th>用户</th>
+  <th>状态</th>
+  <th>得分</th>
+  <th>培训页</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>
+    <%= link_to @tu.user.name ,admin_elearning_training_user_path(:training_id=>@tu.training_id,:id=>@tu.id)  %>
+  </td>
+  <td>
+      <%= @tu.status%>
+  </td>
+  <td><%= @tu.score %></td>
+  <td><%= @tu.page.title if @tu.page_id %></td>
+</tr>
+<tr>
+<td colspan="5">
+  <% @tu.qas %>
+</td>
+</tr>
+
+<% i = 1 %>
+<% @tests.each do |test|%>
+<% qas = @tu.qas[test.id.to_s] %>
+<tr>
+<td colspan="4">
+<input type="hidden" name="test_ids[]" value="<%= test.id%>" />
+<ul style="list-style:none;"><!-- ul -->
+<li title="<%= test.answers %>/<%= test.remark %>"><%= "#{i}.#{test.question}?" %>[<%= test.type_desc %>] <%= "#{test.score}分"%></li>
+<% if test.objective %><!-- 选择题 -->
+  <% j = 0 %>  
+  <% test.options.each do |option|%>
+  
+   <% if @tu.qas[test.id.to_s] && (@tu.qas[test.id.to_s].include? option) %>
+    <% chk = "checked='checked'" %>
+   <%end%>
+    <li title=""><label><%= (65+j).chr %>.
+        <input disabled="disabled" name="<%= test.id %>[]" type="<%= test.type %>" value="<%= option %>" <%= chk %> /><%= option %>
+        <span style="color:green;"> <%= "√" if (test.answers.include? option) %></span>   
+     </label></li>
+    <% j = j+1 %>
+  <%end%>
+<%else%><!-- 主观题 -->
+    <li><label>
+      <% if test.type == "textarea" %>
+        回答：<textarea readonly="readonly" name="<%= test.id %>[]" style="width:560px;height:60px;"><%= qas[0] if qas %></textarea>
+      <%else%>
+        回答：<input readonly="readonly" name="<%= test.id %>[]" type="text" value="<%= qas[0] if qas %>" />
+      <%end%>
+     </label></li>
+<%end%>
+</ul><!-- ul  end -->
+<% if test.objective %>
+结果：<%= @tu.qas[test.id.to_s] == test.answers ? "<span style='color:green;'>正确</span>".html_safe : "<span style='color:red;'>错误</span>".html_safe  %>
+<%else%>
+<% if @tu.check%>
+得分：<span style="color: red;"><%= @tu.score_hash[test.id.to_s]%></span>
+<%else%>
+分数：<input type="text" name="<%= test.id %>" class="input-small numbersOnly" />
+<%end%>
+
+<%end%>
+<!-- -->
+
+</td>
+</tr>
+<% i = i+1 %>
+<%end%>
+</tbody>
+</table>
+<% unless @tu.check%>
+<input type="submit" value="提交" />
+<%end%>
+</form>
+<script type="text/javascript">
+$(function(){
+  jQuery('.numbersOnly').keyup(function () { 
+    this.value = this.value.replace(/[^0-9\.]/g,'');
+  });
+});
+</script>
+

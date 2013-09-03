@@ -1,0 +1,17 @@
+<div class="bk">
+	<div class="bk_t"></div>
+	<div class="bk_c">
+		<div class="tab"><a class="qb on" href="javascript:void(0)">#<%= @topic.title %>#</a></div>
+		<% if @tweets.any? %>
+    	<%= render :collection => @tweets, :partial => '/tweets/tweet' %>
+      <%= will_paginate @tweets %>
+      <script type="text/javascript">
+        $("div[data-type=Tweet]").tweet();
+      </script>
+  	<% else %>
+  	  <div class="empty"><span>该话题还没有任何微博哦～</span></div>
+  	<% end %>
+		<div class="clearfix"></div>
+	</div>
+	<div class="bk_t bk_d"></div>
+</div>

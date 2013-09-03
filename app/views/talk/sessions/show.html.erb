@@ -1,0 +1,41 @@
+<% provide(:title, '私信') %>
+
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="tab">
+      <%= link_to '私信', talk_url, class: 'qb on' %>
+      <div class="tab_z">&gt;&nbsp;<%= talk_session_title(@session) %></div>
+      <% unless @session._p2p %>
+        <div class="right">
+          <%= link_to '查看成员', talk_session_members_path(@session), class: 'btn bn an f12' %>
+        </div>
+      <% end %>
+    </div>
+    
+    <%= render 'talk/messages/form' %>
+
+    <div data-type="talk-messages-list">
+      <%= render @feeds %>
+
+      <% if @feeds.empty? %>
+        <% if @feeds.current_page == 1 %>
+          <div class="empty"><span>您还没收到或者发出任何私信哦～</span></div>
+        <% else %>
+          <div class="empty"><span>没有了</span></div>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="lb text-center">
+      <%= will_paginate @feeds, inner_window: 1, outer_window: 0 %>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="bk_t bk_d"></div>
+</div>
+
+<script type="text/javascript">
+  $("[data-type=talk-message-form]").talkMessageForm();
+  $("[data-type=talk-messages-list]").talkMessagesList();
+</script>
+

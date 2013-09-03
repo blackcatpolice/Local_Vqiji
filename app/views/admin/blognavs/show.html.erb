@@ -1,0 +1,17 @@
+<% content_for :title do%>导航详细<%end%>
+<div>
+	标题：
+	<%= @subject.title %>
+</div>
+
+<div>
+	详情：
+	<%= @subject.detail.html_safe %>
+</div>
+
+<div>
+	专题显示时间
+	<%= @subject.begin_date %> --
+	<%= @subject.end_date %>
+</div>
+

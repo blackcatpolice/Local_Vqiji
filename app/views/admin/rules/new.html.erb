@@ -1,0 +1,19 @@
+<% content_for :title do%>新建制度<%end%>
+  <% if flash[:notice] -%>
+			 <div class="alert">
+        <a class="close" data-dismiss="alert">&times;</a>
+        <strong>提示：</strong> <%= flash[:notice] %>
+      </div>
+   <% end -%>
+  
+  <script type="text/javascript" >
+  	$(document).ready(function() {
+  		$(".close").click(function(){
+  			$(".alert").slideToggle();
+  		})
+  	})
+  </script>
+    
+<%= form_for @rule, :url => admin_rules_path do |form| %>
+	<%= render :partial => "form", :locals => {:form => form} %>
+<% end %>

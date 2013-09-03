@@ -1,0 +1,67 @@
+
+<form name="" action="/admin/weibos/tweets" method="get" onsubmit="return checkout_form(this);">
+<table class="table">
+<thead>
+<tr>
+  <td colspan="2">
+  	<label style="float:left;line-height:28px;">关键字:&nbsp;&nbsp;</label> 
+	  <div class="controls docs-input-sizes">
+	    <div class="input-prepend">
+	   		<input type="text" name="keyword" maxlength="100" class="txt L" value="请输入关键字" onfocus="if (this.value == '请输入关键字') this.value = '';" onblur="if (this.value == '') this.value = '请输入关键字';">
+	    </div>
+	  </div>
+	  <b style="clear: both;"></b>
+  </td>
+  <td colspan="2">
+  	<label style="float:left;line-height:28px;">时间段:&nbsp;&nbsp;</label>
+  	<div class="controls">
+	    <div class="input-prepend input-append">
+	      <input class="input-small" id="datepicker_begin" name="begin" size="30" type="text" value="" data-date-format="yyyy-mm-dd" data-min-view="2"><span class="add-on">至</span><input class="input-small" id="datepicker_end" name="end" size="30" type="text" value="" data-date-format="yyyy-mm-dd" data-min-view="2">
+	    </div>
+ 	</div>
+  	<b style="clear: both;"></b>	
+  </td>
+  <td><input class="btn btn-primary" type="submit" value="&nbsp;查&nbsp;&nbsp;询&nbsp;"></td>
+</tr>
+<tr>
+  <th>发送人</th>
+  <th>内容</th>
+  <th>转发</th>
+  <th>评论</th>
+  <th>时间</th>
+  <th>操作</th>
+</tr>
+</thead>
+<tbody>
+<% @tweets.each do |tweet|%>
+<tr>
+	<td>
+		<a target="_blank" " href="/users/<%= tweet.sender.id%>"><%= tweet.sender.name %></a>
+	</td>
+	<td><a target="_blank" href="/tweets/<%= tweet.id%>"><%= truncate(tweet.text , :length => 30) %></td>
+	<td><%= tweet.reposts_count %></td>
+	<td><%= tweet.comments_count %></td>
+	<td><%= timemsg tweet.created_at %></td>
+	<td>
+		<%= link_to '删除',{:controller => "tweets",:action => "destroy",:id => tweet.id},:onclick=>"return confirm('确定删除当前微博');" %>
+	</td>
+</tr>
+<%end%>
+</tbody>
+</table>
+<%= will_paginate @tweets %>
+</form>
+
+ 
+<script>
+$(function() {
+	$("#datepicker_begin").datetimepicker();
+	$("#datepicker_end").datetimepicker();
+});
+	
+function checkout_form(f){
+	if(typeof(f.keyword) == 'object' && f.keyword.value == '请输入关键字'){
+		f.keyword.value = '';
+	}
+}
+</script>

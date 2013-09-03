@@ -1,0 +1,55 @@
+<div class="control-group" id="div-menu">
+<label class="control-label" for="input01">权限选择</label>
+<div class="controls">
+	
+<!--start-->
+<% @menus.each do |top|%>
+<div class="div_1">
+	<label class="checkbox"><input name="role[menu_ids][]" type="checkbox" onclick="chk(this);" value="<%= top.url%>" <%= 'checked="checked"' if @role.menu_id_hash.has_key? top.url %> /><b><%= top.name %></b></label>
+<%	ms = top.children 
+	ms.each do |m|
+%>
+<div class="div_2">
+	<label class="checkbox" >
+		<input name="role[menu_ids][]" type="checkbox" onclick="chk(this);" value="<%= m.url%>" <%= 'checked="checked"' if @role.menu_id_hash.has_key? m.url %> /><%= m.name %>
+	</label>
+<div class="div_3">
+<%	as = m.children
+	as.each do |a|
+%>
+ <label class="checkbox">
+ 	<input name="role[menu_ids][]" type="checkbox" onclick="chk(this);" value="<%= a.url %>" <%= 'checked="checked"' if @role.menu_id_hash.has_key? a.url %> /><%= a.name %>
+ </label>
+<%end%>
+</div>
+</div>
+<%end%>
+</div>
+<%end%>
+<!-- end -->
+
+</div>
+</div>
+
+<br />
+<style type="text/css">
+.div_1{border-top: 1px solid #ccc;font-weight:bold;}
+.div_2{margin-left: 20px;}
+.div_3{margin-left: 36px;}
+</style>
+<script type="text/javascript">
+/**/
+function chk(chk){
+	var div = $(chk).parent().parent();
+	var div_class = $(div).attr("class");
+	if("div_1"==div_class){
+		chk.checked ? $(div).find("input").attr("checked","checked") : $(div).find("input").removeAttr("checked");
+	}else if("div_2" == div_class){
+		chk.checked ? $(div).parent().children().children().attr("checked","checked") : null;
+		chk.checked ? $(div).find("input").attr("checked","checked") : $(div).find("input").removeAttr("checked");
+	}else if("div_3" == div_class){
+		chk.checked ? $(div).parent().children().children().attr("checked","checked") : null;
+		chk.checked ? $(div).parent().parent().children().children().attr("checked","checked") : null;
+	}
+}
+</script>

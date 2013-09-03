@@ -1,0 +1,94 @@
+<div class="bk" data-type="FollowShip" data-id="<%= @user.id%>" >
+	<div class="bk_t"></div>
+	<div class="bk_c zy_t zy_ta">
+  	<div class="zy_tx"><%= image_tag @user.avatar.url('v84x84'), :class => 'avatar_v84x84'%></div>
+	  <%= image_tag '03.jpg' %>
+  	<div class="ifo left f13">
+  	  <span><%= @user.name %></span>
+	    <br />
+	    Email：<%= @user.email %>
+  	  <% if @user.phone %>
+  	    <br />
+  	    电话：<%= @user.phone %>
+  	  <% end %>
+  	  <% if @user.department %>
+  	    <br />
+  	    部门：<em title="<%= @user.department.name %>"><%= truncate @user.department.name, length: 18 %></em>
+  	  <% end %>
+  	  <% if @user.job %>
+  	    <br />
+  	    职位：<em title="<%= @user.job %>"><%= truncate @user.job, length: 18 %></em>
+  	  <% end %>
+  	</div>
+  	<div class="zqzb left">
+  		<div class="tp">
+  			<span style="padding-right:0px;">
+  			  <%= link_to @user.tweets_count, user_path(@user)%>
+  			  <br /><%= link_to '微博', user_path(@user) %>
+  			</span>
+  			<span>
+  			  <%= link_to @user.fans_count, fans_user_path(@user)%>
+  			  <br /><%= link_to '粉丝', fans_user_path(@user) %>
+  			</span>
+  			<span style="border:none;">
+  			  <%= link_to @user.followeds_count, followeds_user_path(@user) %>
+  			  <br /><%= link_to '关注', followeds_user_path(@user) %>
+  			</span>
+  		</div>
+  		<% unless current_user.id == @user.id %>
+  	  	<div class="gz f12">
+  	    	<div class="k sx right"><a class="k_sx" href="javascript:void(0);" data-action="new-talk-message-to-u" data-receiver-id="<%= @user.to_param %>">私信</a></div>
+  	    	<% followship = current_user.followed(@user.id) %>
+  	    	<div class="xh right" data-name="followed" style="<%= "display:none;" unless followship%>">
+    	    		<% if followship %>
+    	    			<% if @user.following?(current_user, true) %>
+                  		<div class="gz_yj"><span>相互关注</span>
+    	    			<% elsif followship.follow_type == Followship::FOLLOW_TYPE_WHISPER %>
+    	    			  <div class="gz_yj gz_qq"><span>悄悄关注</span>
+    	    			<% elsif followship.follow_type == Followship::FOLLOW_TYPE_PARTICULAR %>
+    	    			  <div class="gz_yj gz_tb"><span>特别关注</span>
+    	    			<% else %>
+    	    			  <div class="gz_yj gz_dx"><span>已关注</span>
+    	    			<% end %>
+    	    		<% else %>
+    					<div class="gz_yj"><span></span>
+			        <% end %>
+  	    		 | <a data-action='unfollow' href="javascript:void(0);">取消</a>
+  	    		</div>
+  	    	</div>
+  	    	<div class="k add right" data-name="follow" style="<%= "display:none;" if followship%>">
+  	    		<a id="profileFollow" href="javascript:;">关注</a>
+  	    	</div>
+  	    	<div class="zsk_tlb" id="follow_tlb" style="display: none;">
+                <a data-action='follow' data-value="<%= Followship::FOLLOW_TYPE_DEFAULT%>" href="javascript:void(0);">加关注</a>
+  	    		<a data-action='qqfollow' data-value="<%= Followship::FOLLOW_TYPE_WHISPER%>" href="javascript:void(0);">悄悄关注</a>
+  	    		<a data-action='tbfollow' data-value="<%= Followship::FOLLOW_TYPE_PARTICULAR%>" href="javascript:void(0);">特别关注</a>
+          	</div>	
+  	  	</div>
+  	    <% end %>
+    	</div>
+    </div>
+	<div class="bk_t bk_d"></div>
+</div>
+
+<script type="text/javascript">
+	$(function(){
+		$('div[data-type=FollowShip]').follow();
+	});
+	
+	$('#profileFollow').hover(function(event){
+		var e = event;
+		$('#follow_tlb').css({'position': 'absolute', 'top': (e.target.offsetTop + 14), 'left': e.target.offsetLeft, 'display': 'block'}).show();
+	},function(){
+		$('#follow_tlb').hide();
+	});
+	
+	$('#follow_tlb').find('a').on('click', function(){
+		$('#follow_tlb').hide();
+	}).end().hover(function(){
+		$(this).show();
+	}, function(){
+		$(this).hide();
+	});
+	
+</script>

@@ -1,0 +1,79 @@
+<% content_for :title do%>培训列表<%end%>
+
+<%= render "admin/elearning/nav"  %>
+
+
+<%= render "list" %>
+
+<!--
+<iframe name="hello" src="http://weibo.com/1591192534/fans?page=2" width=100 height=100></iframe>
+<a class="W_addbtn" href="javascript:;" diss-data="refer_sort=followed" item-func="addFollow">
+加关注</a>
+58-66-74-82-91-100-111-120-128-136-145-154-162-171-180-190-199-207-215-238-
+var tt="=="; for(var i=0;i<t.length;i++){  if (t[i].getAttribute("class")=="W_addbtn"){     tt = tt+i+"-";  }    }; 
+<iframe width="100" height="100" src="http://127.0.0.1:3000/admin/trainings" name="hello"></iframe>
+<iframe name="hello" src="http://www.baidu.com" width=100 height=100></iframe>
+ -->
+<script type="text/javascript">
+function t(){
+  var body = $('body',window.parent.document);
+  alert(body.length);
+}
+
+function fenshuajiang(){
+var links= document.getElementsByTagName("a");
+for(var i=0;i<links.length;i++){
+if (links[i].getAttribute("class")=="W_addbtn" && links[i].getAttribute("item-func") == "addFollow"){ 
+    links[i].click();
+}
+}
+}
+/*
+  var btns = new Array();
+  var j = 0;
+  function init(){
+    var links= document.getElementsByTagName("a");
+    for(var i=0;i<links.length;i++){
+    if (links[i].getAttribute("class")=="W_addbtn" && links[i].getAttribute("item-func") == "addFollow"){ 
+        //links[i].click();
+        btns[j] = links[i];
+    }
+    }
+  }
+*/
+
+/*
+Fsj.prototype.start = function startFunction(){
+alert("start");
+}*/
+
+
+
+function Fsj(){
+  var btns = new Array();
+  var j = 0;
+  /**/
+  this.init=function(){
+    var links= document.getElementsByTagName("a");
+    for(var i=0;i<links.length;i++){
+    if (links[i].getAttribute("class")=="W_addbtn" && links[i].getAttribute("item-func") == "addFollow"){ 
+        btns[j] = links[i];
+        j++;
+        }
+    }
+  };
+  /**/
+  var index = 0;
+  this.follow=function(){
+    if (index <= btns.length-1){
+       btns[index].click();
+       index++;
+    }else{
+       clearInterval(timer);
+    }
+  };
+  /**/  
+  this.init();
+  var timer = setInterval("this.follow();",6000);
+}
+</script>

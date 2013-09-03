@@ -1,0 +1,1 @@
+window.Rtext = window.Rtext || {};

@@ -1,0 +1,57 @@
+<div class="main_zx left">
+	<div class="zx_hd">
+    	<a class="tit t_px" href="/elearn/trainings">我的培训</a> &gt;&gt;
+    	<%= link_to @training.name, elearn_training_path(@training) %>
+  	</div>
+  	<div class="zx_bd">
+    	<div class="bk_t"></div>
+    	<div class="bk_c">
+      		<div class="px_t"><%= image_tag "logo.png" %></div>
+      		<div class="px_wz f13">
+      			<h4><%= @page.title %></h4>
+        		<%= @page.context.html_safe %>
+      		</div>
+    	</div>
+    	<div class="bk_t bk_d"></div>
+    	<div class="px_jg">请回答完所有题目，进入下一题</div>
+      	<div class="bk_t"></div>
+      	<div class="bk_c">
+    		<% if @training_user.pass || @training.timeout || (@training_user.exam && !@training_user.check)%>
+    		<div class="px_wz f13"></div>
+        	<div class="px_btn">
+	          	<% if @page.next %>
+	            <%= link_to "下一页",elearn_training_page_path(:training_id=>@training.id,:id=>@page.next_id),:class=>"btn btn-danger"%>
+	          	<%else%>
+	            <%= link_to "返回",elearn_training_path(@training),:class=>"btn btn-danger"%>
+	          	<%end%>
+        	</div>
+    		<%else%>
+    		<form accept-charset="UTF-8" action="<%= next_elearn_training_page_path(:training_id=>@training.id,:id=>@page.id) %>" method="post">
+    		<div class="clearfix"></div>
+    		<% if flash[:msg] %>
+        	<div class="alert alert-error" style="margin-top:30px;"><span><%= flash[:msg] %></span></div>
+        	<%end%>
+        	<div class="px_wz f13">
+        	<% unless @tests.empty?%>
+            	<%= render '/elearn/pages/tests' %> 
+        	<%end%>
+        	</div>
+        	<div class="px_btn">
+            <% unless @page.next_id %>
+	           	<% if @training.tests_count == 0 %>
+	           	  <input type="submit" class="btn btn-danger" style="width:180px;" value="完成培训" /> 
+	           	<% else %>
+	           	  <input type="submit" class="btn btn-danger" style="width:180px;" value="进入考试" />
+	           	<% end %>    
+            <% else %>
+              <input type="submit" class="btn btn-danger" style="width:180px;" value="下一页" />
+            <% end %>
+         	</div>
+    		</form>
+    		<% end %>
+        </div>
+        <div class="bk_t bk_d"></div>
+  	</div>
+	<div class="zx_db"></div>
+</div>
+<div class="clearfix"></div>

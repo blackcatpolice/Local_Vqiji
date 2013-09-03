@@ -1,0 +1,49 @@
+<%= form_for(@courier,:url => {:controller => "couriers",:action=>@action},
+  :html=>{:onsubmit=>"return validate(this);",:id=>"courier_form"}) do |f|  %><div class="control-group">
+  <%= f.label "name","货运方式",:class=>"control-label" %>
+  <div class="controls docs-input-sizes">
+    <div class="input-prepend">
+    <%= f.text_field :name%>
+    </div>
+  </div>
+</div>
+
+<div class="control-group">
+  <%= f.label "url","URL 地址",:class=>"control-label" %>
+  <div class="controls docs-input-sizes">
+    <div class="input-prepend">
+    <%= f.text_field :url%>
+    </div>
+  </div>
+</div>
+
+<div class="control-group">
+  <%= f.label "telephone","联系电话",:class=>"control-label" %>
+  <div class="controls docs-input-sizes">
+    <div class="input-prepend">
+    <%= f.text_field :telephone%>
+    </div>
+  </div>
+</div>
+
+<div class="control-group">
+  <%= f.label "remark","备注",:class=>"control-label" %>
+  <div class="controls docs-input-sizes">
+    <%= f.text_area :remark ,:style=>"width:400px;height:80px;"%>
+  </div>
+</div>
+
+<div>
+<%= f.submit "保存",:class=> "btn btn-primary"%>
+<%= f.button "重置",:class=> "btn",:type=>"reset"%>
+</div>
+<% end %>
+
+
+<script>
+	function validate(f){
+		
+		//return false;
+	}
+	
+</script>

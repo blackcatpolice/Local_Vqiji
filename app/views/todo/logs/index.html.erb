@@ -1,0 +1,5 @@
+<% provide(:title, '任务日志') %>
+<%= render_cell Todo::Task, :logs,:task=>@task  %>
+<p>
+  <%= link_to "填写日志",new_todo_task_log_path(@task) %>
+</p>

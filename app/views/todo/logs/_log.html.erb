@@ -1,0 +1,38 @@
+<div class="rw_k rw_ing" data-finished="<%= log.task_schedule == Todo::Task::SCHEDULE_COMPLETED%>" data-value="<%= log.value%>" data-old-value="<%= log.old_value%>" data-change="<%= log.value != log.old_value%>">
+	<div class="rw_kt">
+		<div class="rw_tx">
+			<%= image_tag(log.user.avatar_url('v50x50'), :class => '') %>
+			<span><%= user_tag log.user %> <%= log.user.department.name if log.user.department %></span>
+			<span class="right"><%= l log.created_at, :format=>:short%></span>
+		</div>
+		<div class="rw_wz">
+			<%= log.msg || "..." %>
+			<% if log.file %>
+			<div class="rw_fj"><%= link_to log.file.name, "/download/#{ log.file.id }", :target => '_blank', :'data-skip-pjax' => true, :title=>log.file.name %></div>
+			<% end %>
+			<% if log.picture %>
+			<div class="rw_fj rw_tp"><%= link_to log.picture.name || log.picture.filename, log.picture.file.thumb.url, :target => '_blank', :'data-skip-pjax' => true, :title=>log.picture.name  %></a></div>
+			<% end %>
+		</div>
+		<% unless log.value == log.old_value %>
+		<div class="rw_jd">
+			<% unless log.task_schedule == Todo::Task::SCHEDULE_COMPLETED %>
+			<div class="re_jd_xx">
+				更新为
+				<br>
+				<span><%= log.value %></span>%
+			</div>
+			<% else %>
+			<div class="re_jd_xx">
+				已完成
+				<br>
+				<span class="ok"></span>
+			</div>
+			<% end %>
+			<input class="knob" value="<%= log.value %>">
+		</div>
+		<% end %>
+	</div>
+	<div class="rw_kd"></div>
+</div>
+<div class="clearfix"></div>

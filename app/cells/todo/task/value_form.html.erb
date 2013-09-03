@@ -1,0 +1,68 @@
+
+	<div class="bk_t"></div>
+	<div class="bk_c">
+		<div class="rw_cj">
+			<div id="slider_task_value" >
+				<% @logs.each do |l| %>
+				<div class="rw_jdz <%= (l.old_value > l.value) ?  "rw_jdz2" : ""%> f12" style="left:<%= l.value-2 %>%;cursor: pointer;" title="<%= l.old_value > l.value ? "任务退回到: #{l.value}%" : "任务进展到: #{l.value}%"%>"><%= l.value %>%</div>
+				<% end %>
+				<div id="slider_task_value_tag" class="rw_jdz rw_jdz1 f12" style="left:<%= @task.value-2 %>%;"><%= @task.value %>%</div>
+			</div>
+			<input type="hidden" id="todo-task-value" value="<%= @task.value %>"/>
+		</div>
+		<% if @task.creator == @user%>
+		<div class="rw_xjk1">
+			<label for="todo_task_end_date">截止时间：</label>
+			<div class="input-append date form_datetime">
+				<input type="text" id="todo-task-end-date" style="cursor: pointer;" value="<%= l(@task.end_date, :format => :en_long)%>" class="span2" readonly="readonly"/>
+				<span class="add-on"><i class="icon-calendar"></i></span>
+			</div>
+		</div>
+		<div class="rw_xjk1" style="padding-left:30px;" data-type="todo-task-level">
+        	<label>优先级：</label>
+        	<div class="rw_xz <%= "rw_xz#{@task.level}" unless @task.level == 0%>">
+		    	<a href="javascript:void(0)" data-class="" data-value="0"></a>
+		    	<a href="javascript:void(0)" data-class="rw_xz1" data-value="1"></a>
+		    	<a href="javascript:void(0)" data-class="rw_xz2" data-value="2"></a>
+    		</div>
+    		<input type="hidden" id="todo-task-level" value="<%= @task.level%>"/>
+        </div>
+        <% end %>
+		<div class="rw_inp">
+			<textarea class="texter"></textarea>
+	    </div>
+	    <div class="dhk_gn f12 toolbar" style="display: block;padding-left:0px; width:495px;">
+	         <a href="javascript:;" class="tijiao submiter"></a>
+	    </div>
+	    <div class="clearfix"></div>
+    </div>
+    <div class="bk_t bk_d"></div>
+
+
+<script type="text/javascript">
+	$(function(){
+    	// 任务进度条
+	    $('#slider_task_value').slider({
+	  		animate: "fast",
+	  		range: 'min',
+	    	max: 100,
+	    	min:0,
+	    	step: 1,
+	    	value: $('#todo-task-value').val(),
+	    	change: function(event, ui){
+	    		$('#slider_task_value_tag').css({left: (ui.value-2) + "%"}).show().text(ui.value + '%');
+	    		$('#todo-task-value').val(ui.value);
+	    	}
+	  	});
+	      	
+	     //任务优先级
+	    $('[data-type=todo-task-level] a').click(function(){
+	    	$('#todo-task-level').val($(this).attr('data-value'));
+		 	$(this).parent().removeClass('rw_xz1').removeClass('rw_xz2').addClass($(this).attr('data-class'));
+		});
+    	
+	});
+
+/**/
+
+</script>

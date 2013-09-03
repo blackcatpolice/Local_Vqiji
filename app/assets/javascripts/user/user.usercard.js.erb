@@ -1,0 +1,227 @@
+// 用户名片
+
+// require 
+// require jquery
+// require jquery.ui.widget
+// require lib/jquery/jquery.spin
+// require utils/jquery.tip
+
+(function($) {
+  var DEFAULT_DELAY = 50; // ms
+
+  // 用户名片
+  $.widget("user.usercard", {
+    options: {
+      csses: {
+        zIndex: 1030
+      }
+    },
+  
+    _getCreateOptions: function() {
+      return {
+        userId: this.element.data("user-id"),
+        autoOpen: !(this.element.data("auto-open") === "false"),
+        direction: this.element.data("direction") || "top"
+      };
+    },
+    
+    _create: function() {
+      if (!this.options.userId) {
+        $.error("Parameter 'userId' require!");
+      }
+      if (this.options.userId == $CURRENT_USER.id) {
+        $.error("can't create usercard for $CURRENT_USER!");
+      }
+      this._openRetain = 0;
+    },
+    
+    _init: function() {
+      if (this.options.autoOpen) {
+        this.open();
+      }
+    },
+    
+    _destroy: function() {
+      if (this._tip) {
+        this._tip.remove();
+      }
+    },
+    
+    _card: function(user) {
+      var card = $.tmpl(''
+        + '<img src="${avatar_url}" class="avatar">'
+        + '<div class="usercard-i">'
+          + '<div class="u_name">'
+            + '<img class="gender" src="${ (gender == 1) ? \"<%= asset_path 'female.png' %>\" : \"<%= asset_path 'male.png' %>\" }">'
+            + '<a href="/users/${id}">${name}</a>'
+          +'</div>'
+          + '<div class="u_num f12">'
+            + '关注<em>${followeds_count}</em>'
+            + '<span class="divider">|</span>粉丝<em>${fans_count}</em>'
+            + '<span class="divider">|</span>微博<em>${tweets_count}</em>'
+          + '</div>'
+          + '<div class="u_work f12">'
+            + '部门：<em>${department_name}</em><br/>'
+            + '职位：<em>${job}</em>'
+          +'</div>'
+        + '</div>'
+        + '<div class="usercard-b">'
+          + '<div class="user-follow hide" data-follow-user="${id}" data-followed="${followed}" data-is-fan="${is_fan}">'
+            + '<div class="unfollow-state">'
+              + '关注'
+              + '<div class="li follow-types hide">'
+                + '<a href="javascript:void(0)" class="follow">关注</a>'
+                + '<a href="javascript:void(0)" class="follow-whisper">悄悄关注</a>'
+                + '<a href="javascript:void(0)" class="follow-particular">特别关注</a>'
+              + '</div>'
+            + '</div>'
+            + '<div class="followed-state">已关注 | <span class="unfollow">取消</span></div>'
+            + '<div class="followed-particular-state">特别关注 | <span class="unfollow">取消</span></div>'
+            + '<div class="followed-whisper-state">悄悄关注 | <span class="unfollow">取消</span></div>'
+            + '<div class="mutual-followed-state">相互关注 | <span class="unfollow">取消</span></div>'
+          + '</div>'
+          + '<a class="user-msg f12" href="javascript:void(0)" data-action="new-talk-message-to-u" data-receiver-id="${id}">私信</a>'
+        + '</div>'
+      , user);
+
+      card.find(".user-follow").follow2().fadeIn("fast");
+      return card;
+    },
+    
+    // 加载用户名片
+    _load: function() {
+      this._load = $.noop; // 防止重复加载
+
+      var self = this;
+      this._tip.spin("small");
+      
+      $.ajax({
+        url: "/users/" + this.options.userId + "/card.json",
+        dataType: "json",
+        method: "GET",
+        cache: false,
+
+        success: function(user) {
+          self._card(user).prependTo(self._tip);
+        },
+
+        error: function(jqXHR, textStatus, errorThrown) {
+          if (textStatus != "abort") {
+            var errorMsg = App.error.XHRError.call(this, jqXHR, textStatus, errorThrown, "加载用户名片失败！");
+            $("<span class=\"error\">" + errorMsg + "</span>").prependTo( self._tip );
+          }
+        },
+        
+        complete: function() {
+          self._tip.spin(false);
+        }
+      });
+    },
+    
+    _onTipOpen: function() {
+      this._trigger("open");
+      this._load();
+    },
+    
+    _onTipClose: function() {
+      this._trigger("close");
+    },
+    
+    _onTipMouseEnter: function() {
+      this.open();
+    },
+    
+    _onTipMouseLeave: function() {
+      setTimeout($.proxy(function() {
+        this.close();
+      }, this), DEFAULT_DELAY);
+    },
+    
+    _getTip: function() {
+      if (!this._tip) {
+        this._tip = $("<div class=\"usercard\"></div>");
+        this._tip
+          .tip({
+            tipClass: "usercard-tip",
+            csses: this.options.csses,
+            trigger: this.element,
+            triggerEvents: null,
+            closeable: false,
+            autoOpen: false,
+            direction: this.options.direction,
+            open: $.proxy(this._onTipOpen, this),
+            close: $.proxy(this._onTipClose, this)
+          })
+          .on( "mouseenter.usercard", $.proxy(this._onTipMouseEnter, this) )
+          .on( "mouseleave.usercard", $.proxy(this._onTipMouseLeave, this) );
+      }
+      return this._tip;
+    },
+
+    open: function() {
+      this._openRetain = (this._openRetain >= 0) ? (this._openRetain + 1) : 1;
+      this._getTip().tip("open");
+      return this;
+    },
+    
+    close: function(force) {
+      this._openRetain -= 1;
+      if ((this._openRetain <= 0) && this._tip) {
+        this._tip.tip("close");
+      }
+      return this;
+    }
+  }); // widget
+  
+  function openUserCard($target) {
+    var userId = $target.data("user-id");
+    if (userId == $CURRENT_USER.id) {
+      return;
+    }
+    if ($target.is( ":data('user-usercard')" )) {
+      $target.usercard("open");
+    } else {
+      $target.usercard({
+        userId: userId,
+        autoOpen: true,
+        close: function() {
+          // 关闭后销毁
+          $target.usercard("destroy");
+        }
+      });
+    }
+  }
+
+  function closeUserCard($target, delay) {
+    if ($target.is( ":data('user-usercard')" )) {
+      if (arguments.length == 1) {
+        delay = DEFAULT_DELAY;
+      }
+      if (delay > 0) {
+        // 延迟 50 毫秒关闭
+        setTimeout(function() {
+          $target.usercard("close");          
+        }, delay);
+      } else {
+        $target.usercard("close");
+      }
+    }
+  }
+  
+  $.user.usercard.helpers = {
+    open: openUserCard,
+    close: closeUserCard
+  };
+
+  $(function() {
+    $(document)
+      .on("mouseenter.usercard", 
+        "[data-user-id]:not([data-prevent-usercard])", function(e) {
+          openUserCard( $(e.currentTarget) );
+        })
+      .on("mouseleave.usercard",
+        "[data-user-id]:not([data-prevent-usercard])", function(e) {
+          closeUserCard( $(e.currentTarget) );
+        });
+  });
+})(jQuery);

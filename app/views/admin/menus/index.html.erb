@@ -1,0 +1,30 @@
+<% content_for :title do%>菜单管理<%end%>
+<table class="table">
+<thead>
+ <tr>
+    <th>Name</th>
+    <th>Url</th>
+    <th>Parent</th>
+    <th>Remark</th>
+    <th>Priority</th>
+    <th>操作</th>
+  </tr>	
+</thead>
+ 
+
+<% @menus.each do |menu| %>
+  <tr>
+    <td><%= menu.name %></td>
+    <td><%= menu.url %></td>
+    <td><%= menu.parent %></td>
+    <td><%= menu.remark %></td>
+    <td><%= menu.priority %></td>
+   <td>
+   	<%= link_to "编辑",:controller=>"menus",:action=>"edit",:id=>menu.id %>
+   	<%= link_to "删除",:controller=>"menus",:action=>"destroy",:id=>menu.id %>
+   </td>
+  </tr>
+<% end %>
+</table>
+<%= will_paginate @menus %>
+<%= link_to '新建菜单', new_admin_menu_path %>

@@ -1,0 +1,49 @@
+// require jquery
+// require jquery.ui.widget
+// require jquery.ui.dialog
+// rtext.editor require weibo
+
+(function($) {
+  // 聊天编辑器
+  $.widget("talk.talkMessageForm", $.rtext.rtextEditor, {
+    options: {
+      allowBlank: false,
+      textMaxLength: <%= Talk::Message::User::TEXT_MAXLEN %>,
+      tools: ["bigAudio", "emotion", "picture", "file"],
+      inputMention: false,
+      preset: "",
+      placeHolder: "在这里输入私信"
+    },
+
+    _create: function() {
+      this._super();
+    },
+
+    destroy: function() {
+      if (this._pictureUploader) {
+        this._pictureUploader.pictureUploader("destroy");
+      }
+
+      if(this._audioRecorder){
+        this._audioRecorder.audioRecorder("destroy");
+      }
+
+      $.rtext.rtextEditor.prototype.destroy.call(this);
+    },
+
+    session_id: function() {
+      return this.element.attr("data-session-id");
+    },
+
+    _submit: function(text, done) {
+      Talk.api.talkTo(this.session_id(), text, {
+        audio: this._audio,
+        picture: this._picture,
+        file: (this._file || this._selectedFile),
+        success: $.proxy(this.reset, this),
+        error: App.error.handleXHRError,
+        complete: done
+      });
+    }
+  });
+})(jQuery);

@@ -1,0 +1,404 @@
+//
+// 微博 api
+//
+// require jquery
+// require API
+
+(function($) {
+  "use strict";
+
+  WEIBO.api = new function() {
+    var context = this;
+    var _defaultOptions = API.defaultOptions;
+
+    // 发布微博 
+    this.tweet  = function(data, options) {
+      var _args = $.extend(
+        true, {}, _defaultOptions, options,{
+          type: "POST",dataType: "html",
+          data: data
+        }
+      );
+      return API._request("/tweets.html", _args, context.tweet);
+    };
+    
+    // 转发微博
+    this.repost = function(tweet_id, text, options) {
+      var _args = $.extend(
+        true, {}, _defaultOptions, options,
+        {
+          type: "POST",
+          dataType: "html",
+          data: { text: text }
+        }
+      );
+      if(_args["tmpl"]){
+      	_args["data"].tmpl = _args["tmpl"]; 
+      }
+      
+      return API._request("/tweets/" + tweet_id + "/reposts.html", _args, context.repost);
+    };
+    
+    this.newRepost = function(tweet_id, options) {
+      var _args = $.extend(true, {}, _defaultOptions, options);
+
+      var _args = options || {};
+      _args["type"] = "GET";
+      _args["dataType"] = "html";
+      _args["cache"] = true;
+      
+     // $.ajax("/tweets/" + tweet_id + "/reposts/new.json", _args);
+     $.ajax("/tweets/" + tweet_id + "/reposts/new.html", _args);
+    };
+    
+    // 删除微博
+    this.deleteTweet = function(tweet_id, options) {
+      var _args = options || {};
+      _args["type"] = "DELETE";
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      
+      return API._request("/tweets/" + tweet_id + ".json", _args, context.deleteTweet);
+    };
+    
+    // 获取生活微博评论详细
+    this.commentInfo = function(comment_id, options) {
+      var _args = $.extend(true, {}, _defaultOptions, options);
+      
+      $.ajax("/comments/" + comment_id + ".json", _args);
+    };
+        
+    
+    // 删除评论
+    this.deleteComment = function(comment_id, options) {
+      var _args = options || {};
+      _args["type"] = "DELETE";
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      
+      return API._request("/comments/" + comment_id + ".json", _args, context.deleteComment);
+    };
+    
+    /**/
+    this.sendComment = function(data,options){
+        var _args = options || {};
+        _args["type"] = "POST";
+        _args["dataType"] = "json";
+        _args["cache"] = false;
+        _args["data"] = data;
+        return API._request("/tweets/" + data.tweet_id + "/comments.json", _args, context.sendComment);
+    };
+    
+    // 新建评论
+    this.newComment = function(data, options) {
+      var _args = $.extend(true, {}, _defaultOptions, options,{
+          type: "GET",
+          cache: true,
+          dataType: "html",
+          data:data
+        }
+      );
+
+      $.ajax("/tweets/" + data.tweet_id + "/comments/new.html", _args);    
+    };
+    
+    // 获取评论
+    this.comments = function(tweet_id, page, timestamp, options) {
+      var _args = options || {};
+      _args["type"] = "GET";
+      _args["cache"] = true;
+      _args["data"] = { page: page, timestamp: timestamp };
+      _args["dataType"] = "json";
+      
+      $.ajax("/tweets/" + tweet_id + "/comments.json", _args);
+    };
+
+    //
+    this.commentsList = function(tweet_id, options) {
+      var _args = options || {};
+      _args["type"] = "GET";
+      _args["cache"] = true;
+      _args["dataType"] = "html";
+      $.ajax("/tweets/" + tweet_id + "/comments/list.html", _args);
+    };
+    
+    // 关注
+    this.follow = function(user_id, follow_type, options) {
+      if (arguments.length < 3) {
+        options = follow_type;
+        follow_type = null;
+      }
+    
+      var _args = options || {};
+      _args["type"] = "POST";
+      _args["data"] = { user_id : user_id,follow_type:follow_type };
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      
+      $.ajax("/my/followeds.json", _args);
+    };
+    
+    // 取消关注
+    this.unfollow = function(user_id, options) {
+      var _args = options || {};
+      _args["type"] = "DELETE";
+      _args["data"] = { user_id: user_id };
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      $.ajax("/my/followeds/" + user_id + ".json", _args);
+    };
+    
+    // 收藏
+    this.favorite = function(tweet_id, options) {
+      var _args = options || {};
+      _args["type"] = "POST";
+      _args["data"] = { tweet_id: tweet_id };
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      
+      $.ajax(("/my/favorites.json"), _args);
+    };
+    
+    // 取消收藏
+    this.deleteFavorite = function(tweet_id, options) {
+      var _args = options || {};
+      _args["type"] = "DELETE";
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      
+      $.ajax(("/my/favorites/" + tweet_id + ".json"), _args);
+    };
+    
+    // 获取所有有关注的人
+    this.queryFolloweds = function(options) {
+      var _args = options || {};
+      _args["type"] = "GET";
+      _args["cache"] = true;
+      _args["dataType"] = "json";
+      _args["data"] = {
+        page: options.page || 0,
+        psize: options.psize,
+        query: options.query
+      };
+      
+      $.ajax("/my/followeds/query.json", _args);
+    };
+    
+    // 获取工作组
+    this.queryGroups = function(options) {
+      var _args = $.extend(
+        true, {}, _defaultOptions, options,
+        {
+          type: "GET",
+          cache: true
+        }
+      );
+      
+      $.ajax("/groups/mine.json", _args);
+    }
+    
+    // 获取工作组成员
+    this.queryGroupMembers = function(group_id, options) {
+      var _args = $.extend(
+        true, {}, _defaultOptions, options,
+        {
+          type: "GET",
+          cache: true
+        }
+      );
+      
+      $.ajax("/groups/" + group_id + "/members.json", _args);
+    }
+    
+    // 获取部门
+    this.queryDepartments = function(options) {
+      var _args = $.extend(
+        true, {}, _defaultOptions, options,
+        {
+          type: "GET",
+          cache: true
+        }
+      );
+      
+      $.ajax("/departments.json", _args);
+    }
+    
+    // 获取部门成员
+    this.queryDepartmentMembers = function(department_id, options) {
+      var _args = $.extend(
+        true, {}, _defaultOptions, options,
+        {
+          type: "GET",
+          cache: true
+        }
+      );
+      
+      $.ajax("/departments/" + department_id + "/members.json", _args);
+    }
+
+    //
+    this.solveQuestion = function(id, options) {
+      var _args = options || {};
+      _args["type"] = "POST";
+      _args["data"] = { review: options.review };
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      
+      $.ajax("/advisory/questions/" + id + "/solve.json", _args);
+    };
+    
+    // 回答问题
+    this.answer = function(id, text, options) {
+      var _args = $.extend(
+        true, {}, _defaultOptions, options,
+        {
+          type: "POST",
+          cache: false,
+          dataType: "html",
+          data: {
+          	question_id: id,
+            text: text
+          }
+        }
+      );
+      if(_args["audio"]){
+      	_args["data"].audioId = _args["audio"].id;
+      }
+      return API._request("/advisory/answers.html", _args, this.answer);
+    };
+
+    // 
+    this.deleteQuestion = function(id, options) {
+      var _args = options || {};
+      _args["type"] = "DELETE";
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      return API._request("/advisory/questions/" + id + ".json", _args, context.deleteQuestion);
+    };
+    
+    
+    this.updateExpert = function(id, description, options){
+      var _args = options || {};
+      _args["type"] = "PUT";
+      _args["data"] = { expert:{description: description }};
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      $.ajax("/advisory/experts/" + id + ".json", _args);
+    };
+    
+    
+    this.getCaseHistory = function(options){
+      var _args = options || {};
+      _args["type"] = "GET";
+      _args["data"] = {};
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      return API._request("/attachments/case_history.json", _args, context.getCaseHistory);
+    };
+
+
+    this.diskFileRename = function(id, options){
+      var _args = options || {};
+      _args["type"] = "post";
+      _args["data"] = {id: id, name: options.name};
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      return API._request("/network_disks/rename", _args, context.diskFileRename);
+    };
+    
+    this.fileEncrypt = function(id, options){
+      var _args = options || {};
+      _args["type"] = "post";
+      _args["data"] = {id: id, encrypt: options.encrypt};
+      _args["dataType"] = "html";
+      _args["cache"] = false;
+      return API._request("/network_disks/encrypt", _args, context.fileEncrypt);
+    };
+    
+    this.collectFile = function(id, options){
+      var _args = options || {};
+      _args["type"] = "post";
+      _args["data"] = {id: id};
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      return API._request("/network_disks/collect", _args, context.collectFile);
+    };
+
+    // widgets
+
+    // 知识库 widget
+    this.knowledgesWidget = function(options){
+      var _args = options || {};
+      _args["type"] = "get";
+      _args["data"] = { size: options.size };
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      return API._request("/knowledges/widget", _args, context.knowledgesWidget);
+    };
+
+    //网盘widget
+    this.filesWidget = function(options){
+      var _args = options || {};
+      _args["type"] = "get";
+      _args["data"] = { size: options.size };
+      _args["dataType"] = "json";
+      _args["cache"] = false;
+      return API._request("/network_disks", _args, context.filesWidget);
+    };
+    
+    // 填写任务日志
+    // id => todo_task_id, text => todo_log_msg 
+    this.todoTaskLog = function(id, text, options) {
+      var _args = options || {}; 
+      _args["type"] = "POST";
+      
+      _args["data"] = { msg: text, value: options.value };
+      
+      if(options.end_date){
+      	_args["data"].end_date = options.end_date
+      }
+      if(options.level){
+      	_args["data"].level = options.level
+      }
+      if(options.picture_id){
+      	_args["data"].picture_id = options.picture_id
+      }
+      if(options.picture_id){
+      	_args["data"].picture_id = options.picture_id
+      }
+      if(options.file_id){
+      	_args["data"].file_id = options.file_id
+      }
+      _args["dataType"] = "html";
+      _args["cache"] = false; 
+      return API._request("/todo/tasks/" + id + "/logs.html", _args, context.todoTaskLog);
+    };
+    
+    this.todoTaskProgress = function(id, options){
+      var _args = options || {};
+      _args["data"] = { id: id};
+      _args["type"] = "POST";
+      _args["dataType"] = "json";
+      _args["cache"] = false; 
+      return API._request("/todo/tasks/progress.json", _args, context.todoTaskProgress);
+    };
+    
+    this.todoMyTasks = function(options){
+      var _args = options || {};
+      _args["type"] = "POST";
+      _args["dataType"] = "json";
+      _args["cache"] = false; 
+      return API._request("/todo/tasks/my_tasks.json", _args, context.todoMyTasks);
+    }
+
+	  this.attachmentDisks = function(options){
+	    var _args = options || {};
+        _args["type"] = "POST";
+        _args["dataType"] = "json";
+        _args["cache"] = false; 
+        return API._request("/attachments/disks.json", _args, context.attachmentDisks);
+	  }
+  };
+  
+  $.extend(true, WEIBO, WEIBO.api);
+})(jQuery);

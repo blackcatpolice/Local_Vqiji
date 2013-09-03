@@ -1,0 +1,186 @@
+// require jQuery
+// require jQuery.ui.widget
+
+(function($) {
+  $.widget("rtext.rtextAttachments", {
+    options: {
+      message: null // required
+    },
+    
+    _create: function() {
+      var context = this;
+      this._children = this.element.children();
+      
+      this.element.find(" > [data-role=rtext-attachment]")
+        .each(function(_, attachment) {
+          var $attachment = $(attachment);
+          var wraper = context["_wrap" + $attachment.attr("data-type")];
+
+          if ($.isFunction(wraper)) {
+            wraper.call(context, $attachment);
+          }
+        });
+    },
+    
+    _destroy: function() {
+      if (this._viewer) {
+        this._viewer.remove();
+      }
+    },
+    
+    /*
+     * {
+     *     href: url,
+     *     title: desc,
+     *     'data-source' => source,
+     *     'data-play-url' => plurl,
+     *     'data-cover-url' => cvurl
+     * }
+     */
+    attachVideoUrls: function(videoUrls) {
+      var context = this;
+      videoUrls.each(function(i, elem) {
+        context._addVideoPreview($(elem));
+      });
+      videoUrls.click(function(e) {
+        context._viewVideoUrl($(e.target));
+        e.preventDefault();
+      });
+    },
+    
+    _addVideoPreview: function(videoUrl) {
+      var _preview = $("" +
+        "<div class=\"attachment video\">" +
+          "<img src=\"" + videoUrl.attr("data-cover-url") + "\" class=\"cover\" title=\"点击播放\"/>" +
+        "</div>" +
+      "");
+      _preview.find("img.cover").click($.proxy(function() {
+          this._viewVideoUrl(videoUrl);
+        }, this));
+      this.element.append(_preview);
+      this._children = this._children.add(_preview);
+    },
+    
+    _viewVideoUrl: function(videoUrl) {      
+      if(videoUrl.data("isPlaying")) {
+        return false;
+      }
+
+      var context = this;
+
+      var _viewer = $(''
+        + '<div style="margin-bottom: 10px;">'
+          + '<embed src="' 
+            + videoUrl.attr("data-play-url") 
+            + '" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" wmode="opaque" width="400" height="400" withSearchBar="false" autoPlay="true" pluginspage="http://get.adobe.com/cn/flashplayer/"  flashvars="playMovie=true&amp;auto=1" wmode="transparent"></embed>'
+        + '</div>')
+        .appendTo(context.element)
+        .rtextAttachmentViewer({
+         open: function() {
+           context._children.hide();
+           videoUrl.data("isPlaying", true);
+         },
+         close: function() {
+           context._children.show();
+           _viewer.remove(); // 删除
+           videoUrl.data("isPlaying", false);
+         },
+         buttons: {
+           "在新窗口中打开": {// 在单独窗口中打开图片
+              class_: "",
+              click: function() {
+                window.open(videoUrl.attr("href"));
+              }
+           }
+         }
+       });
+      
+      this._openViewer(_viewer);
+      return false;
+    },
+
+    _wrappicture: function(attachment) {
+      attachment.find("img.thumb").bind("click", $.proxy(function() {
+        var viewer = this._createPictureViewer(attachment);
+        this._openViewer(viewer);
+      }, this));
+    },
+    
+    _wrapaudio: function(attachment) {
+      $.rtext.rtextAttachments.embedAudioPlayerFlash( attachment );
+    },
+    
+    _wrapfile: function(attachment) {
+      // do noting
+    },
+    
+    _openViewer: function(viewer) {
+      if (this._viewer) {
+        this._viewer.rtextAttachmentViewer("close");
+      }
+      var context = this;
+      viewer.bind("rtextattachmentviewerclose", function() {  
+         context._viewer = null;
+      }).rtextAttachmentViewer("open");
+      this._viewer = viewer;
+    },
+
+    _createPictureViewer: function(attachment) {
+      var context = this
+        , _originUrl = attachment.attr("data-url"); // 原始图片链接
+
+      var _imageViewer = $('<img class="origin" src="' + _originUrl + '" />')
+        .appendTo(context.element)
+        .rtextAttachmentViewer({
+         open: function() {
+           context._children.hide();
+         },
+         close: function() {
+           context._children.show();
+           _imageViewer.remove(); // 删除
+         },
+         buttons: {
+           "查看大图": {// 在单独窗口中打开图片
+              class_: "ck",
+              click: function() {
+                window.open(_originUrl);
+              }
+           }
+         }
+       })
+       .click(function() {
+         _imageViewer.rtextAttachmentViewer("close");
+       });
+       
+      return _imageViewer;
+    }
+  });
+  
+  $.extend($.rtext.rtextAttachments, {
+    embedAudioPlayerFlash: function(elem) {
+      $(elem).flashembed({
+        src: "<%= asset_path 'jwplayer.swf' %>",
+        width: "240", height: "24",
+        bgcolor: "#000000",
+        wmode: "transparent",
+        allowfullscreen: "false",
+        onFail: function() {
+          $(elem).html(''
+          + '<div style=\"width:240px; margin:0px; padding:10px; border:1px outset #ccc; background-color:#efefef;\">'
+            + '<%= image_tag 'flashplayer_64x64.jpg', style: 'float:left; margin-right:10px;' %>'
+            + '<h5 style="margin-top:10px;">需要 Flash 播放器！</h5>'
+            + '<p>'
+              + '<a href="http://get.adobe.com/flashplayer/" title="获取 Adobe Flash 播放器">获取 Adobe Flash 播放器</a>'
+            + '</p>'
+            + '<div style="height: 0; clear: both;" />'
+          + '</div>'
+        + '</div>');
+        }
+      }, {
+        file: elem.attr("data-src"),
+        duration: elem.attr("data-duration"),
+        autostart: false
+      });
+    }
+  });
+})(jQuery);

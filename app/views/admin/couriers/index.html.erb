@@ -1,0 +1,25 @@
+<% content_for :title do%>快递列表<%end%>
+<%= link_to '新增快递', new_admin_courier_path,:class=>"btn btn-primary" %>
+<table class="table">
+<thead>
+<tr>
+<th>货运方式</th>
+<th>联系电话</th>
+<th>URL 地址</th>
+<th>备注</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+<% @couriers.each do |c|%>
+<tr>
+  <td><%= c.name %></td>
+  <td width="150"><%= c.telephone %></td>
+  <td width="200"><%= c.url %></td>
+  <td><%= c.remark %></td>
+  <td width="100"><%=link_to "修改",edit_admin_courier_path(c) %>&nbsp;&nbsp;&nbsp;<%=link_to "删除","couriers/destroy/#{c.id}",:confirm => "是否删除选中快递?" %></td>
+</tr> 
+<%end%>
+</tbody>
+</table>
+<%= will_paginate @couriers %>

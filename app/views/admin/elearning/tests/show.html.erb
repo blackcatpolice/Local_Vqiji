@@ -1,0 +1,66 @@
+<% content_for :title do%>培训测试<%end%>
+
+<%= render :partial => "admin/elearning/nav_training" ,:locals=>{:training => @training} %>
+
+<table class="table table-bordered table-condensed">
+<thead>
+    <tr>
+       <th colspan="2">
+        [<%= link_to @training.name, admin_elearning_training_path(@training)  %>]
+       </th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+  <td style="width:100px;">题型 / 分数:</td>
+  <td>
+    <%= @test.type_desc %> / <a style="color:red;"><%= @test.score %></a>
+  </td>
+</tr>
+<tr>
+  <td>所属页:</td>
+  <td>
+    <%= @test.page.nil? ?  "不属于任何一页" : @test.page.title %>
+  </td>
+</tr>
+
+<tr>
+  <td>题目:</td>
+  <td>
+    <%= @test.question%>
+  </td>
+</tr>
+<tr>
+  <td>备注:</td>
+  <td>
+    <%= @test.remark%>
+  </td>
+</tr>
+
+<tr>
+  <td>选项:</td>
+  <td>
+    <ol style="list-style-type:upper-latin;">
+    <% @test.options.each do |option| %>
+    <% unless option.blank? %>
+    <li>
+      <div><%= option %> &nbsp;&nbsp;&nbsp;
+        <%if @test.answers.include? option %>
+          <span style="color:green;">[正确]</span>
+        <%end%>
+      </div>
+    </li>
+
+    <% end %>
+    <% end %>
+    </ol>
+   
+  </td>
+</tr>
+
+
+</tbody>
+</table>
+
+
+

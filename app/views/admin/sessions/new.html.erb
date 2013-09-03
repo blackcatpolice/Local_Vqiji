@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>管理登录</title>
+    <%= javascript_include_tag "admin" %>
+    <%= stylesheet_link_tag    "bootstrap_and_overrides" %>
+    <%= stylesheet_link_tag    "jquery-ui" %>
+    <%= csrf_meta_tags %>
+    <style type="text/css">
+    .more {
+        border-color: #9ABBC8 transparent transparent;
+        border-style: solid dashed dashed;
+        border-width: 4px 4px 0;
+        display: inline-block;
+        font-size: 0;
+        height: 0;
+        line-height: 0;
+        margin: 0 0 0 3px;
+        vertical-align: middle;
+        width: 0;
+        border-top-color: red;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">管理登录</a>
+          <div class="nav-collapse collapse">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+<!-- Masthead
+================================================== -->
+<div class="inner">
+   <h1>登录信息</h1>
+   <p></p>
+   <%= form_for(@session,:url => {:controller => "sessions",:action=>"create" },:html=>{:onsubmit=>"validate(this);",:class=>""}) do |f| %>
+   <%= f.label :邮箱 %>
+   <%= f.email_field :email, :class => 'mem_login_ip' %>
+   <%= f.label :密码 %>
+   <%= f.password_field :password, :class => 'mem_login_ip' %>
+   <%= flash.notice %><br/>
+   <%= f.submit '登录', :class => 'btn-primary btn-large'%>
+   <% end %>
+</div>
+<hr class="soften">
+<span class="more"></span>
+<h1 style=";font-weight:bold;display:none;">
+<i style="color:blue;">S</i><i style="color:red;">O</i><i style="color:#F7C434;">S</i><i style="color:green;">O</i>
+</h1>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<% provide(:title, '登录') %>
+
+<div id="page-new-session">
+  <div class="signin">
+    <%= form_for(resource, :as => resource_name, :url => session_path(resource_name),
+      :html=>{ :class=>'form-horizontal form-signin' }) do |f| %>
+      <div class="notice"><%= alert || notice %></div>
+      <div class="ipt">
+        <%= f.text_field :login, :autofocus => true, :placeholder=>'邮箱，员工号' %>
+      </div>
+
+      <div class="ipt ipt1" style="margin-bottom:11px;">
+        <%= f.password_field :password, :placeholder => '密码' %>
+      </div>
+
+      <% if devise_mapping.rememberable? %>
+        <div class="ip">
+          <%= f.check_box :remember_me, id: 'cc', class: 'hide' %>
+          <div class="ck" id="cc_proxy">&nbsp;</div>
+          <div class="ck_tip">下次自动登录</div>
+        </div>
+      <% end %>
+      <%= f.submit '', class: 'btn btn-signin' %>
+      <%= link_to '', new_user_registration_path, class: 'btn btn-signup' %>
+      <div>
+    <% end %>
+    <div class="links">
+      <%= link_to '忘记密码？', new_user_password_path, class: 'forgot-pass' %>
+    </div>
+  </div>
+  <script>
+    (function($) {
+        function toggleCCChecked(e) {
+          var cc = $("#cc");
+          cc.attr("checked", !cc.attr("checked"));
+          $("#cc_proxy").toggleClass("checked");
+        }
+
+        $(document).ready(function() {
+          $('#cc_proxy').click(toggleCCChecked);
+        });
+    })(jQuery);
+  </script>
+</div>

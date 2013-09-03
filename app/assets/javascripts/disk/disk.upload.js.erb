@@ -1,0 +1,62 @@
+(function($) {
+	$.widget('disk.upload', {
+  		options: {
+    	},
+    	_create: function(options) {
+      		var self = this;
+
+    		$(':checkbox[name=checkbox_list]').click(function(){
+    			var _checked = this.checked;
+    			$(':checkbox[data-name=fileId]').each(function(){
+    				this.checked = _checked;
+    			});
+    		});
+    		$('a[data-action=delete_list]', self.element).click(function(){
+    			if($(':checkbox[data-name=fileId]:checked').length == 0){
+    				$.alert('没有选中文件！');
+    				return;
+    			}
+    			$.confirm('是否删所有除选中文件？', function(flag){
+    				if(flag){
+                        $('form[data-pjax]').submit();
+                    }
+    			});
+    		});
+    		
+    		//上传
+    		$('a[data-action=file_upload]').click(function(){
+    			var _swfuploadTmpl = self._swfuploadHtml();
+    			$(_swfuploadTmpl).modal({
+    				backdrop: 'static',
+    				remote: "/network_disks/swfupload.html"
+    			}).on('hidden', function(){
+    				$(this).remove();
+    			});
+    		});
+    		//上传
+    		$('a[data-action=history_upload]').click(function(){
+    			var _historyTmpl = self._historyHtml();
+    			$(_historyTmpl).modal({
+    				backdrop: 'static',
+    				remote: "/network_disks/history.html"
+    			}).on('hidden', function(){
+    				$(this).remove();
+    			});
+    		});
+    		
+	    },
+	    
+	    _swfuploadHtml: function(){
+	    	return '<div class="modal" id="fileModal" style="display:; width:500px;display:none;">' + 
+	    		'<div class="modal-header" style="background-color:#9aceff;"><a class="close" data-dismiss="modal"></a><div class="model_tabs"><a href="#" class="tabs_rw">上传文件</a></div></div>' +
+	    		'<div class="modal-body"></div>' +  
+	    	'</div>';
+	    },
+	    _historyHtml: function(){
+	    	return '<div class="modal" id="fileModal" style="display:; width:500px;display:none;">' + 
+	    		'<div class="modal-header" style="background-color:#9aceff;"><a class="close" data-dismiss="modal"></a><div class="model_tabs"><a href="#" class="tabs_rw">上传病历</a></div></div>' +
+	    		'<div class="modal-body"></div>' +  
+	    	'</div>';
+	    }
+ 	}); 
+})(jQuery);

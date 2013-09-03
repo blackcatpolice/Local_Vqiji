@@ -1,0 +1,109 @@
+// require _base
+
+(function($) {
+  $.widget("talk.talkNewSessionDialog", {
+    options: {
+      autoOpen: true
+    },
+    
+    _create: function() {
+      this._topicInput = this.element.find("input[name=topic]");
+      this._topicP = this.element.find("[data-role=topic-p]");
+       
+      this._membersSelector = this.element.find("[data-role=weibo-members-selector]")
+        .userMembersSelector({
+          change: $.proxy(function() {
+            var ids = this._membersSelector.userMembersSelector("selectedMemberIds");
+            this._topicP[ ids.length > 1 ? "show" : "hide" ]();
+          }, this)
+        }).userMembersSelector("presetSelected", [ $CURRENT_USER ]);
+
+      this._on({ "click [data-action=submit]" : this.submit });
+    },
+
+    _init: function() {
+      if (this.options.autoOpen) {
+        this.open();
+      }
+    },
+
+    disable: function() {
+      this._membersSelector.userMembersSelector("disable")
+      this.element.find("[data-action=submit]").attr("disabled", true)
+      return this;
+    },
+    
+    enable: function() {
+      this._membersSelector.userMembersSelector("enable")
+      this.element.find("[data-action=submit]").attr("disabled", false)
+      return this;
+    },
+    
+    open: function() {
+      this.element.modal("show");
+      return this;
+    },
+    
+    close: function() {
+      this.element.modal("hide");
+      return this;
+    },
+
+    submit: function(e) {
+      e.preventDefault();
+      
+      if (this._submitXHR) {
+        return this;
+      }
+      
+      var _members = this._membersSelector.userMembersSelector("selectedMemberIds");
+      if (_members.length == 0) {
+        $.alert("至少需要两个联系人！", 2);
+        return this;
+      }
+      
+      var _topic = $.trim( this._topicInput.val() );
+      
+      // 创建讨论组需要主题
+      if ( this._topicInput.is(":visible") ) {
+        if ($.isBlank(_topic)) {
+          this._topicInput.val( _topic ).blink();
+          return this;
+        }
+      }
+    
+      this.disable();
+      this.element.spin("small");
+
+      this._submitXHR = Talk.api.createSession(_members, {
+        topic: _topic,
+        success: $.proxy(function(data) {
+          this.reset();
+          this._trigger("submit", null, data);
+        }, this),
+        error: function(jqXHR, textStatus, errorThrown) {
+          var errorMsg = App.error.XHRError.call(this, jqXHR, textStatus, errorThrown, "创建会话失败！");
+          $.alert(errorMsg, 2);
+        },
+        complete: $.proxy(function() {
+          this.enable();
+          this.element.spin(false);
+          this._submitXHR = null;
+        }, this)
+      });
+
+      return this;
+    },
+
+    reset: function() {
+      this._membersSelector.userMembersSelector("reset");
+      this._topicP.hide();
+      this._topicInput.val("");
+      return this;
+    },
+
+    _destroy: function() {
+      this._membersSelector.userMembersSelector("destroy");
+    }
+  });
+})(jQuery);

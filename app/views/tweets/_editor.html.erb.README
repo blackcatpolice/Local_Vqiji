@@ -1,0 +1,10 @@
+在一下位置有自定义 _editor.html.erb, 为了风格统一，请在维护 _editor.html.erb 时一并维护:
+
+/tweets/_editor.html.erb
+/tweets/repost/new.html.erb
+
+/groups/_tweet_editor.html.erb
+/network_disks/share.html.erb
+
+/talk/messages/_form.html.erb
+/talk/messages/new_modal_to_user.html.erb

@@ -1,0 +1,21 @@
+<%= content_for :title do%>
+商品详细
+<%end%>
+<%= link_to '编辑商品信息', edit_admin_product_path(@product) %> |
+<%= link_to '商品列表', admin_products_path %>
+<p>
+  <b>名称:</b>
+  <%= @product.name %><br/>
+    <b>所需积分:</b>
+  <%= @product.price %>
+  <br/>
+  <%= image_tag(@product.image_url,:size => "200x200", :alt => "Edit Entry") if @product.image?  %>
+  <hr/>
+  <h3>商品详细</h3>
+  <hr/>
+  <div>
+  	<%= @product.detail.html_safe %>
+  <div>
+</p>
+
+

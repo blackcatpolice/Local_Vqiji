@@ -1,0 +1,87 @@
+<% u = suggest.sender%>
+<% comments = suggest.comments%>
+<div class="list_k" data-type="Suggest" data-id="<%= suggest.id %>">
+	<div class="list_tx">
+		<% unless suggest.realname %>
+  		<%=image_tag(user_default_avater("v180x180"))%>
+  		<%else%>	
+  		<%=image_tag(u.avatar,:size => "80x80", :id =>u.id) if u.avatar %>
+  		<%end%>
+	</div>
+	<div class="list_nr">
+		<div class="nr_k">
+			<a href="javascript:;"><%= suggest.title%></a>
+			<br>
+			<div class="fw_show">
+				<%= truncate(suggest.content, :length => 80)%>
+				<% unless suggest.content.length > 80 %>
+					<%if suggest.audio %>
+						<%= render :partial => "/attachments/audio", :object => suggest.audio %>
+					<% end %>
+					<%if suggest.picture %>
+						<%= render :partial => "/attachments/picture", :object => suggest.picture %>
+					<% end %>
+				<% end %>
+			</div>
+			<% if suggest.content.length > 80 %>
+			<div class="fw_none">
+				<%= suggest.content%>
+				<%if suggest.audio %>
+					<%= render :partial => "/attachments/audio", :object => suggest.audio %>
+				<% end %>
+				<%if suggest.picture %>
+					<%= render :partial => "/attachments/picture", :object => suggest.picture %>
+				<% end %>
+			</div>
+			<% end %>
+			<%if suggest.content.size > 80%>
+			<div class="dw">
+				展开▼
+			</div>
+			<% end %>
+		</div>
+		<div class="nr_k">
+			<% if suggest.check.to_i == 1%>
+			<a href="javascript:;" class="pl" data-action="comment"><%= suggest.comment_counts%></a>
+			<% end %>
+			<% if suggest.file %>
+			<a href="<%= suggest.file.file.url%>" target="_bank" class="fj"></a>
+			<%end%>
+		</div>
+		<% if suggest.check.to_i == 1%>
+		<div class="cov_d" style="display:none;"></div>
+		<div class="comm" data-name="comments" style="display:none;"></div>
+		<% end %>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function(){
+		$(".dw").toggle(
+			function(){
+				$('.fw_none', $(this).parent()).show();
+				$('.fw_show', $(this).parent()).hide();
+				$(this).html("收起▲");
+			},
+			function(){
+				$('.fw_show', $(this).parent()).show();
+				$('.fw_none', $(this).parent()).hide();
+				$(this).html("展开▼")
+			}
+		);
+		
+		$("a[data-action=comment]").toggle(
+			function(){
+				$('.cov_d', $(this).parent().parent()).show();
+				$('.comm', $(this).parent().parent()).show();
+			},
+			function(){
+				$('.cov_d', $(this).parent().parent()).hide();
+				$('.comm', $(this).parent().parent()).hide();
+			}
+		);
+	});
+
+	$('div[data-type=Suggest]').suggest();
+	
+</script>

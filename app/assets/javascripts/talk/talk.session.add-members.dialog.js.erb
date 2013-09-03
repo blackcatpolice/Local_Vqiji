@@ -1,0 +1,115 @@
+// require jquery
+// require jquery.ui.widget
+// require bootstrap.modal
+// require weibo.api
+// require user.members.selector
+
+(function($) {
+  $.widget("talk.talkSessionAddMembersDialog", {
+    options: {
+      modal: true,
+      autoOpen: true
+    },
+
+    _create: function() {
+      this._membersSelector = this.element.find("[data-role=weibo-members-selector]").userMembersSelector();
+      this._on("[data-action=submit]", { "click" : this.submit });
+      this._loadExistsMembers();
+    },
+    
+    _init: function() {
+      if (this.options.autoOpen) {
+        this.open();
+      }
+    },
+    
+    open: function() {
+      this.element.modal("show");
+      return this;
+    },
+    
+    close: function() {
+      this.element.modal("hide");
+      return this;
+    },
+    
+    disable: function() {
+      this._super();
+      this._membersSelector.userMembersSelector("disable");
+      this.element.find("[data-action=submit]").attr("disabled", true);
+      return this;
+    },
+    
+    enable: function() {
+      this._super();
+      this._membersSelector.userMembersSelector("enable");
+      this.element.find("[data-action=submit]").attr("disabled", false);
+      return this;
+    },
+    
+    _loadExistsMembers: function() {
+      var self = this;
+      this.element.spin("small");
+      Talk.api.sessionMembers(this.sessionId(), {
+        success: function(members) {
+          self._membersSelector.userMembersSelector("presetSelected", members);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          var errorMsg = App.error.XHRError.call(this, jqXHR, textStatus, errorThrown, "获取成员失败");
+          $.alert(errorMsg, 2);
+        },
+        complete: function() {
+          self.element.spin(false);
+        }
+      });
+    },
+    
+    sessionId: function() {
+      return this.element.attr("data-session-id");
+    },
+    
+    submit: function(e) {
+      e.preventDefault();
+    
+      if (this._submitXHR) {
+        return;
+      }
+    
+      var _members = this._membersSelector.userMembersSelector("selectedMemberIds");
+      this.disable();
+    
+      this._submitXHR = Talk.api.addSessionMembers(this.sessionId(), _members, {
+        success: $.proxy(function(data) {
+          this.reset();
+          this._trigger("submit", null, data);
+        }, this),
+        error: function(jqXHR, textStatus, errorThrown) {
+          if (textStatus != "abort") {
+            var errorMsg = App.error.XHRError.call(this, arguments, "添加成员失败！");
+            $.alert(errorMsg, 2);            
+          }
+        },
+        complete: $.proxy(function() {
+          this._submitXHR = null;
+          this.enable();
+        }, this)
+      });
+
+      return this;
+    },
+    
+    reset: function() {
+      this._membersSelector.userMembersSelector("reset");
+      this.enable();
+      return this;
+    },
+    
+    _destroy: function() {
+      if (this._submitXHR) {
+        this._submitXHR.abort();
+      }
+      this._membersSelector.userMembersSelector("destroy");
+    }
+  });
+  
+})(jQuery);

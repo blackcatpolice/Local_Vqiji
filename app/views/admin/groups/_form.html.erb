@@ -1,0 +1,52 @@
+<%= form_for([:admin,@group],:html=>{:class=>"form-horizontal"}) do |f| %>
+  <% if @group.errors.count > 0 %>
+    <div class="alert">
+      <strong>错误:</strong>
+      <span id="span_alert"><%= @group.errors.count %>
+        <ul>
+          <% @group.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </span>
+    </div>
+  <% end%>
+
+  <div class="control-group">
+    <label class="control-label">工作组名称:</label>
+    <div class="controls"> <%= f.text_field :name,:maxlength=>23,:required=>"required" %></div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">工作组简介:</label>
+    <div class="controls"><%= f.text_field :summary,:maxlength=>50 %></div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">工作组公告:</label>
+    <div class="controls"><%= f.text_area :notice,:class=>"input-xlarge",:size => "30x3",:maxlength=>50 %></div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <label class="checkbox" title="">
+	      <%= f.check_box :quitable %>成员可以自行退出
+      </label>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">所属部门:</label>
+    <div class="controls">
+      <%= render :partial => "admin/departments/select", :locals => { :id => "group_department_id",:name=> "group[department_id]",:default=>false, :level => 2,:select => @group.department_id } %>
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <%= f.submit "保存",:class=>"btn btn-primary" %>
+    </div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+ $(function(){
+    $("form[id=new_group]").validate();
+    $("form[id=edit_group_<%= @group.id %>]").validate();
+ });
+</script>

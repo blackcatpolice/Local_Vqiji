@@ -1,0 +1,68 @@
+<%= form_for([:admin,@department],:html=>{:onsubmit=>"return validate(this);",:class=>"form-horizontal"}) do |f| %>
+<div class="control-group">
+<label class="control-label">部门名称:</label>
+<div class="controls"> <%= f.text_field :name %></div>
+</div>
+<div class="control-group">
+<label class="control-label">部门级别:</label>
+<div class="controls">
+	<% if params[:action] == "edit"%>
+	<label class="checkbox"><%= @department.level == 0 ? "大部门" : "#{@department.level == 1 ? '一级部门' : '二级部门'}"%></label>
+	<% else %>
+	<% Department::LS.keys.each do |key|%>
+	<label class="radio"><%= f.radio_button :level, key %><%= Department::LS[key]%></label>
+	<%end%>
+	<% end %>
+</div>
+</div>
+<div class="control-group">
+<label class="control-label">上级部门:</label>
+<div class="controls">
+<%= render :partial => "admin/departments/select", 
+	:locals => { :id => "department_sup_id",:name=> "department[sup_id]",:default=>false, :level => 1,:select=>@department.sup_id } %>
+</div>
+</div>
+
+<div class="control-group">
+<div class="controls">
+  <%= f.submit "保存",:class=>"btn btn-primary" %>
+  <a href="javascript:window.history.back();" class="btn">返回</a>
+</div>
+</div>
+
+<%end%>
+
+<script type="text/javascript">
+
+
+/**/
+function set_level(level){
+	switch(level)
+	{
+	case 0:/*大部*/
+		$("#department_sup_id").attr("disabled","disabled");
+		break;
+	case 1:/*一级部门*/
+		$("#department_sup_id").removeAttr("disabled");
+		$(".opt_top").removeAttr("disabled");
+		$(".opt_first").attr("disabled","disabled");
+		break;
+	case 2:/*二级部门*/
+	  $("#department_sup_id").removeAttr("disabled");
+	  $(".opt_first").removeAttr("disabled");
+	  $(".opt_top").attr("disabled","disabled");
+	  break;
+	default:
+	  $("#department_sup_id").attr("disabled","disabled");
+	}
+}
+
+$(function(){
+	/**/
+$("input[name='department[level]']").click(function(){
+	set_level(parseInt(this.value));
+});
+set_level(<%= @department.level %>);
+});
+
+</script>

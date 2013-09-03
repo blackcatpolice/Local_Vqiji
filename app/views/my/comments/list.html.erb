@@ -1,0 +1,39 @@
+<% provide :title, action_name =="sends" ? '发出的评论' : '收到的评论' %>
+
+<div class="bk">
+	<div class="bk_t"></div>
+	<div class="bk_c">
+		<div class="tab">
+      <% if action_name == 'sends' %>
+        <%= link_to '收到的评论', receives_my_comments_path %>
+        <%= link_to '发出的评论', 'javascript:;', :class=>"qb on" %>
+      <%else%>
+        <%= link_to '收到的评论', 'javascript:;', :class=>"qb on" %>
+        <%= link_to '发出的评论', sends_my_comments_path %>
+      <% end%>
+		</div>
+
+	  <div data-type="comment-list">
+    	<% if @comments.any? %>
+    	  <div data-role="comment-items">
+		      <%= render :collection => @comments, :partial => '/tweets/comment' %>
+		    </div>
+        <div class="lb text-center">
+          <%= will_paginate @comment %>
+        </div>
+		  <% else %>
+		    <div class="empty"><span>没有收到评论哦～</span></div>
+		  <% end %>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+	<div class="bk_t bk_d"></div>
+</div>
+
+<script>
+  $("[data-type=comment-list]").commentList({
+    commentOptions: {
+      replayModal: true
+    }
+  });
+</script>

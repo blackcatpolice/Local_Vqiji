@@ -1,0 +1,24 @@
+<div data-type="comment-embed-list" data-tweet-id="<%= @tweet.id %>">
+  <div class="comm_t"></div>
+  <div class="lb_comm">
+    <div class="comm_form" data-role="comment-editor">
+      <div class="comm_tips remain_counter f12">您还可以输入<span class="remain">0</span>个字</div>
+      <div class="comm_ip">
+        <textarea class="texter chackTextarea" placeholder="请在这里输入您的评论" style="overflow-y: hidden;" aria-disabled="false"></textarea>
+      </div>
+      <div class="dhk_gn f12 toolbar">
+        <!-- <a class="ly" href="javascript:void(0);" data-action="audio">录音</a>
+        <a class="bq" href="javascript:void(0);" data-action="emotion">表情</a> -->
+        <a class="btn btn-danger bn submiter">评论</a>
+      </div>
+    </div>
+    
+    <div class="comment-list f12" data-role="comment-list">
+      <%= render :partial => 'tweet/comments/comment2', :as =>"comment", :collection => @comments  %>
+    </div>
+    <div class="clearfix"></div>
+    <div class="comm_list_nr red_dc5 trt f12">
+      <%= link_to "查看更多»",tweet_comments_path(@tweet.id) %>
+    </div>
+ </div>
+</div>

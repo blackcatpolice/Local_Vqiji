@@ -1,0 +1,64 @@
+
+(function($, undefined) {
+$.widget("advisory.answer_editor", $.rtext.rtextEditor, {
+    options: {
+      	placeHolder: "请在这里输入您的回复",
+      	tools: ["bigAudio"],
+      	toolbarOptions: {
+	      tip: {
+	        csses: {
+	          position: "fixed",
+	          zIndex: 1060
+	        }
+	      }
+	    }
+    },
+    
+    _create: function() {
+    	var self = this;
+      	$.rtext.rtextEditor.prototype._create.call(this);
+      	$('a[node-type=close]', this.element).click(function(){
+      		self.reset();
+      	});
+      	this.option("submit", $.proxy(this._submit, this));
+    },
+     
+    _submit: function (text, done) {
+    	var self = this;
+    	var question_id = this._question_id();
+  		if (!question_id) {
+        	$.error("Parameter 'question_id' required!");
+      	}
+    	
+    	var audio = null;
+      	if(this._audio){
+      		audio = this._audio; //将录音机的音频赋值给 附件
+      	}
+    	
+    	WEIBO.answer(question_id, text, {
+    		audio: audio,
+    		success: function(answer) {
+    			$(answer).answer().insertBefore($('#span_answer'));
+    			self.reset();
+    		},
+    		error: WEIBO.ui.errorHandler,
+	      complete: $.proxy(done, this)
+    	});
+    },
+    
+    reset: function() {
+	    // 重置录音机
+	    if (this._audioRecorder) {
+	    	this._audioRecorder.audioRecorder("reset");
+		}
+	    this._audio = null;
+	    $.rtext.rtextEditor.prototype.reset.call(this);
+    },
+    
+    _question_id: function(){
+    	return $(this.element).attr('data-id');
+    }
+    
+});
+  
+})( jQuery );

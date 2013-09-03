@@ -1,0 +1,43 @@
+<% rand_id = Time.now.to_i %>
+<div class="modal_form" id="shareFileEditor-<%= rand_id %>" data-default-group-id="0" data-default-group-cancelable="true">
+	<div class="wd_zf">
+		<div class="foo">
+			<span class="remain_counter"></span>
+		</div>
+		<div class="wd_zf_k wd_wb">
+			<textarea class="texter" placeholder="在这里输入您想说的话" style="width: 430px;"></textarea>
+			<div class="toolbar" data-type="toolbar" style="width:444px;">
+				<a href="javascript:void(0);" class="btn bn btn-danger submiter" data-dismiss="modal" style="float:right;">分 享</a>
+				<a class="send_to" data-action="send_to" style="float:right;">分发</a>
+				<span class="zy">
+          <input name="is_top" type="checkbox" value="" /> 重要
+        </span>
+			</div>
+		</div>
+		<div class="wd_wb_fj">
+			<div class="cg">
+				<a href="javascript:void(0)" data-skip-pjax title="<%= @share_file.name%>">
+				  <%= truncate_u(@share_file.name, 12)%>
+				  <br />
+				  <%= number_to_human_size @share_file.size %>
+				</a>
+			</div>
+		</div>
+	  <input type="hidden" data-type="group-id" value="<%= @group ? @group.id : 0  %>" />
+	</div>
+</div>
+<script>
+  $('#shareFileEditor-<%= rand_id %>').tweetEditor({
+	  file: { id: "<%= @share_file.id %>" },
+	  tools: ['audio', "sendTo"],
+	  isShare: true,
+      toolbarOptions: {
+        tip: {
+          csses: {
+            position: "fixed",
+            zIndex: 1060
+          }
+        }
+      }
+  });
+</script>

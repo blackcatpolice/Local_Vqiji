@@ -1,0 +1,178 @@
+<% content_for :title do %>病历上传<%end%>
+<div class="sz_nav f12">
+	<b>病历上传</b>
+</div>
+<div class="profile">
+	<div class="t"></div>
+	<div class="t c">
+		<div class="head1 mb10">
+			<div class="mt5"><input id="batch-all" name="" type="checkbox"/></div><div class="pl10">文件夹</div>
+    </div>
+    <% @mrs.each do |mr| %> 
+      <div class="med_dhk mb10" id="show<%=mr.id%>">
+      	<div class="chk"><input name="files" type="checkbox" value="<%=mr.id%>" /></div>
+      	<div class="con">
+      		<div ><%= link_to mr.title, mr.record_url, :target => "_blank", :id=>"title#{mr.id}"%><a href="javascript:;" id="<%=mr.id%>" class="changeName f12" >重命名</a></div>
+      		<div class="mt5 f12">
+      			<%= format_time(mr.created_at,"%Y-%m-%d") %>
+      			<a href="/my/medicals/<%=mr.id%>/destroy" onclick="return confirm('您确定要删除吗？');" style="float:right;" class="del"></a>
+      		</div>
+      	</div>
+     	</div>
+   	<%end%>
+       	
+   	<div class="med_bot mb10">
+ 			<input id="batch-del" class="sbtn1" name="delbat" type="button" value="批量删除"  />&nbsp;&nbsp;
+   		<input id="uploadFile" class="sbtn" name="" type="button"  value="上传文件"/>
+   	</div>
+   	
+   	<div class="med_up">
+   		<div id="uploadForm" style="display:none">
+        <%= form_for @mr,:url => my_medicals_path(@mr) do |f| %>
+          <%= f.label "title", '标题' %>:
+          <%= f.text_field :title, :class=>"inp_title" %><br /><br />
+          <%= f.label :record, '文件' %>:
+          <%= f.file_field :record %>
+          <span class="f12">(文件不能大于5M)</span><br /><br />
+          <input id="reset-up" type="button" class="sbtn1" value="取消"%>&nbsp;&nbsp;
+          <%= f.submit "上传", :id=>"file-up", :class=>"sbtn"%>
+        <% end %>
+	    </div>
+   	</div>
+  </div>
+	<div class="t d"></div>
+</div>
+<div id="dialog-form" title="重命名" >
+  <center>
+	  <p class="validateTips">请填写新文件名</p>
+	  <form>
+		  <fieldset>
+			  <label for="name">文件名</label>
+			  <input type="text" name="name" class="text ui-widget-content ui-corner-all" />
+		  </fieldset>
+	  </form>
+  </center>	
+</div>
+
+<script>
+	$(function(){
+		<% if flash[:notice] %>
+		  alert("<%= flash[:notice]%>");
+		<% end %>
+	});
+
+	$( "#dialog-form" ).dialog({
+		autoOpen: false,
+		height: 180,
+		width: 280,
+		modal: true,
+		buttons: {
+			"确认": function() {
+				var filename = $(".text").val();
+				var fileid = $(".text").attr("id");
+				
+				if (filename.match(/^\s*$/)) {
+					$.alert("文件名不能为空");
+					return false;
+				}
+				
+				var params = "title=" + filename;
+				var url = "/my/medicals/"+ fileid +"/changetitle.json";
+				$.ajax({
+					type: "post",
+					url: url,
+					dataType: "json",
+					data: params,
+					success: function(msg){
+						//setTimeout("$.alert('5 seconds!')",5000)
+						$.dialog("修改成功！");
+						$("#title"+msg._id).text(msg.title);
+					 },
+					error: function() {
+						$.alert("出错了");
+					}
+		 	 });					
+				$(this).dialog( "close" );	
+			},
+			"取消": function() {
+				$( this ).dialog( "close" );
+			}
+		},
+		close: function() {}
+	});
+
+  $(".changeName").click(function(){
+ 		$(".text").attr("id", $(this).attr("id"));
+	  $( "#dialog-form" ).dialog( "open" );
+  });
+
+	$("#uploadFile").click(function(){
+		$("#uploadForm").show();
+		$(".error").slideUp();
+	});	
+	
+	$("#reset-up").click(function(){
+		$("#uploadForm").hide();
+	});
+	
+	$("#file-up").click(function(){
+		var record = $("#qa_medical_record_record").val();
+		var title = $("#qa_medical_record_title").val();
+		
+		if(title.length == 0) {
+			$.alert("文件名不能为空");
+			return false;
+		}
+		
+		if(record.length==0){
+			$.alert("请选择文件");
+			return false;
+		}
+	});
+	
+	//选中批量
+	$("#batch-all").click(function() {
+		if ($("#batch-all").attr("checked") == "checked") {
+   	  	$("[name=files]:checkbox").attr('checked',true);
+   	  }
+   	else 
+   	{
+   			$("[name=files]:checkbox").attr('checked',false);
+   	}  
+	});
+	
+	//批量删除
+	$("#batch-del").click(function(){
+    var txt = $("input[name=files]:checked").map(function(i, ele) {
+			return $(ele).val();
+		}).get();
+ 	  					
+	  if (txt.length == 0) {
+			  $.alert("请勾选需要批量删除的病历");
+			  return false;
+   	};
+   	
+		if(!confirm("您确定要删除所选病历吗?")) {
+			return false;
+		};	
+	     		
+    var url="/my/medicals/destroy_batch.json";
+   	var params = "msgList=" + txt.join();;
+	  $.ajax({
+		  type: "post",
+		  url: url,
+		  dataType: "json",
+		  data: params,
+		  success: function(msg){
+			  for(i=0;i<msg.length; ++i){
+			    _id = "#show" + msg[i];
+		      $(_id).hide(1000);
+			  };
+			  $.dialog("删除成功！");
+		  },
+	    error: function(){
+	      $.alert("发生未知错误");
+	    }
+   	});
+	});
+</script>

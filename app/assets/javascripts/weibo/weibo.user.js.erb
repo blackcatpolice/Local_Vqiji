@@ -1,0 +1,95 @@
+// require weibo
+// require jquery_ui
+
+(function($) {
+
+  $.widget("weibo.user", {
+    _create: function() {
+      var self = this;
+      
+      this._toggler().bind("click", function() {
+        self._toggle();
+      });
+      this._setFollowed(this.isFollowed(),this.isFollowedBy());
+    },
+    
+    _toggler: function() {
+      return $("*[data-name=toggler]", this.element);
+    },
+    
+    isFollowed: function() {
+      return (this.element.attr("data-followed") == "true");
+    },
+    
+    isFollowedBy:function(){
+    	return (this.element.attr("data-followed-by")=="true");
+    },
+    
+    _toggle: function() {
+      if (this.isFollowed()) {
+        this._unfollow();
+      } else {
+        this._follow();
+      }
+    },
+    
+    _userId: function() {
+      return this.element.attr("data-id");
+    },
+    
+    _follow: function() {
+      var self = this;
+    
+      WEIBO.follow(self._userId(), {
+       success : function() {
+       	//alert(isFollowedBy());
+         self._setFollowed(true,true);
+       },
+       error : WEIBO.ui.errorHandler
+      });
+    },
+    
+    _unfollow: function() {
+      var self = this;
+    
+      WEIBO.ui.confirm('您确认取消关注TA吗？', function(ensure) {
+        if (!ensure) { return; }
+       
+        WEIBO.unfollow(self._userId(), {
+         async: false,
+         success : function() {
+           self._setFollowed(false);
+         },
+         error : WEIBO.ui.errorHandler
+        });
+      })
+    },
+    
+    _setFollowed: function(followed,followedBy) {
+    	//alert(followed+"=="+followedBy);
+      var self = this;
+      this.element.attr("data-followed", followed);
+      this.element.attr("data-followed-by", followedBy);
+      //data-followed-by
+      with(this._toggler()) {
+        fadeOut(300, function() {
+          if (followed && followedBy) {
+            html('<div><a><%= image_tag 'fw_xh.jpg' %></a><br/><a style="display: inline;">取消关注</a></div>');
+          }else if(followed){
+            html('<div><a>取消关注</a></div>');
+          } else {
+            //html('<a href="javascript:void(0);" class="basic-modal"><%= image_tag  'jia.jpg' %></a>');
+         	//<a data-action='follow' href="javascript:void(0);">+ 关注</a>
+        	//<a data-action='more' class="more"></a>
+        	//var html = '<a  href="javascript:void(0);" class="basic-modal">+ 关注</a>';
+        	//html(html);
+        	html('<a href="javascript:void(0);" class="basic-modal">+关注</a><span data-action="more" class="more"></span>');
+          }
+          
+          fadeIn(600);
+        });      
+      }
+    }
+  });
+})(jQuery);
+

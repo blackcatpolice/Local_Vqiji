@@ -1,0 +1,37 @@
+<div class="lb" data-Type="Tweet" data-id="<%= tweet.id %>" data-favorite="true" data-is-top="<%= tweet.is_top %>">
+  <div class="lb_tx" data-user-id="<%= tweet.sender.to_param %>">
+    <%= link_to image_tag(tweet.sender.avatar_url('v50x50')), user_path(tweet.sender) %>
+  </div>
+  <div class="lb_nr" title="<%= tweet.is_top ? "重要" : "" %>">
+    <%= user_tag tweet.sender %>
+    <br /><%= rtext_tag tweet.rtext %>
+  </div>
+
+  <div class="cov_nr attachments" data-role="rtext-attachments">
+    <%= render(:partial => '/attachments/audio', :object => tweet.audio) if tweet.audio -%>
+    <%= render(:partial => '/attachments/picture', :object => tweet.picture) if tweet.picture -%>
+    <%= render(:partial => '/attachments/file', :object => tweet.file) if tweet.file -%>
+    <%= render(:partial => '/tweets/reftweet', :object=> tweet.reftweet) if tweet.reftweet_id -%>
+  </div>
+  
+  <div class="lb_if f12 red_a_dc5" data-role="counter">
+    <span class="left">
+      <%= l tweet.created_at , format: :short %>
+    </span>
+    <span class="right">
+      <% if tweet.sender_id == current_user.id %>
+        <div class="delete-wraper">
+          <a href="javascript:void(0);" data-action="delete">删除</a>
+          <span class="divider">|</span>
+        </div>
+      <% end %>
+      <% if tweet.repostable? %>
+        <a href="javascript:void(0);" data-action="repost">转发(<%= tweet.reposts_count %>)</a>
+        <span class="divider">|</span>
+      <% end %>
+      <a href="javascript:void(0);" data-action="comment">评论(<%= tweet.comments_count %>)</a>
+      <span class="divider">|</span>
+      <a href="javascript:void(0);" data-action="favorite">取消收藏</a>
+    </span>
+  </div>
+</div>

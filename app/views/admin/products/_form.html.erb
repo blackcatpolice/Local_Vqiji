@@ -1,0 +1,166 @@
+<%= @product.errors.full_messages %>
+<%= form_for(@product,:url => {:controller => "products",:action=>@action},:html=>{:onsubmit=>"return validate(this);",:class=>"form-horizontal"}) do |f|  %>
+<div class="control-group">
+<%= f.label :商品名称及类型 ,:class=>"control-label" %>
+<div class="controls docs-input-sizes">
+  <%= f.text_field :name ,:class=>"inline",:maxlength=>"32" %>
+  <%= f.select "product_type", product_type_all_help(@product.product_type) %>
+</div>
+</div>
+<div class="control-group">
+<%= f.label :商品摘要 ,:class=>"control-label" %>
+<div class="controls docs-input-sizes">
+    <%= f.text_field :summary ,:class=>"inline",:maxlength=>"32" %>
+    <label class="radio inline" disabled="disabled">特别推荐</label>
+    <label class="radio inline">
+      <%= f.radio_button :recommend, true %>是
+    </label>
+    <label class="radio inline">
+      <%= f.radio_button :recommend, false %>否
+    </label>
+</div>
+</div>
+<div class="control-group"><%= f.label :基本信息 ,:class=>"control-label" %>
+<div class="controls docs-input-sizes">
+<div class="input-prepend input-append">
+    <span class="add-on">单位:</span><%= f.text_field :unit,:class=>"input-small",:onchange=>"unit_change(this.value);",:maxlength=>"3" %>
+    -<span class="add-on">数量:</span><%= f.text_field :quantity,:class=>"input-small",:maxlength=>"5" %>
+    -<span class="add-on">价格:</span><%= f.text_field :price,:class=>"input-small",:maxlength=>"5" %><span class="add-on">积分</span>
+    </div>
+</div>
+</div>
+
+<div class="control-group"><%= f.label :商品详细 ,:class=>"control-label" %>
+  <div class="controls docs-input-sizes">
+     <%= f.kindeditor :detail,:width => 800, :height => 280 %>
+  </div>
+</div>
+
+
+<div class="control-group">
+<%= f.label :图片 ,:class=>"control-label" %>
+<div class="controls docs-input-sizes">
+  <%= f.file_field :image %>
+    <% if @product.image? %>
+      <div> <%= image_tag(@product.image.v200x200) if @product.image?  %></div>
+    <%end%>
+  </div>
+</div>
+<div class="control-group">
+<label class="control-label">
+  <input type="checkbox" name="has_styles" value="1" onclick="has_diff_styles(this);" style="display: inline;" <%= @product.has_styles ? "checked='checked'" : "" %> />
+  <span>此商品有不同的款式</span>
+  </label>
+  <div class="controls docs-input-sizes">
+     <div class="field" id="div_product_styles" >
+      <%
+      html_options = Hash.new
+      html_options["disabled"] = "disabled" if !@product.has_styles
+      %>
+      <%= f.select "style_option", style_options_help(@product.style_option),{},html_options %>
+      <%= f.text_field :styles ,html_options%> 
+      <span class="help-inline"> 多个用空格( )隔开如：红色  蓝色  白色</span>
+      </div>
+    </div>
+</div>
+<div class="control-group"><%= f.label :兑换时间 ,:class=>"control-label" %>
+  <div class="controls">
+    <div class="input-prepend input-append">
+      <%= f.text_field :begin_date,:id=>"datepicker_begin",:class=>"input-small" %><span class="add-on">至</span><%= f.text_field :end_date,:id=>"datepicker_end",:class=>"input-small" %>
+      <label class="radio inline" disabled="disabled">商品状态</label>
+      <label class="radio inline"><input type="radio" value="1" name="store_product[enable]" <%= @product.enable ? "checked='checked'" : ""%> />上架</label>
+      <label class="radio inline"><input type="radio" value="0" name="store_product[enable]" <%= !@product.enable ? "checked='checked'" : ""%> />下架</label>
+    </div>
+  </div>
+</div>
+
+<div class="control-group"><%= f.label :兑换方式 ,:class=>"control-label" %>
+  <div class="controls">
+      <select name="store_product[exchange]" onchange="exc(this.value);";>
+        <option value="0" title="需要填写报销单" >发票报销</option>
+        <option value="1" title="直接用积分兑换" <%= "selected='selected'" if @product.exchange%> >直接兑换</option>
+      </select>
+  </div>
+</div>
+<div class="control-group"><%= f.label :取货方式 ,:class=>"control-label" %>
+  <div class="controls">
+     <div class="input-prepend">
+      <select name="store_product[post]">
+        <option value="0">自提</option>
+        <option value="1" <%= "selected='selected'" if @product.post %> >邮递</option>
+      </select>
+      </div>
+  </div>
+</div>
+<div class="control-group"><%= f.label :提货说明 ,:class=>"control-label" %>
+  <div class="controls">
+     <div class="input-prepend input-append">
+      <%= f.text_field :pickup ,:class=>"",:maxlength=>"100" %>
+       <span>选择邮递时无需填写</span>
+      </div>
+  </div>
+</div>
+<div class="control-group"><%= f.label :邮费 ,:class=>"control-label" %>
+  <div class="controls">
+     <div class="input-prepend input-append">
+       <span class="add-on">每</span><%= f.text_field :postage_unit ,:class=>"input-small",:maxlength=>"3" %><span class="add-on" id="post_unit"><%= @product.unit%></span><%= f.text_field :postage ,:class=>"input-small",:maxlength=>"4" %><span class="add-on">积分</span>
+        <span>选择自提时无需填写</span>
+      </div>
+  </div>
+</div>
+<!--
+<div class="control-group"><%= f.label :商品备注 ,:class=>"control-label",:maxlength=>"100" %>
+  <div class="controls">
+      <%= f.text_field :remark ,:class=>"" %>
+  </div>
+</div>
+-->
+<div class="form-actions">
+<%= f.submit "保存",:class=> "btn btn-primary"%>
+</div>
+<%end%>
+
+<script type="text/javascript">
+function exc(v){
+  
+}
+$(function() {
+	$("#datepicker_begin").datepicker({ dateFormat: "yy-mm-dd" });
+	$("#datepicker_end").datepicker({ dateFormat: "yy-mm-dd" });
+});
+function has_diff_styles(chk){
+	if(chk.checked){
+		$("#store_product_style_option").removeAttr("disabled");
+		$("#store_product_styles").removeAttr("disabled");
+	}else{
+		$("#store_product_style_option").attr("disabled","disabled");
+		$("#store_product_styles").attr("disabled","disabled");
+	}
+}
+function unit_change(unit){
+$("#post_unit").text(unit);
+}
+function validate(from){
+var name = $("#store_product_name").val();
+if(!name.replace(/\s/g,'')){
+  alert("请输入商品名称");
+  return false;
+}
+var price = $("#store_product_price").val();
+if(!/^[1-9]\d*$/.test(price)){
+    alert("商品价格必须为正整数");
+    return false;
+}
+var quantity = $("#store_product_quantity").val();
+if(!/^[1-9]\d*$/.test(quantity)){
+    alert("商品数量必须为正整数");
+    return false;
+}
+var unit = $("#store_product_unit").val();
+if(!unit.replace(/\s/g,'')){
+  alert("请输入商品单位");
+  return false;
+}
+return true;
+}
+</script>

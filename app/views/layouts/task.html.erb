@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= @title %></title>
+    <%= csrf_meta_tags %>
+    <%= stylesheet_link_tag    "frameworks" %>
+    <%= stylesheet_link_tag 'task' %>
+    
+	  <script type="text/javascript">
+      <% if user_signed_in? %>
+     		$CURRENT_USER = <%= raw current_user.to_builder.target! %>;
+	    <% end %>
+   	</script>
+    <%= javascript_include_tag "frameworks" %>
+    <%= javascript_include_tag 'task' %>
+  </head>
+  <body>
+    <%= yield %>
+  </body>
+</html>

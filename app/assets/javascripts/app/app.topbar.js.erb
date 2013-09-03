@@ -1,0 +1,250 @@
+// require _base
+
+
+// 顶部工具插件
+(function($) {
+  $.widget("app.topbar", {
+    _create: function() {
+      this._initSearchField();// 找人
+      this._initNotifacationsBoard();// 通知中心
+      this._on("[data-action=sign_out]", { click: this.signOut });
+      // jquery widget 插件机制的_on用法，给特殊的jquery元素绑定事件及处理
+      // 在这里，相当于给元素data-action属性为sign_out的元素绑定单击事件，事件处理方法signOUt
+    },
+    
+    _destroy: function() {
+      this._destroyNotifacationsBoard();
+    },
+    
+    // 找人
+    _initSearchField: function() {
+      this.element.find(".search-query")
+        .typeahead({ // bootstrap自动完成插件
+          source: function(query, process) { // 数据源，query是查询的关键字，process是callback
+            if (this._initSearchField_queryXHR) {
+              this._initSearchField_queryXHR.abort();
+            }
+            //  App.api.searchUserByName是在app/app.api.js中定义的方法，这里会返回ajax请求对象
+            this._initSearchField_queryXHR = App.api.searchUserByName(query, {
+            //  将success与complete的callback合并到查询的ajax请求对象中去，相当于在这里定义了这两个回调
+              success: function(users) {
+                process.call(this, $.map(users, function(user, _) {
+                  return user.name;
+                }));
+              },
+              complete: $(function() {
+                this._initSearchField_queryXHR = null;
+              }, this)
+            });
+          },
+          matcher: function() {
+            return true;
+          },
+          items: 5
+        }).placeholder(); // 显示提示字符“找人”
+    },
+    
+    // 通知中心
+    _initNotifacationsBoard: function() {
+      if (! this._notificationsBoard) {
+          //创建通知面板，就在该文件下面部分定义
+         this._notificationsBoard = new NotificationBoard(this.element.find("[data-action=toggle_notifications_board]"));
+      }
+    },
+    
+    _destroyNotifacationsBoard: function() {
+      if (! this._notificationsBoard) {
+        this._notificationsBoard.destory();
+        this._notificationsBoard = null;
+      }
+    },
+
+    // 退出
+    signOut: function(e) {
+      e.preventDefault(); // 阻止事件发生默认行为
+      $.confirm("确认退出？", function(ensure) {
+        if (!ensure) { return };
+          window.location = "/sign_out.html";
+        });
+      return false;
+    }
+  });
+
+
+  //  通知面板
+  function NotificationBoard(trigger) {
+    //  将面板本身的事件触发器设置为 jquery(window)的触发器设置
+    this.$trigger = $(trigger);
+    this.init();
+  }
+
+  //  扩展NotificationBoard
+  $.extend(NotificationBoard.prototype, {
+    init: function() {
+      this.$trigger.popover(this._getPopoverOptions());
+      this.$badge = $("<span class=\"badge\">0</span>").prependTo(this.$trigger);
+      this.$trigger //  注册鼠标出入事件，mouseenter是事件名，.nb是事件的namespace
+        .on("mouseenter.nb", $.proxy(this._onMouseEnter, this)) //jquery的proxy方法是将当前对象的注入到指定方法的this上下文
+        .on("mouseleave.nb", $.proxy(this._onMouseLeave, this));
+
+      this._$updateBadge = $.proxy(this.updateBadge, this);
+      setTimeout(this._$updateBadge, 3000); // 初始化页面后3秒自动更新一次
+
+      this._$onCountChanged = $.proxy(this._onCountChanged, this);
+      App.realtime.triggers.register('notificationsCountChanged', this._$onCountChanged);
+
+      // 强制更新 content
+      this._forceUpdateContent = true;
+    },
+
+    show: function() {
+      this.$trigger.popover("show");
+    },
+
+    hide: function() {
+      this.$trigger.popover("hide");
+    },
+
+    destroy: function() {
+      App.realtime.triggers.unregister('notificationsCountChanged', this._$onCountChanged);
+      
+      this.$trigger
+        .off("shown.nb").off("hidden.nb")
+        .off("mouseenter.nb").off("mouseleave.nb")
+        .popover("destroy");
+      
+      if (this.$content) {
+        this.$content.off("mouseenter.nb").off("mouseleave.nb");
+        this.$content = null;
+      }
+    },
+
+    _getPopoverOptions: function() {
+      return {
+        placement: "bottom",
+        animation: true,
+        html: true,
+        title: '通知中心',
+        content: $.proxy(this._getContent, this),
+        template: '<div class="popover ntb"><div class="arrow"></div><div class="popover-content"></div></div>',
+        container: 'body'
+      };
+    },
+    
+    _onShown: function() {
+      this.$content
+        .on("mouseenter.nb", $.proxy(this._onMouseEnter, this))
+        .on("mouseleave.nb", $.proxy(this._onMouseLeave, this));
+
+      if (this._isNeedUpdateContent()) {
+        this.updateContent();
+      }
+      this._isShown = true;
+    },
+    
+    _onHidden: function() {
+      this.$content.off("mouseenter.nb").off("mouseleave.nb");
+      if (this._isNeedUpdateContent()) {
+        this.updateContent();
+      }
+      this._isShown = false;
+    },
+    
+    _isNeedUpdateContent: function() {
+      return (this._forceUpdateContent || this._countChanged);
+    },
+    
+    updateContent: function() {
+      if (! this.$content) return;
+      var self = this;
+      self.$content.spin("small");
+
+      $.ajax("/notifications/nb.html", {
+        dataType: "html",
+        cache: false,
+        success: function(nb) {
+          self.$content.html( nb );
+        },
+        error: function(jqXHR, httpStatus, throwErrors) {
+          var errorMsg = App.error.XHRError(jqXHR, httpStatus, throwErrors, "获取未读消息列表失败!");
+          self.$content.html( $("<div class=\"error\"></div>").text(errorMsg) );
+        },
+        complete: function() {
+          self._countChanged = self._forceUpdateContent = false;
+          self.$content.spin(false);
+        }
+      });
+    },
+    
+    _getContent: function() {
+      if (!this.$content) {
+        this.$content = $("<div data-role=\"content\"></div>");
+        this.$trigger
+          .on("shown.nb", $.proxy(this._onShown, this))
+          .on("hidden.nb", $.proxy(this._onHidden, this));
+      }
+      return this.$content;
+    },
+    
+    // 更新 badge
+    updateBadge: function(force) {
+      if (this._updateBadgeXHR) {
+        if (!force) {
+          return;
+        }
+        this._updateBadgeXHR.abort();
+      };
+      
+      var self = this;
+      
+      //  类似上面的查找用户，notificationsCount同样定义在app/app.api.js中
+      this._updateBadgeXHR = App.api.notificationsCount({
+        success: function(count) {
+          self.setBadgeCount(count);
+        }/*,
+        error: function(jqXHR, textStatus, errorThrown) {
+          if (textStatus == "abort") {
+            return;
+          }
+          $.error("fetch notifications count error: " + errorThrown);
+        }*/,
+        complete: function() {
+          self._updateBadgeXHR = null;
+        }
+      });
+    },
+
+    _onCountChanged: function(newCount) {
+      this.setBadgeCount(newCount);
+      this._countChanged = true;
+      if (this._isShown) {
+        this.updateContent();
+      }
+    },
+    
+    _onMouseEnter: function() {
+      if ( this._mouseLeavelHideTimer ) {
+        clearTimeout( this._mouseLeavelHideTimer );
+        this._mouseLeavelHideTimer = null;
+      }
+    },
+    
+    _onMouseLeave: function() {
+      if ( this._mouseLeavelHideTimer ) {
+        clearTimeout( this._mouseLeavelHideTimer );
+      }
+      this._mouseLeavelHideTimer = setTimeout( $.proxy(function() {
+        this._mouseLeavelHideTimer = null;
+        this.hide();
+      }, this), 5000 );
+    },
+
+    setBadgeCount: function(count) {
+      if (count > 0) {
+        this.$badge.text(count).addClass("badge-important");
+      } else {
+        this.$badge.text(0).removeClass("badge-important");
+      }
+    }
+  });
+})(jQuery);

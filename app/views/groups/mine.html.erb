@@ -1,0 +1,48 @@
+<% provide :title, '我的工作组' %>
+
+<div class="main_n">
+  <div class="bk">
+    <div class="bk_td f13">
+      <div class="gzz_jj">
+      	<span>
+      	  我的工作组
+      		<a class="right btn btn-danger bn" href="/groups/new">新建工作组</a>
+      	</span>
+      </div>
+      <div class="gzz_tab">
+        <%= link_to "我的工作组",mine_groups_path(),:class=>"on"%>
+			  <%= link_to "所有工作组",list_groups_path()%>
+        <div class="input-append"></div>
+      </div>
+    </div>
+    
+    <div class="bk_c">
+      <div class="gzz_list">
+        <% if @group_members.any? %>
+		      <% @group_members.each do |gm|%>
+		        <%= render :partial=> "group", :locals=> {
+		          :group => gm.group, :in_group => true, :is_admin=> gm.is_admin } %>
+	        <% end %>
+
+          <div class="lb text-center">
+            <%= will_paginate @group_members, inner_window: 1, outer_window: 0 %>
+          </div>
+		    <% else %>
+	        <div class="empty"><span>您还没有加入任何工作组哦～</span></div>
+		    <% end %>
+
+        <div class="clearfix"></div>
+      </div>
+    </div>
+
+    <div class="bk_t bk_d"></div>
+  </div>
+</div>
+
+<script>
+	$(function(){
+		<% if flash['notice'] %>
+		  $.alert("<%= flash['notice']%>");
+		<% end %>
+	});
+</script>

@@ -1,0 +1,9 @@
+zh-CN:
+  mongoid:
+    models:
+      question_type: "咨询类型"
+      
+    attributes:
+      question_type:
+        name: "咨询类型名"
+        priority: "优先级"

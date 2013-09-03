@@ -1,0 +1,57 @@
+<% end_date_msg = " #{@training.end_date.year}年#{@training.end_date.month}月#{@training.end_date.day}日" %>
+<div class="main_zx">
+<div class="zx_hd">
+  <a class="tit t_px" href="/elearn/trainings">我的培训</a> &gt;&gt;
+  <%= link_to @training.name, elearn_training_path(@training)%>
+</div>
+  <div class="zx_bd">
+      <div class="bk_t"></div>
+      <div class="bk_c">
+        <div class="px_t px_t2">
+          <%= image_tag "logo.png"%>
+        </div>
+        <div class="px_t1">
+          <span class="left">截止日期：
+            <% if @training.timeout%>
+               <b><%= @training.end_date.strftime("%Y年%m月%d日") %></b>(已截止)
+            <%else%>
+               <%= @training.end_date.strftime("%Y年%m月%d日") %>
+            <%end%>
+          </span>
+          <% if @tu.check && @training.tests_count > 0%>
+          <span class="right">考试所得分数：<b style="color:#da4f49;"><%= @tu.score if @tu.check %>分</b></span>
+          <% end %>
+        </div>
+        <% if flash[:notice] %>
+         <div class="alert alert-error"><span><%= flash[:notice] %></span></div>
+        <%end%>
+        <div class="px_nr">
+        <div class="px_nrt left">
+          <!-- <a href="#" class="zt2"></a> -->
+          <%= link_to_training_status @tu %>
+        </div>
+        <div class="px_nrz f13 left">
+              <p class="red_a_dc5"><%= @training.name %></p>
+             <% if @training.tests_count > 0%>
+          	 <span>培训合格分数：<%= @training.pass_score %>分</span><br/>
+          	 <% end %>
+              <span>培训类型：</span><%= @training.type.name%><br/>
+              <span>培训简介：</span><br/><%= @training.summary %>
+        </div>
+        </div>
+        <div class="px_t1 px_t3">培训目录</div>
+        <div class="px_ml">
+          <ol>
+            <% @training.pages.asc("number").each do |page|%>
+            <li class="<%= 'red_a_dc5' if @tu.pages.include? page.id %>">
+            <%= link_to page.title,elearn_training_page_path(:training_id=>@training.id,:id=>page.id)%>
+            </li>
+            <%end%>     
+          </ol>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="bk_t bk_d"></div>
+    </div>
+<div class="zx_db"></div> 
+</div>

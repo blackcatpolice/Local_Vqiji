@@ -1,0 +1,17 @@
+<% content_for :title do %>专题<%end%>
+<div class="sz_nav f14">
+	<b>专题详细</b> » <%= @subject.title%>
+</div>
+
+<div class="adv">
+	<div class="adv_t"></div>
+	<div class="adv_dhk">
+		<div class="ts_tt f18 blue_82 ts_tt1">
+			<%= @subject.title%>
+		</div>
+		<div class="zd_nr">
+			<%= raw @subject.detail %>
+		</div>
+	</div>
+	<div class="adv_t adv_d"></div>
+</div>

@@ -1,0 +1,18 @@
+defaults: &defaults
+  distribution: :random
+  timeout: 2
+  connect_timeout: 1
+
+#production:
+#  <<: *defaults
+#  servers:
+#    - kestrel01.example.com:22133
+#    - kestrel02.example.com:22133
+#    - kestrel03.example.com:22133
+
+development:
+  <<: *defaults
+  servers:
+    - localhost:22133
+  show_backtraces: true
+

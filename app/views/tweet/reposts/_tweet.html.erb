@@ -1,0 +1,24 @@
+<div class="lb" data-type="Tweet" data-id="<%= tweet.id %>">
+	<div class="lb_tx" data-user-id="<%= tweet.sender.to_param %>">
+	  <%= link_to image_tag(tweet.sender.avatar_url('v50x50'), :class => 'avatar_v50x50'), user_path(:id => tweet.sender.id) %>
+	</div>
+  <div class="lb_nr">
+  	<%= link_to "#{tweet.sender.name}：", user_path(:id => tweet.sender.id), :'data-user-id' => tweet.sender.to_param %><%= rtext_tag tweet.rtext %>
+  </div>
+  <div class="lb_if f12 red_a_dc5" data-role="counter">
+  	<span class="left"><%= l tweet.created_at, format: :short %></span>
+  	<span class="right">
+      <% if tweet.sender == current_user %>
+        <div class="delete-wraper">
+          <a href="javascript:void(0);" data-action="delete">删除</a>
+          <span class="divider">|</span>
+        </div>
+      <% end %>
+      <% if tweet.repostable? %>
+  		  <a href="javascript:void(0);" data-action="repost">转发(<%= tweet.reposts_count %>)</a>
+  		  <span class="divider">|</span>
+  		<% end %>
+  		<a href="javascript:void(0);" data-action="comment">评论(<%= tweet.comments_count %>)</a>
+  	</span>
+  </div>
+</div>

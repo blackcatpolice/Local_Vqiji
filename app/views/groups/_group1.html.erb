@@ -1,0 +1,19 @@
+<div class="gz_lb" title="">
+<div class="sz left">
+<div class="tb red_dc5">
+<%= in_group ? link_to(group.name,group_path(group),:class=>"f16") : raw("<a href='#' class='f16' >#{group.name}</a>") %> 
+微博：<%= in_group ? link_to(group.tweets_count,group_path(group)) : group.tweets_count %>
+成员：<%= in_group ? link_to(group.members_count,group_members_path(group)) : group.members_count %><br />
+简介：<%= group.summary %>
+</div>
+<div class="db f12">
+  管理员:<% group.admin_users.each do |user|%>
+    <%= user_tag user%>
+  <%end%>
+</div>
+</div>
+<div class="ani left f12">
+  <a class="glz" href="javascript:void(0);">
+    <%= in_group ? "已加入" : "未加入" %></a>
+</div>
+</div>

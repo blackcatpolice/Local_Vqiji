@@ -1,0 +1,55 @@
+<div class="container reg_con">
+  <div class="reg">
+    <div class="reg_t">获取帐号</div>
+    <div class="reg_c">
+      <%= form_for(resource, :as => resource_name, 
+      :url => registration_path(resource_name),:html=>{:class=>"form-horizontal"}) do |f| %>
+        <input type="hidden" name="check_id" value="<%= @check.id %>" />
+        <fieldset>
+          <div class="reg_line f18">请填写注册信息</div>
+          <% if @check.get_message("user") %>
+          	<div class="alert alert-error"><span><%= @check.get_message("user")%></span></div>
+          <% end %>
+          <div class="control-group">
+            <label class="control-label" for="input01">真实姓名: <span>*</span></label>
+            <div class="controls">
+               <input type="text" readonly="readonly" value="<%= @check.name %>" class="input-xlarge" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">员工号: <span>*</span></label>
+            <div class="controls">
+              <input type="text" readonly="readonly" value="<%= @check.job_no %>" class="input-xlarge" />
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">邮箱: <span>*</span></label>
+            <div class="controls">
+              <%= f.text_field :email, :autofocus => true,:placeholder=>"邮箱",:class=>"input-xlarge" %>
+          	<p class="help-block"><%= @check.get_message("email") %></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">密码: <span>*</span></label>
+            <div class="controls">
+              <%= f.password_field :password,:placeholder=>"密码",:class=>"input-xlarge" %>
+        		<p class="help-block"><%= @check.get_message("password") %></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">确认密码: <span>*</span></label>
+            <div class="controls">
+               <%= f.password_field :password_confirmation,:placeholder=>"确认密码",:class=>"input-xlarge" %>
+            </div>
+          </div>
+          <div class="reg_btn">
+          	<%= image_submit_tag("reg_con.png") %>
+          	<%= link_to "返回登录", new_session_path("user") %>
+          </div>
+        </fieldset>
+      <% end %>
+      <div class="clearfix"></div>
+    </div>
+    <div class="reg_d"></div>
+  </div>
+</div>

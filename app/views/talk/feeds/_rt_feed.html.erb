@@ -1,0 +1,42 @@
+<% message = feed.message -%>
+<% unless message.sys? -%>
+  <div data-type="TalkRealtimeMessage" data-id="<%= feed.id %>" data-position="<%= message.sender == current_user ? 'right' : 'left' %>">
+    <div class="tp_date"><%= message.sender.name %>&nbsp;<%= l feed.created_at, format: :short %></div>
+    <div class="tp_pop lp_na">
+      <div class="arrow"></div>
+      <div class="tp_pop3">
+        <%= message.rtext_html %>
+      </div>
+      <% if message.audio || message.picture || message.file %>
+      <div class="rtm-attachments">
+        <% if (_audio = message.audio) %>
+          <div class="attachment audio" data-src="<%= _audio.url %>" data-duration="<%= _audio.duration %>"></div>
+        <% end %>
+        <% if (_picture = message.picture) %>
+          <div class="attachment picture" data-origin-src="<%= _picture.url %>">
+            <img class="thumb" src="<%= _picture.file.thumb.url %>" title="点击查看原图" />
+          </div>
+        <% end %>
+        <% if (_file = message.file) %>
+          <div class="attachment file">
+            <a href="javascript:void(0)" title="<%= _file.name %>"><%= truncate(_file.name) %></a>
+            <p>
+              <%= number_to_human_size(_file.size) %>
+              &nbsp;<a class="dl" href="<%= download_attachment_path(_file) %>" target="_blank" data-skip-pjax>下载</a>
+            </p>
+          </div>
+        <% end %>
+      </div>
+      <% end %>
+    </div>
+  </div>
+<% else -%>
+  <div data-type="TalkRealtimeMessage" data-id="<%= feed.id %>">
+    <% case message.type -%>
+    <% when Talk::Message::Sys::TYPE_USER_JOIN -%>
+      <div class="lb_in f13"><%= message.actor.name %>加入了会话组</div>
+    <% when Talk::Message::Sys::TYPE_USER_QUIT -%>
+      <div class="lb_in f13 lb_out"><%= message.actor.name %>退出了会话组</div>
+    <% end -%>
+  </div>
+<% end -%>

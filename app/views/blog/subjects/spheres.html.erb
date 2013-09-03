@@ -1,0 +1,26 @@
+<% content_for :title do %>专题列表<%end%>
+<div class="sz_nav f12"><span class="left"><b>专题列表</b></span></div>
+<div class="adv">
+	<div class="adv_t"></div>
+   	<div class="adv_dhk">
+    	<div class="fw_kt"><img src="<%= @spheres.header_image.url%>"></div>
+    	<div class="zt_hd">
+    		<div class="zt_tu left"><img src="<%= @spheres.body_image.url%>"></div>
+    		<% unless @subjects.blank?
+    			fsub = @subjects.first 
+    		%>
+    		<div class="zt_z left blue f13">
+      			<p class="f15"><%= link_to truncate(fsub.title, :length => 18), blog_subject_path(fsub), :target => "_blank" %></p><%= sub_string(fsub.detail, "&nbsp;", 150)%> <%= link_to '查看全文>>', blog_subject_path(fsub), :target => "_blank" %></div>
+  			</div>
+			<% end %>
+			<% @subjects.each do |s| next if fsub.id == s.id%>
+     		<div class="px_list px_list1">
+      	  		<div class="pic"></div>
+      	  		<div class="tit"><span class="blue f15"><%= link_to truncate(s.title, :length => 18), blog_subject_path(s), :target => "_blank" %></span></div>
+      	  		<div class="dbz"><%= sub_string(s.detail, "&nbsp;", 150)%><span><%= link_to '查看全文>>', blog_subject_path(s), :target => "_blank" %></span></div>
+        	</div>
+        	<%= will_paginate @subjects %>
+        	<% end %>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,131 @@
+<form data-pjax action="<%= destroy_list_network_disks_path%>" id="network_disk_form" method="post">
+<input type="hidden" name="fid[]" data-name="fileId" value="" />
+<div class="bk" node-type="FileListOperate">
+  <div class="bk_wpt">
+    <p>我的网盘</p>
+    <a class="btn_addPic btn btn-danger bn" href="javascript:;" data-action="file_upload"><span>上传文件</span></a>
+    <a class="btn_addPic btn btn-danger bn" href="javascript:;" data-action="history_upload" style="margin-left:30px;"><span>上传病历</span></a>
+    <a class="btn bn btn-warning right" href="javascript:;" data-action="delete_list">批量删除</a>
+  </div>
+  <div class="bk_c">
+    <% if @files.any? %>
+      <div class="wp_t">
+      	<div class="w25"><input name="checkbox_list" type="checkbox"></div>
+      	<div class="w220">文档名</div>
+      	<div class="w60">大小</div>
+      	<div class="w130">创建时间</div>
+      </div>
+      <span id="fileAppendSpan"></span>
+      <%= render :collection => @files, :partial => 'network_disks/file' %>
+      <%= will_paginate @files %>
+    <% else %>
+      <div class="empty"><span>还没有文件哦～</span></div>
+    <% end %>
+  </div>
+  <div class="bk_t bk_d"></div>
+</div>
+</form>
+<div class="wp_gd f12" id="moreFileOperate" style="display:none;" fid="">
+	<a href="javascript:;" data-action="frename">重命名</a>
+	<a href="javascript:;" data-action="fencrypt">加密</a>
+	<a href="javascript:;" data-action="fdelete">删除</a>
+</div>
+<%= render 'encrypt'%>
+<script>
+	var _newNameInput = $('<input name="newname" value="" title="按Enter键确定，按ESC键取消" style="width:180px;height:14px;" onblur="javascript:_rename();"/>');
+
+	$('div[node-type=FileListOperate]').upload();
+	$('div[node-type=File]').fileOperate();
+	$('form[data-pjax]').on('submit', function(event){
+    	$.pjax.submit(event, '[data-pjax-container]');
+  	}).click(function(){
+		$('#moreFileOperate').hide();
+		if($('input[name=newname]', 'div[node-type=File]').length > 0){
+    		_rename();
+    	}
+	});
+	
+	$('[data-action=frename]', '#moreFileOperate').click(function(e){
+		e.stopPropagation();
+		$('#moreFileOperate').hide();
+    $('[data-name=fname]').show();
+		
+		var _fid = $('#moreFileOperate').attr('fid'), _fileNmae = $('#fid_' + _fid).attr('data-name');
+    $('[data-type=history]', '#fid_' + _fid).hide();
+		_newNameInput.val(_fileNmae.substr(0, _fileNmae.lastIndexOf(".") > 0 ? _fileNmae.lastIndexOf(".") : _fileNmae.length)).click(function(e){
+			e.stopPropagation();
+		}).keydown(function(e){
+	  		if(e.keyCode == 13){
+	  			_rename();
+	  			return false;
+	  		}else if(e.keyCode == 27){
+	  			_newNameInput.remove();
+          		$('[data-type=history]', '#fid_' + _fid).show();
+	  			$('[data-name=fname]', '#fid_' + _fid).show();
+	  		}
+  		}).insertAfter($('[data-name=fname]', '#fid_' + _fid));
+  		_newNameInput[0].focus();
+  		$('[data-name=fname]', '#fid_' + _fid).hide();
+	});
+
+	$('[data-action=fdelete]', '#moreFileOperate').click(function(){
+		$('#moreFileOperate').hide();
+		$.confirm("是否删除文件？", function(flag){
+  		if(flag){
+   			$(':hidden[data-name=fileId]').val($('#moreFileOperate').attr('fid'));
+      	$('form[data-pjax]').submit();
+  		}
+ 		});
+	});
+	
+	var _rename = function(){
+		var _fid = $('#moreFileOperate').attr('fid');
+		var _newName = _newNameInput.val();
+		if(!_newName || _newName == $('#fid_' + _fid).attr('data-name')){
+			_newNameInput.remove();
+      $('[data-type=history]', '#fid_' + _fid).show();
+			$('[data-name=fname]', '#fid_' + _fid).show();
+			return false;
+		}
+		WEIBO.diskFileRename(_fid, {
+			name: _newName,
+			success: function(data) {
+				$('#fid_' + _fid).attr('data-name', data.new_name);
+				$('[data-name=fname]', '#fid_' + _fid).text(subString(data.new_name, 21)).show();
+        $('[data-type=history]', '#fid_' + _fid).show();
+				_newNameInput.remove();
+  		},
+  		error: WEIBO.ui.errorHandler
+		});
+  }
+  
+  var subString = function(str, len, omission){
+		var omission = omission || "...";
+		var newLength = 0;   
+	 	var newStr = "";   
+    var chineseRegex = /[^\x00-\xff]/g;   
+    var singleChar = "";   
+    var strLength = str.replace(chineseRegex,"**").length;   
+    for(var i = 0;i < strLength;i++){   
+        singleChar = str.charAt(i).toString();   
+        if(singleChar.match(chineseRegex) != null)   
+        {   
+            newLength += 2;   
+        }       
+        else   
+        {   
+            newLength++;   
+        }   
+        if(newLength > len)   
+        {   
+            break;   
+        }   
+        newStr += singleChar;   
+    }   
+       
+    if(len && strLength > len){   
+        newStr += omission;   
+    }
+    return newStr;
+	}
+</script>

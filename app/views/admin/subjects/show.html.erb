@@ -1,0 +1,11 @@
+<% content_for :title do%>专题详细<%end%>
+<div>
+	标题：
+	<%= @subject.title %>
+</div>
+
+<div>
+	详情：
+	<%= @subject.detail.html_safe %>
+</div>
+

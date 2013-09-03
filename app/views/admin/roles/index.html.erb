@@ -1,0 +1,30 @@
+<% content_for :title do%>角色列表<%end%>
+<table class="table">
+<thead>
+<tr>
+  <th>角色名</th>
+  <th>备注</th>
+  <th>创建时间</th>
+  <th>权限数量</th>
+  <th>操作</th>
+</tr>
+</thead>
+<tbody>
+<% @roles.each do |role| %>
+  <tr>
+    <td><%= role.name %></td>
+    <td><%= role.remark %></td>
+    <td><%= role.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+    <td><%=  role.menu_ids ? role.menu_ids.length : 0 %></td>
+    <td>
+    	<%= link_to '编辑', edit_admin_role_path(role) %>
+    	<% link_to '删除',{:controller=>"roles",:action=>"destroy",:id=>role.id} %>
+    </td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+
+<br />
+
+<%= link_to '新建角色', new_admin_role_path %>

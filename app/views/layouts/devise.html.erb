@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <meta name="description" content="川航云平台" />
+
+  <%= stylesheet_link_tag 'devise' %>
+  <%= javascript_include_tag 'devise' %>
+</head>
+
+<body>
+  <div class="devise">
+    <div class="navbar navbar-fixed-top">
+      <%= image_tag 'logo.png' %>
+    </div>
+
+    <div class="main">
+      <%= render '/layouts/partials/old_brower_alert' %>
+      <%= yield %>
+    </div>
+
+    <div class="fixed-bottom">
+      <div class="tie"></div>
+      <div class="clouds2"></div>
+      <div class="qiqiu"></div>
+      <%= render '/layouts/nav/foot' %>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,161 @@
+//
+// 文件上传
+//
+// require jquery
+// require jquery_ui
+// require jquery.tmpl
+// require weibo
+
+$.widget("rtext.fileUploader", {
+  options: {
+  },
+  
+  _create: function() {
+    this._waitingView = this._createWaitingView();
+    this.element.append(this._waitingView);
+  },
+  
+  reset: function() {
+    if (this._uploadingView) {
+      this._uploadingView.remove();
+      this._uploadingView = null;
+    }
+    
+    if (this._fileView) {
+      this._fileView.remove();
+      this._fileView = null;
+    }
+    
+    if (this._uploadFaildView) {
+      this._uploadFaildView.remove();
+      this._uploadFaildView = null;
+    }
+    
+    this._file = null;
+    this._waitingView.show();
+  },
+  
+  _createWaitingView: function() {
+    var _view = $('' +
+        '<div class="waiting">' +
+          '<span class="file-button">' +
+            '<input type="file" name="file[file]" size="1" />' +
+            '<a href="javascript:void(0);">本地文件</a>' +
+          '</span>' +
+          '<p class="notice">' +
+            '支持上传<b>5M</b>以下的任意类型文件' +
+          '</p>' +
+        '</div>');
+
+    $("input[type=file]", _view).fileupload({
+       url: '/attachments/file.json',
+       type: 'POST',
+       dataType: 'json',
+       dropZone: _view,
+       sequentialUploads: true
+     })
+     .bind("fileuploadsubmit", $.proxy(this._onfileuploadsubmit, this))
+     .bind("fileuploaddone", $.proxy(this._onfileuploaddone, this))
+     .bind("fileuploadfail", $.proxy(this._onfileuploadfail, this))
+     .bind("fileuploadalways", $.proxy(this._onfileuploadalways, this));
+    return _view;
+  },
+  
+  _onfileuploadsubmit: function (e, data) {
+      this._waitingView.hide();
+      this._uploadingView = this._createUploadingView()
+       .appendTo(this.element).show();
+   },
+   
+   _onfileuploaddone: function (e, data) {
+      var _file = data.result;
+      if (_file && (_file._type === "Attachment::File")) {
+        this._uploadingView.remove();
+        this._uploadingView = null;
+        if (this._fileView) {
+          this._fileView.remove();
+        }
+        this._fileView = this._createfileView(_file)
+         .appendTo(this.element).show();
+        this._file = _file;
+        this._trigger("uploaded", null, _file);
+      } else {
+        var error = App.error.Error(_file);
+        this._fileuploadFail(error);
+      }
+   },
+
+   _onfileuploadfail: function (e, data) {
+      var error = App.error.parseError(data.jqXHR.responseText);
+      this._fileuploadFail(error);
+   },
+   
+   _fileuploadFail: function (error) {
+      this._uploadingView.remove();
+      this._uploadingView = null;
+      this._uploadFaildView = this._createUploadFaildView(error)
+       .appendTo(this.element).show();
+   },
+   
+   _onfileuploadalways: function(e, data) {
+   },
+  
+  _createUploadingView: function() {
+    var _view = $('<div class="uploading">' +
+      '<p>' +
+        '<%= image_tag 'loading.gif' %> 正在上传，请稍后' +
+      '</p>' +
+     '</div>');
+    return _view;
+  },
+  
+  _createfileView: function(file) {
+    var context = this;
+    var _fileViewTmpl = '<div class="preview">' +
+      '<span class="msg">上传文件成功！</span>' +
+      '<div class="actions">' +
+        '<a class="btn" data-action="delete" href="javascript:void(0);">删除</a>' +
+        '<a class="btn" data-action="finish" href="javascript:void(0);">完成</a>' +
+      '</div>' +
+    '</div>';
+    var _view = $.tmpl(_fileViewTmpl, file);
+    _view.on('click', '*[data-action=delete]', function() {
+        Rtext.api.deleteAttachment(file.id);
+        context._waitingView.show();
+        _view.remove();
+        context._trigger("deleted");
+      }).on("click", "[data-action=finish]", function() {
+        context._trigger("finish");
+      });
+    return _view;
+  },
+  
+  _createUploadFaildView: function(errorMsg) {
+    var _view = $.tmpl(''
+      + '<div class="error">'
+        + '<table><tr><td>'
+          + '${errorMsg}'
+          + '&nbsp;<a data-action="back" href="javascript:void(0);">返回</a>'
+        + '</td></tr></table>'
+      + '</div>', {
+        /*
+          FIXME：在通过 iframe-transport 上传中文件发生错误后后返回 json，
+          在 ie 中由于不能正确识别编码，导致错误信息乱码，或许使用 xml 是一种靠谱的解决方法
+        */
+        errorMsg: $.msie() ? "上传文件发生错误！请确保文件大小在限制内" : errorMsg
+      });
+    
+    var context = this;
+    $("a[data-action=back]", _view)
+      .click(function() {
+        context._waitingView.show();
+        _view.remove();
+      });
+    return _view;
+  },
+  
+  // 获取上传的临时文件
+  file: function() {
+    return this._file;
+  }
+});

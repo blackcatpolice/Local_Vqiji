@@ -1,0 +1,25 @@
+<%= form_for(@admin,:url=>{:controller=>"admins",:action=>@action},:html=>{:class=>"form-horizontal"}) do |f| %>
+<%= "<div class='alert alert-error'>#{flash.notice}</div>".html_safe if flash.notice%>
+<input type="hidden" name="id" value="<%= @admin.id %>" />
+<%= f.label "用户邮箱" %>
+<% if @admin.email.nil? %>
+<%= f.text_field :email %>
+<%else%>
+<%= f.text_field :email,:readonly=>true %>
+<%end%>
+<%= f.label "真实姓名" %>
+<%= f.text_field :real_name %>
+<%= f.label "角色" %>
+<% @roles = Role.all %>
+<% @roles.each do |role|%>
+<label class="checkbox inline">
+<% chk = 'checked="checked"' if @admin.roles_hash.has_key? role.name %>
+	<input type="checkbox" name="admin[role_ids][]" value="<%= role.name%>" title="<%= role.remark %>" <%= chk%> /><%= role.name%>
+</label>
+<%end%>
+<%= f.label "是否启用" %>
+<label class="radio inline"><input type="radio" value="1" name="admin[enable]" <%= @admin.enable ? "checked='checked'" : ""%> />是</label>
+<label class="radio inline"><input type="radio" value="0" name="admin[enable]" <%= !@admin.enable ? "checked='checked'" : ""%> />否</label>
+<hr/><%= f.submit "保存" %>
+<% end %>
+

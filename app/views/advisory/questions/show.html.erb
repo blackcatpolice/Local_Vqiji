@@ -1,0 +1,155 @@
+<div class="zx_hd">
+	<span>问题详情</span>
+	<% if @question.allow_delete%>
+	<a href="javascript:void(0)" class="del" data-action="question-delete" data-id="<%= @question.id%>"></a>
+	<% end %>
+</div>
+<div class="zx_bd">
+	<div class="bk" node-type="Question">
+		<div class="bk_t"></div>
+		<div class="bk_c">
+			<div class="tx_tit red_dc5 f13">
+				<div class="tx">
+					<%= (@question.owner_id != current_user.id && @question.incognito) ? incognito_avatar_tag("v50x50") : link_to(image_tag(@question.owner.avatar_url('v50x50')), user_path(@question.owner))%>
+				</div>
+				<% if @question.solved %>
+				<div class="<%= @question.review == Question::REVIEW_GREAT ? "zt" : "zt zt1"%>"></div>
+				<% end %>
+				<%= (@question.owner_id != current_user.id && @question.incognito) ? "匿名用户" : link_to(@question.owner.name, user_path(@question.owner))%>
+			</div>
+			<div class="bt red_a_dc5">
+				<%= raw "#{@question.owner_id == current_user.id && @question.incognito ? '<b>『 匿名提问 』</b><br/>' : ''}"%><%= @question.title%>
+			</div>
+			<div class="wz1">
+				<%= @question.text%>
+				<div data-role="rtext-attachments">
+				<% if @question.audio %>
+				<%= render :partial => '/attachments/audio', :object => @question.audio %>
+				<% end %>
+				</div>
+			</div>
+			<% if (@question.owner_id == current_user.id || @question.expert.user_id == current_user.id) && @question.get_case_history %>
+			<% @question.get_case_history.each do |h|%>
+			<div class="lb_fj">
+				<%= link_to raw("#{h.name}<br>#{number_to_human_size(h.size)}"), "/download/#{h.id}", :target=>"_blank"%>
+			</div>
+			<% end %>
+			<% end %>
+			
+			
+			<% if @question.info %>
+			<div class="bt red_a_dc5">
+				基本信息
+			</div>
+			<div class="wz1">
+				<%= "身高：#{@question.info['hight']}cm " unless @question.info["hight"].blank? %><%= "体重：#{@question.info['weight']}kg " unless @question.info["weight"].blank? %>年龄：<%= @question.info["age"] %>　性别：<%= @question.info["sex"] %>
+			</div>
+			<% end %>
+			<div class="bt bt_date red_dc5">
+				<%= timemsg @question.created_at%>&nbsp;&nbsp;&nbsp;&nbsp;<%= "分类：#{@question.question_type.name}" if @question.question_type%>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+		<div class="bk_t bk_d"></div>
+	</div>
+	<% unless @question.answers.empty?%>
+	<%= render :collection => @question.answers, :partial => 'advisory/tmpl/answer' %>
+	<% end %>
+	<span id="span_answer"></span>
+</div>
+<% if !@question.solved && current_user.id == @question.owner_id %>
+<div class="zx_db zx_db_wei">
+	<a href="#answerEditor" data-keyboard="true" data-show="false" data-toggle="modal" class="jx" data-backdrop="true">继续问</a>
+	<a href="#questionReview" data-keyboard="true" data-show="false" data-toggle="modal" class="yjj" data-backdrop="true">已解决</a>
+</div>
+
+<div class="modal" id="answerEditor" style="display:none;" data-id="<%= @question.id %>">
+  	<div class="modal-header">
+    	<a class="close" data-dismiss="modal" node-type="close"></a>
+    	<div class="model_tabs"><a href="javascript:void(0);" class="tabs_rw">继续提问</a></div>
+  	</div>
+  	<div class="modal-body">
+    	<div class="modal_form">
+      	<div class="w_lyk">
+        	<div class="ly_time" data-type="audio-button"><a href="javascript:void(0)"></a></div>
+        	<div class="ly_txt"><textarea class="texter"></textarea></div>
+      	</div>
+      	<div class="w_xz toolbar"></div>
+    	</div>
+  	</div>
+  	<div class="modal-footer">
+    	<a href="#" class="btn bn f12" data-dismiss="modal" node-type="close">取消</a>
+    	<a href="#" class="btn btn-danger bn f12 submiter" data-dismiss="modal">提交问题</a>
+  	</div>
+</div>
+
+<div class="modal" id="questionReview" style="display:none; width:400px;">
+  <div class="modal-header"> 
+    <a class="close" data-dismiss="modal" node-type="close"></a>
+    <div class="model_tabs">对医生的问答评分</div>
+  </div>
+  <div class="modal-body">
+    <div class="modal_form">
+		<div class="zx_pf"><a href="javascript:void(0)" data-action="review-question" class="btn btn-danger bn" data-value="<%= Question::REVIEW_GREAT%>" data-id="<%= @question.id%>"  data-dismiss="modal">满 意</a><a href="javascript:void(0)" class="btn bn" data-action="review-question" data-value="<%= Question::REVIEW_GOOD%>" data-id="<%= @question.id%>" data-dismiss="modal">一 般</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#answerEditor').modal({backdrop:true, keyboard:true, show:false});
+  $('#questionReview').modal({backdrop:true, keyboard:true, show:false});	
+</script>
+
+<% elsif !@question.solved && current_user.is_expert && current_user.expert.id == @question.expert_id %>
+  <div class="zx_db"></div>
+  <div class="zx_hd"><a class="tit yjj" href="javascript:void(0)">回答问题</a></div>
+  <div class="zx_bd" id="answerEditor" data-id="<%= @question.id %>">
+	  <div class="bk ys_bk">
+          <div class="bk_t"></div>
+          <div class="bk_c ys_wt">
+            	<div class="ys_lyk">
+              	<div class="ly_time" data-type="audio-button"><a href="javascript:void(0)"></a></div>
+              	<div class="ly_txt"><textarea class="texter"></textarea></div>
+            	</div>
+            	<div class="ys_tj toolbar"><a href="javascript:void(0);" class="btn btn-danger bn submiter">确定提交</a></div>
+          </div>
+          <div class="bk_t bk_d"></div>
+	  </div>
+  </div>
+  <div class="zx_db"></div>
+<% else %>
+  <div class="zx_db"></div>
+<% end %>
+<script>
+$('div[node-type=Question]').question();
+$('div[node-type=Answer]').answer();
+$('#answerEditor').answer_editor(<% if current_user.is_expert && current_user.expert.id == @question.expert_id %>{toolbarOptions: null}<% end %>);
+$(function(){
+	$('a[data-action="question-delete"]').click(function(){
+		var self = this;
+		$.confirm("是否删除此问题?", function(tag){
+			if(tag){
+				var _questionId = $(self).attr('data-id');
+				WEIBO.deleteQuestion(_questionId, {
+					success: function(data) {
+						window.location.href="<%= unsolved_advisory_questions_path%>";
+    				},
+					error: WEIBO.ui.errorHandler
+				});
+			}
+		});
+	});
+
+	$('a[data-action="review-question"]','#questionReview').click(function(){
+		var _questionId = $(this).attr('data-id');
+		var _review = $(this).attr('data-value');
+		WEIBO.solveQuestion(_questionId, {
+			review: _review,
+			success: function() {
+				window.location.href="<%= solved_advisory_questions_path%>";
+			},
+			error: WEIBO.ui.errorHandler
+		});
+	});
+});
+</script>

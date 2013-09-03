@@ -1,0 +1,31 @@
+<ul class="breadcrumb">
+<li><a href="#">首页</a> <span class="divider">/</span></li>
+<li>
+	<%= link_to "培训列表",admin_elearning_trainings_path%> 
+	<span class="divider">/</span>
+</li>
+<li>
+	<%= link_to training.name, admin_elearning_training_path(training)%>
+	<!-- <span class="divider">/</span> -->
+</li>
+<!-- <li class="active">基本信息</li> -->
+</ul>
+
+<% active = 'class=active' %>
+<ul class="nav nav-tabs">
+  <li <%= active  if controller_name == "trainings" and action_name == "show" %>>
+   <%= link_to "基本信息", admin_elearning_training_path(training)%>
+  </li>
+  <li <%= active if controller_name == "trainings" and action_name == "edit"%>> 
+  	<%= link_to "修改信息", edit_admin_elearning_training_path(training)%> 
+  </li>
+  <li <%= active if controller_name == "pages"%>> 
+  	<%= link_to "内容管理", admin_elearning_training_pages_path(training)%>
+  </li>
+  <li <%= active if controller_name == "tests"%>> 
+  	<%= link_to "试题管理", admin_elearning_training_tests_path(training)%>
+   </li>
+  <li <%= active if controller_name == "users"%> >
+   <%= link_to "用户管理", admin_elearning_training_users_path(training)%>
+  </li>
+</ul>

@@ -1,0 +1,2 @@
+window.WEIBO = window.WEIBO || {};
+

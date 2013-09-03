@@ -1,0 +1,25 @@
+<% content_for :title do%>咨询类型列表<%end%>
+<table class="table table-bordered" id="qas_doctors">
+	<thead>
+		<tr>
+			<th>问题类型名</th>
+			<th>优先级</th>
+			<th>创建时间</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% @question_types.each do |t|%>
+		<tr>
+			<td><%= t.name%></td>
+			<td><%= t.priority%></td>
+			<td><%= t.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+			<td>
+				<%= link_to "#{t.status == 0  ? '启用' : '禁用'}", "#{disable_admin_question_type_path(t)}?status=#{t.status == 1 ? 0 : 1}" , :confirm=>"是否#{t.status == 0 ? '启用' : '禁用' }问问类型 #{t.name}？"%>&nbsp;&nbsp;&nbsp;
+				<%= link_to "修改",edit_admin_question_type_path(t)%>&nbsp;&nbsp;&nbsp;
+				<%= link_to "删除", admin_question_type_path(t) , :confirm => "是否删除问问类型 #{t.name}？", :method=>:delete%>
+			</td>
+		</tr>
+		<% end %>
+	</tbody>
+</table>

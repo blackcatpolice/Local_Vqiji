@@ -1,0 +1,21 @@
+<!-- 个人信息 -->
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c mr_bg1">
+    <div class="mr_tx left">
+        <%= image_tag(current_user.avatar_url('v80x80')) %>
+    </div>
+    <div class="mr_xx left">
+      <p><%= current_user.name %></p>
+      <span>
+        部门：<span title="<%= user_department_title(current_user)%>"><%= truncate_u(user_department_title(current_user), 6)%></span><br />
+        职位：<span title="<%= user_job_title(current_user)%>"><%= truncate_u(user_job_title(current_user), 6) %></span>
+      </span>
+    </div>
+  </div>
+  <div class="bk_t mr_d1">
+    <%= link_to current_user.followeds_count, followeds_user_path(current_user), :class => 'mr_gz', :title => '我的关注', :'data-skip-pjax' => true %>
+    <%= link_to current_user.fans_count, fans_user_path(current_user), :class => 'mr_fs', :title => '我的粉丝', :'data-skip-pjax' => true %>
+    <%= link_to current_user.tweets_count, user_path(current_user), :class => 'mr_wb', :title => '我的微博', :'data-skip-pjax' => true %>
+  </div>
+</div>

@@ -1,0 +1,123 @@
+
+(function($, undefined) {
+	$.widget("todo.log", $.rtext.rtextEditor, {
+	    options: {
+	    	allowBlank: false,
+	    	placeHolder: "请填写日志",
+	    	newChildTask: null, //新建子任务
+      	tools: ['picture', 'file']
+	    },
+	    
+	    _create: function() {
+	      	$.rtext.rtextEditor.prototype._create.call(this);
+	      	this.option("submit", this._submit);
+	    },
+	     
+	    _submit: function (text, done) {
+	    	var self = this;
+	    	
+	    	var file_id, picture_id = null;
+	    	if(this._file){
+	    		file_id = this._file.id;
+	    	}
+	    	/* 附件选择网盘文件 */
+      		if(!file_id && self._chooseFiles && $(self._chooseFiles.find(":checkbox:checked")).length > 0){
+      			file_id = $(self._chooseFiles.find(":checkbox:checked")).val();
+      		}
+	    	if(this._picture){
+	    		picture_id = this._picture.id;
+	    	}
+	    	
+	    	WEIBO.todoTaskLog(self._todo_task_id(), text, {
+	    		file_id: file_id,
+	    		picture_id: picture_id,
+	    		value: self._todo_task_value(),
+	    		end_date: self._todo_task_end_date(),
+	    		level: self._todo_task_level(),
+	    		success: function(data){
+	    			self.reset();
+	    			var _data = $(data);
+	    			if($(_data).attr("data-finished") == "true"){
+	    				self.element.remove();
+	    				window.location.reload();
+	    			};
+	    			if($(_data).attr("data-change") == "true"){
+	    				//$('.rw_jdz2,.rw_jdz3', self.element).removeClass('rw_jdz2').removeClass('rw_jdz3');
+	    				$('<div class="rw_jdz ' + ($(_data).attr('data-value') > $(_data).attr('data-old-value') ? "" : "rw_jdz2") + ' f12" style="left:' + ($(_data).attr('data-value')-2) + '%;cursor: pointer;" title="' + ($(_data).attr('data-value') > $(_data).attr('data-old-value') ? "任务进展到: " : "任务回退到: ") + $(_data).attr('data-value') +'%">' + $(_data).attr('data-value') + '%</div>').insertBefore($('#slider_task_value_tag').addClass('rw_jdz1'));
+	    				self._draw_task_progress();
+	    			};
+	    			$(".knob", _data).knob();
+	    			_data.insertAfter($('#todo-task-log-append'));
+	    		},
+	    		error: WEIBO.ui.errorHandler,
+	      		complete: $.proxy(done, this)
+	    	});
+	    },
+	    
+	    _todo_task_id: function(){
+	    	return $(this.element).attr('data-id');
+	    },
+	    
+	    _todo_task_value: function(){
+	    	return $('#todo-task-value', this.element).val();
+	    },
+	    
+	    _todo_task_end_date: function(){
+	    	var _end_date = $('#todo-task-end-date', this.element);
+	    	return _end_date.length > 0 ? _end_date.val() : null;
+	    },
+	    
+	    _todo_task_level: function(){
+	    	var _level = $('#todo-task-level', this.element);
+	    	return _level.length > 0 ? _level.val() : null;
+	    },
+
+	    _draw_task_progress: function(){
+	    	var self = this;
+	    	var options = {
+	            colors:["#00c2c2"],
+	            series: {
+	                lines: {
+	                    show: true,
+	                    fill: true,
+	                    fillColor:"rgba(239, 255, 255, 0.5)" 
+	                },
+	                points: { 
+	                    show: true,
+	                    radius: 2
+	                }
+	            },
+	            yaxis: {
+	                min: 0, 
+	                max: 110,
+	                ticks: 5
+	            }
+	        };
+
+	        WEIBO.todoTaskProgress(self._todo_task_id(), {
+	            success: function(data) {
+	                options.xaxis = {
+	                    show: true,
+	                    mode: "time",
+	                    min: data.min,
+	                    max: data.max,
+	                    ticks: data.ticks,
+	                    timeformat: "%m月%d日"
+	                };
+	                options.grid = {
+	                    borderWidth:0,
+	                    hoverable: true,
+	                    markings: data.markings
+	                };
+	                $.plot("#placeholder", [data.data], options);
+	            },
+	            error: WEIBO.ui.errorHandler
+	        });
+	    },
+	    
+	    reset: function() {
+	    	$.rtext.rtextEditor.prototype.reset.call(this);
+   		}
+	});
+  
+})( jQuery );

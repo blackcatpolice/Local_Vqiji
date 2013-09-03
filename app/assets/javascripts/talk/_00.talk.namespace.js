@@ -1,0 +1,2 @@
+window.Talk = window.Talk || {};
+

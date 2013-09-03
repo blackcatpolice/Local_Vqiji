@@ -1,0 +1,59 @@
+<% expert = current_user.expert %>
+<div class="main_zx_rk bk_t left">
+    <div class="ys_lb ys_jj">
+      	<div class="ks"><%= expert.expert_type.name[0, 2] %></div>
+      	<div class="tx">
+      		<%= image_tag(current_user.avatar.url('v80x80'), :class => 'avatar_v80x80')%>
+      	</div>
+      	<div class="mz" style="height:30px; width:270px; text-align:center"><%= current_user.name%>&nbsp;<%= expert.post%></div>
+    </div>
+    <div class="ys_bk_c f13">
+    	<b>详细介绍：</b><div node-type="description" data-id="<%= expert.id%>"><div><%= expert.description%></div></div>
+    	<div class="ys_bk_btn">
+    		<a href="javascript:;" data-action="description-edit">修改</a>
+    		<a class="left" href="javascript:;" data-action="description-cancel" style="display:none;">取消</a>
+    		<a class="right" href="javascript:;" data-action="description-save" style="display:none;">保存</a>
+    	</div>
+    </div>
+    <div class="ys_bk_d"></div>
+</div>
+<script>
+	$(function(){
+		$('a[data-action="description-edit"]').on('click', function(){
+			var _expert = $('div[node-type="description"]');
+			var _description = $(_expert).find('> div').text();
+			$('<textarea style="height:300px;" placeholder="医生简介长度不超过500字">' + _description + '</textarea>').appendTo(_expert);
+			$(this).hide();
+			$(_expert).find('> div').hide();
+			$('a[data-action="description-cancel"]').show();
+			$('a[data-action="description-save"]').show();
+		});
+		$('a[data-action="description-save"]').on('click', function(){
+			var self = this;
+			var _id = $('div[node-type="description"]').attr('data-id');
+			var _description = $('textarea', 'div[node-type="description"]').val();
+			
+			if(_description.length >= 500){
+				$.alert('医生简介长度不大于500字.');
+				return;
+			}
+			WEIBO.updateExpert(_id , _description, {
+				success: function() {
+					$(self).hide();
+					$('a[data-action="description-cancel"]').hide();
+					$('a[data-action="description-edit"]').show();
+					$('textarea', 'div[node-type="description"]').remove();
+					$('div[node-type="description"]').find('> div').text(_description).show();
+				},
+				error: WEIBO.ui.errorHandler
+			});
+		});
+		$('a[data-action="description-cancel"]').on('click', function(){
+			$('textarea', 'div[node-type="description"]').remove();
+			$(this).hide();
+			$('a[data-action="description-save"]').hide();
+			$('div[node-type="description"]').find('> div').show();
+			$('a[data-action="description-edit"]').show();
+		});
+	});
+</script>

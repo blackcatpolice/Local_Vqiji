@@ -1,0 +1,87 @@
+<!--网盘-->
+<% unless current_user.is_expert %>
+<div class="bk" node-type="FileWidget">
+    <div class="bk_t mr_t1">
+    	<a href="javascript:;" data-action="SWFUpload" title="上传文件"></a>
+   	</div>
+    <div class="bk_c">
+        <div class="mr_lb f12">
+            <ul></ul>
+        </div><div class="clearfix"></div>
+    </div>
+    <div class="bk_t bk_d"></div>
+</div>
+<script type="text/javascript">
+	$('[data-action=SWFUpload]', '[node-type=FileWidget]').click(function(){
+    	var _swfuploadTmpl = _swfuploadHtml();
+    	$(_swfuploadTmpl).modal({
+    		backdrop: 'static',
+    		remote: "/network_disks/w_swfupload.html"
+    	}).on('hidden', function(){
+    		$(this).remove();
+    	});
+	});
+	
+	WEIBO.filesWidget({
+		size: 4,
+		success: function(data){
+			if(data.length == 0){
+				$('ul', '[node-type=FileWidget]').html('<li data-type="message">您的网盘还没有上传文件.</li>');
+				return false;
+			}
+			var _tmpl = '<li>' + 
+				'<a href="/download/${id}" data-skip-pjax title="${name}">${ $.truncate(name, 24) }</a>' + 
+				'<span><a href="javascript:;" data-action="file-share" data-id="${id}">分享</a> | <a href="javascript:;" data-action="file-talk-message" data-id="${id}">私信</a></span>' +
+				'</li>';
+			$.template( "fileTemplate", _tmpl );
+
+			var _templates = $.tmpl( "fileTemplate", data);
+
+    		_templates.appendTo( $('ul', '[node-type=FileWidget]') );
+    		$('a[data-action=file-talk-message]', '[node-type=FileWidget]').click(function(){
+    			var shareFid = $(this).attr('data-id');
+    			var _messageTmpl = _messageHtml();
+    			$(_messageTmpl).modal({
+    				remote: "/network_disks/message.html?fid=" + shareFid
+    			}).on('hidden', function(){
+    				$(this).remove();
+    			});
+    			
+    		});
+    		$('a[data-action=file-share]', '[node-type=FileWidget]').click(function(){
+				var shareFid = $(this).attr('data-id');
+    			var _shareTmpl = _shareHtml();
+    			$(_shareTmpl).modal({
+    				remote: "/network_disks/share.html?fid=" + shareFid
+    			}).on('hidden', function(){
+    				$(this).remove();
+    			});
+			});
+		},
+		error: WEIBO.ui.errorHandler
+	});
+	
+	function _swfuploadHtml(){
+		return '<div class="modal" style="display:; width:500px;display:none;">' + 
+	    		'<div class="modal-header" style="background-color:#9aceff;"><a class="close" data-dismiss="modal"></a><div class="model_tabs"><a href="#" class="tabs_rw">上传文件</a></div></div>' +
+	    		'<div class="modal-body"></div>' +  
+	    	'</div>';
+	}
+	
+	
+	function _shareHtml(){
+		return '<div class="modal" style="display:; width:500px;display:none;">' + 
+	    		'<div class="modal-header"><a class="close" data-dismiss="modal"></a><div class="model_tabs"><a href="#" class="tabs_rw">分享到微博</a></div></div>' +
+	    		'<div class="modal-body"></div>' +  
+	    '</div>';
+	}
+	
+	function _messageHtml(){
+	    	return '<div class="modal" id="talkMessageModel" style="display:; width:500px;display:none;">' + 
+	    		'<div class="modal-header"><a class="close" data-dismiss="modal"></a><div class="model_tabs"><a href="#" class="tabs_rw">发私信</a></div></div>' +
+	    		'<div class="modal-body"></div>' +  
+	    	'</div>';
+	    }
+</script>
+
+<% end %>

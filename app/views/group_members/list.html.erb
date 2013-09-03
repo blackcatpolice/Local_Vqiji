@@ -1,0 +1,78 @@
+<% provide :title, "成员管理 | #{ @group.name }" %>
+
+<div class="bk">
+<div class="bk_t"></div>
+<div class="bk_c">
+<div class="gz_t f18"><span><%= @group.name %></span>
+  <div class="right ran f12"><%=link_to "返回小组首页",group_path(@group)%></div>
+</div>
+<!-- <div class="gz_jj gz_ad f13 red_dc5">工作组签名：亲们，加油哟！<a href="#">编辑</a></div> -->
+<div class="tab">
+  <%= link_to "基本信息",edit_group_path(@group)%>
+  <%= link_to "成员管理",list_group_members_path(@group),:class=>"qb on" %>
+  <%= link_to "添加成员",new_group_member_path(@group)%>
+</div>
+
+<% @members.each do |m|%>
+<div class="gz_lb">
+<div class="sz left">
+  <div class="tb red_dc5">
+    <div class="gz_tx left"><%= image_tag m.user.avatar.url("v50x50")%></div>
+    <div class="gz_wz f13 left">
+      <%= image_tag "#{m.user.gender == User::GENDER_FEMALE ? 'female.png' : 'male.png'}", title: (m.user.gender == User::GENDER_FEMALE ? '女' : '男') %>&nbsp;<%= link_to m.user.name,user_path(m.user) %> <%= "(管理员)" if m.is_admin %><br/>
+      <%= m.user.department.name if m.user.department%>
+    </div>
+  </div>
+</div>
+<div class="ani left f12">
+<!-- <a class="gly" href="">管理员</a> -->
+<% if current_user.id == m.user.id%>
+我自己
+<%else%>
+<div class="btn-group">
+<button class="btn btn-small">选择操作</button>
+<button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+<span class="caret"></span></button>
+<ul class="dropdown-menu" data-type="dropdown-operate-member">
+<li>
+<% if m.is_admin %>
+    <%= link_to "取消管理员", cancel_admin_group_member_path(:group_id=>@group.id,:id=>m.id) %>
+<%else%>
+    <%= link_to "升为管理员", set_admin_group_member_path(:group_id=>@group.id,:id=>m.id) %>
+<%end%>
+</li>
+<li>
+	<a href="javascript:;" data-url="<%= delete_group_member_path( :group_id=>m.group_id, :id=>m.id , :page => params[:page])%>" data-action="remove-member">请出该组</a>
+</li>
+</ul>
+</div>
+<%end%>
+
+
+</div>
+</div>
+<%end%>
+        
+ <!--  -->
+<%= will_paginate @members %>
+<div class="clearfix"></div>
+</div>
+<div class="bk_t bk_d"></div>
+</div>
+
+<form id="remove-member-form" method="post"></form>
+<script>
+	$(function(){
+		$('[data-action=remove-member]', '[data-type=dropdown-operate-member]').click(function(){
+			var $self = $(this);
+			$.confirm('继续执行此操作？', function(tag){
+        if(tag){
+				  $('#remove-member-form').attr('action', $self.attr('data-url')).submit();
+        }
+			});
+		});
+		$('#remove-member-form').on('submit', function(event){
+			$.pjax.submit(event, '[data-pjax-container]');
+		});
+	});
+</script>

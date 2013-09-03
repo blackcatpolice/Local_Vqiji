@@ -1,0 +1,6 @@
+<% content_for :title do%>编辑专题类型<%end%>
+<%= form_for @blog_type, :url=>admin_atype_blogtype_path(), :html=>{:onsubmit=>"return validate(this);"} do |f|%>
+
+	<%= render 'form', :f => f %>
+
+<%end%>

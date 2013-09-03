@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+	<%= stylesheet_link_tag "weibo" %>
+	<script type="text/javascript">
+	  __DISABLE_PJAX = true;
+ 		$CURRENT_GROUPS = <%= raw Group.all.to_json(:only => [:_id,:name]) %>;
+    <% if user_signed_in? %>
+   		$CURRENT_USER = <%= raw current_user.to_builder.target! %>;
+	  <% end %>
+ 	</script>
+	<%= javascript_include_tag "advisory" %>
+</head>
+<body>
+	<%= render "layouts/nav/top"%>
+	<div class="container main">
+    <%= render '/layouts/partials/old_brower_alert' %>
+		<!--左侧导航栏开始-->
+		<%= render "layouts/nav/left"%>
+		<!--左侧导航栏结束-->
+		<div class="main_zx left">
+   		<%= content_for?(:main_left) ? yield(:main_left) : yield %>
+		</div>
+		<div class="main_zx_rk left">
+		  <% if current_user.is_expert %>
+		    <%= render "layouts/nav/advisory/expert_info"%>
+		  <% else %>
+  			<%= render "layouts/nav/advisory/expert_cards"%>
+  			<%= render "layouts/nav/advisory/popular_advisory"%>
+		  <% end %>
+	  </div>
+		<div class="clearfix"></div>
+	</div>
+	<%= render "layouts/nav/foot"%>
+</body>
+<%= yield(:after_body) if content_for?(:after_body) %>
+</html>
+

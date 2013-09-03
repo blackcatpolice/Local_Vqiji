@@ -1,0 +1,20 @@
+<style type="text/css">
+.form-horizontal .control-label{ text-align:left; }
+</style>
+
+<%= form_for([:admin, @excel],
+  :html=>{:onsubmit=>"return validate(this);", :class=>"form form-horizontal"}) do |form|  %>
+  <div class="control-group">
+    <%= form.label :excel文件 ,:class=>"control-label" %>
+    <div class="controls docs-input-sizes">
+       <%= form.file_field :file %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= form.label :备注 ,:class=>"control-label" %>
+    <div class="controls docs-input-sizes">
+     <%= form.text_field :remark %>
+     <%= form.submit "提交",:class=>"btn btn-primary"%>
+    </div>
+  </div>
+<%end%>

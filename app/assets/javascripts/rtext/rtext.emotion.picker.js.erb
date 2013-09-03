@@ -1,0 +1,43 @@
+//
+// 表情选择器
+//
+// require jquery
+// require jquery.ui.widget
+// require jquery.tmpl
+
+(function($, undefined) {
+  $.widget("rtext.rtextEmotionPicker", {
+    _create: function() {
+      this._$list = $('<ul></ul>').appendTo(this.element);
+
+      $.tmpl(""
+        + "<li>"
+          + "<img title=\"${em}\" class=\"em\" src=\"${url}\"/>"
+        + "</li>", 
+        $.rtext.rtextEmotionPicker.emotions
+      ).appendTo(this._$list);
+
+      this._on({ "click .em": this._onPicked });
+    },
+    
+    _destroy: function() {
+      if(this._$list) {
+        this._$list.remove();
+      }
+    },
+    
+    _onPicked: function(e) {
+      var em = $(e.target).attr("title");
+      if (em) {
+        this._trigger("picked", null, { em: em });
+        e.preventDefault();
+      }
+    }
+  });
+
+  $.rtext.rtextEmotionPicker.emotions = [
+    <% Emotion.each do |em, url| %>
+      <%=  "{ em: #{ %Q("#{em}") }, url: #{ %Q("#{url}") } }," %>
+    <% end %>
+  ];
+})(jQuery);

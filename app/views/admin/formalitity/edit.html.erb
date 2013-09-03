@@ -1,0 +1,19 @@
+<% content_for :title do%>修改手续<%end%>
+  <% if flash[:notice] -%>
+			 <div class="alert">
+        <a class="close" data-dismiss="alert">&times;</a>
+        <strong>提示：</strong> <%= flash[:notice] %>
+      </div>
+   <% end -%>
+  
+  <script type="text/javascript" >
+  	$(document).ready(function() {
+  		$(".close").click(function(){
+  			$(".alert").slideToggle();
+  		})
+  	})
+  </script>
+    
+<%= form_for @formalitity, :url => admin_formalitity_path(@formalitity) do |form| %>
+	<%= render :partial => "form", :locals => {:form => form} %>
+<% end %>

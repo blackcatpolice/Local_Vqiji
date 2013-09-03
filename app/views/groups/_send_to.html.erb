@@ -1,0 +1,14 @@
+<div class="dhk_l">
+  <ul node-type="ul-group">
+    <li class="" node-type="li-group">
+	    <label><input name="to_fans" type="checkbox" value="1" checked="checked" />&nbsp;工作大厅</label>
+    </li>
+    <% current_user.groups.each do |group| %>
+      <li class="" node-type="li-group">
+        <label>
+	        <input name="group_id" type="checkbox" value="<%= group.id %>"  />&nbsp;<span title="<%= group.name%>"><%= truncate_u(group.name, 8) %></span>
+        </label>
+      </li>
+    <% end %>
+  </ul>
+</div>

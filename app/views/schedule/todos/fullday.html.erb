@@ -1,0 +1,31 @@
+<% if @todos.any? %>
+  <ul>
+    <% @todos.each do |todo| %>
+      <li data-id="<%= todo.to_param %>" is-sys="<%= raw todo.is_a? Schedule::SysTodo %>">
+        <div class="detail">
+      	<% if todo.is_a?(Schedule::SysTodo) %>
+      	  <%= link_to truncate_u(todo.detail, 8), todo.target_url, :'data-skip-pjax' => true %>&nbsp;
+      	<% else %>
+      	  <%= todo.detail %>
+      	<% end %>
+        </div>
+        <div>
+          <% if todo.is_a? Schedule::SysTodo %>
+          	<% if todo.scope == Schedule::SysTodo::SCOPE_TODO_TASK %>
+          	  <span class="at">任务截止时间 <%= l todo.at, format: '%H:%M' %></span>
+          	<% elsif todo.scope == Schedule::SysTodo::SCOPE_TRAINING %>
+          	  <span class="at">培训截止时间 <%= l todo.at, format: '%H:%M' %></span>
+          	<% else %>
+          	  <span class="at"><%= l todo.at, format: '%H:%M' %></span>
+          	<% end %>
+          <% else %>
+          	<span class="at"><%= l todo.at, format: '%H:%M' %></span>
+          	<a class="hide" href="javascript:void(0)" data-action="delete-schedule-todo">删除</a>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div style="height: 25px; padding-top: 10px; text-align: center;">没有待办事项</div>
+<% end %>

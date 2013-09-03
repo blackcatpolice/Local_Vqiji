@@ -1,0 +1,59 @@
+<form id="knowledge_show_form" action="<%= delete_knowledges_path %>" data-pjax method="post">
+<input type="hidden" name="id" value="<%= @knowledge.id%>" />
+<div class="bk">
+	<div class="bk_t zsk_t f16">
+		知识库
+	</div>
+	<div class="bk_c">
+		<div class="zsk_tit"><%= image_tag "logo.png"%><span><%= @knowledge.clicks%>人阅读</span>
+		</div>
+		<div class="zsk_nr">
+			<div class="zsk_gn">
+				<% if current_user == @knowledge.creator %>
+				<%= link_to "删除", "javascript:;", :class=>"zsk_sc", :data=>{action:'delete'}%><%= link_to "编辑", edit_knowledge_path, :class=>"zsk_bj", :'data-skip-pjax'=>true%>
+				<% end %>
+			</div>
+			<h1><%= @knowledge.title%></h1>
+			<h2>
+			  <span><%= l(@knowledge.created_at, :format => :long)%></span>
+			  <% if @knowledge.creator %>
+			    <span>创建人：<%= @knowledge.creator.name %></span>
+			  <% end %>
+			  <span>类别：<%= @knowledge.knowledge_type.name%></span>
+			</h2>
+			<div class="zsk_z">
+				<iframe id="iframeid" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" onload="javascript:SetCwinHeight();" height="1" width="100%" src="<%= content_knowledge_path @knowledge%>"></iframe>
+			</div>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+	<div class="bk_t bk_d"></div>
+</div>
+</form>
+<script>
+function SetCwinHeight(){
+  var iframeid=document.getElementById("iframeid"); //iframe id
+  	if (document.getElementById){
+   		if (iframeid && !window.opera){
+    		if (iframeid.contentDocument && iframeid.contentDocument.body.offsetHeight){
+     			iframeid.height = iframeid.contentDocument.body.offsetHeight;
+    		}else if(iframeid.Document && iframeid.Document.body.scrollHeight){
+     			iframeid.height = iframeid.Document.body.scrollHeight;
+    		}
+   		}
+  	}
+  }
+  
+  $(function(){
+	  $('a[data-action=delete]', '#knowledge_show_form').click(function(){
+		  $.confirm("是否删除此文章?", function(tag){
+			  if(tag){
+				  $('#knowledge_show_form').submit();
+			  }
+		  });
+	  });
+	  $("form[data-pjax]").on('submit', function(e){
+		  $.pjax.submit(e, '[data-pjax-container]');
+	  });
+  });
+</script>

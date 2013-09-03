@@ -1,0 +1,56 @@
+@charset "utf-8";
+.treeview{ 
+	list-style: none; overflow:auto; overflow-y:hidden;
+}
+.treeview, .treeview ul { 
+	padding-left: 20px;
+}
+
+.treeview ul {
+	background-color: white;
+	margin-top: 4px;
+}
+.treeview span.hover { color:#888;}
+
+.treeview .hitarea {
+	background: url(images/treeview-default.png) -162px -77px no-repeat;
+	height: 20px;
+	width: 20px;
+	margin-left: -30px;
+	float: left;
+	cursor: pointer;
+}
+/* fix for IE6 */
+* html .hitarea {
+	display: inline;
+	float:none;
+}
+
+.treeview li { margin: 0;padding: 0px 0pt 3px 16px;  font-size:12px;}
+.treeview a.selected {background-color: #eee;}
+#treecontrol { margin: 1em 0; display: none; }
+.treeview .hover { color: red; cursor: pointer; }
+.treeview li { background: url(images/treeview-default-line.png) 0 0 no-repeat; }
+.treeview li.collapsable, .treeview li.expandable { background-position: 0 -176px; }
+.treeview li.collapsable a{ color:#888}
+.treeview li.expandable a { color:#3eb0f8;}
+.treeview li a.current {color: #dc5f5e; font-weight:bold;}
+.treeview .expandable-hitarea { background-position: -204px -4px }
+.treeview li.last { background-position: 0px -1745px; }
+.treeview li.lastCollapsable, .treeview li.lastExpandable { background-image: url(images/treeview-default.png); }  
+.treeview li.lastCollapsable { background-position: 0 -111px }
+.treeview li.lastExpandable { background-position: -32px -67px }
+/*
+.treeview div.lastCollapsable-hitarea, .treeview div.lastExpandable-hitarea { background-position: 0; }
+*/
+.treeview .placeholder {
+	background: url(images/ajax-loader.gif) 0 0 no-repeat;
+	height: 16px;
+	width: 16px;
+	display: block;
+}
+.filetree li { padding: 3px 0px 12px 20px; }
+.filetree span.folder {min-height:36px; display:block;white-space:nowrap; width:auto;background: url(images/file.png) 0 0 no-repeat;}
+.filetree li.expandable span.folder { background: url(images/file_closed.png) 0 0 no-repeat; }
+.filetree span.folder, .filetree span.file { padding: 1px 0 1px 50px; display: block;  line-height:16px;}
+.filetree span.file { padding: 10px 0 1px 75px; display: block; height:43px; background-image:url(images/files.png); background-position:30px 10px;}

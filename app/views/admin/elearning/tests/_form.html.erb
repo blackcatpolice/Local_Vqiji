@@ -1,0 +1,132 @@
+<%= form_for(@test,:url => {:controller => "tests",:action=>@action},:html=>{:onsubmit=>"return validate(this);",:class=>"form-horizontal"}) do |f|  %>
+  <div class="control-group">
+    <label class="control-label">所属页:</label>
+    <div class="controls docs-input-sizes" >
+      <%= f.select 'page_id', training_test_option_pages(@training) %>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">题型:</label>
+    <div class="controls docs-input-sizes" data-type="select">
+       <label class="radio inline">
+        <%= f.radio_button :type, "radio" %>单选题
+      </label>
+      <label class="radio inline">
+        <%= f.radio_button :type, "checkbox" %>多选题
+      </label>
+      <label class="radio inline">
+        <%= f.radio_button :type, "text" %>填空题
+      </label>
+      <label class="radio inline">
+        <%= f.radio_button :type, "textarea" %>问答题
+      </label>
+    </div>
+  </div>
+  <div class="control-group">
+  <label class="control-label">分数:</label>
+    <div class="controls docs-input-sizes">
+      <%= f.text_field :score %>
+    </div>
+  </div>
+  <div class="control-group">
+  <label class="control-label">问题:</label>
+    <div class="controls docs-input-sizes">
+      <%= f.text_area :question ,:style=>"width:400px;height:80px;",:required=>"required"%>
+    </div>
+  </div>
+  <div class="control-group">
+  <label class="control-label">备注:</label>
+    <div class="controls docs-input-sizes">
+      <%= f.text_area :remark,:style=>"width:400px;height:80px;" %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">选项/答案:</label>
+    <div class="controls docs-input-sizes" id="options">
+      <span class="text-warning">(多个正确答案表示多选题)</span>
+      <input type="button" onclick="addOption();" value="添加+" class="btn" />
+      <ol style="list-style-type:upper-latin;" id="options-list">
+        <% @test.options.each do |option|%>
+          <li class="div_option">
+            <input type="text" name="training_test[options][]" class="input-xlarge" onblur="setAnswer(this);" value="<%= option %>" />
+            <label class="checkbox inline">
+            <input type="checkbox" name="training_test[answers][]" value="<%= option%>" <%="checked='checked'" if @test.answers.include? option %> >正确答案
+              <a href="#" onclick="delOption(this);" >删除</a>
+            </label>
+          </li>
+        <%end%>
+      </ol>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit "保存",:class=> "btn btn-primary"%>
+  </div>
+<%end%>
+
+<textarea id="txt" style="display:none;" >
+  <li class="div_option">
+    <input type="text" name="training_test[options][]" class="input-xlarge" onblur="setAnswer(this);" />
+    <label class="checkbox inline">
+      <input type="checkbox" name="training_test[answers][]" value="" />正确答案
+      <a href="#" onclick="delOption(this);" >删除</a>
+    </label>
+  </li>
+</textarea>
+
+<style type="text/css">
+  .form-horizontal .control-label{text-align:left;}
+</style>
+
+<script type="text/javascript">
+  $(function(){
+    $("form").validate();
+
+    $(":radio",'div[data-type="select"]').change(function(){
+      var input = $(this).val();
+      if(input == "radio" || input == "checkbox"){
+        $("input","#options").removeAttr("disabled");
+      }else{
+         $("input","#options").attr("disabled","disabled");
+      }
+    });
+  });
+
+  /*添加选项*/
+  function addOption(){
+    var html = $("#txt").text();
+    $("#options-list").append(html);
+  }
+  /*删除选项*/
+  function delOption(a){
+    $(a).parent().parent().remove();
+  }
+  /*设置答案*/
+  function setAnswer(txt){
+    var chk =$(txt).next().children(":checkbox");
+    chk.val($(txt).val());
+  }
+
+  function validate(){
+    var chks = $("input[type=checkbox]:checked:checked","#options-list").length;
+    var input = $("input[type=radio]:checked:checked",'div[data-type="select"]').val();
+    var pageId = $("#training_test_page_id").val();
+    if((pageId != "" ) && (input == "text" || input == "textarea")){
+      alert("内容页不能有主观题");
+      return false;
+    }
+    if(input == "radio"){
+       if(chks != 1){
+         alert("单选题，只需要且只能选中一个正确答案");
+         return false;
+       }
+    }else if(input == "checkbox"){
+      if(chks == 0 ){
+         alert("多选题，至少需要选中一个正确答案");
+         return false;
+       }
+    }
+    return true;
+  }
+</script>

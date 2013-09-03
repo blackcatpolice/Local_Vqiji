@@ -1,0 +1,28 @@
+<div class="rw_zx_lbk">
+	<a href="<%= todo_task_path(task)%>" class="dk" data-skip-pjax="true" >
+		<div class="tt f16" title="<%= task.title%>"><%= truncate_u(task.title, 12)%></div>
+		<div class="rw_jd">
+			<% if task.is_new && task.executor == current_user %>
+			<div class="re_jd_new">New</div>
+			<% else %>
+			<div class="re_jd_xx" style="">
+				<%= Todo::Task::SS["#{task.schedule}"]%><br />
+				<% if task.schedule == Todo::Task::SCHEDULE_COMPLETED %>
+				<span class="ok"></span>
+				<% else %>
+				<span><%= task.value %></span>%
+				<% end %>
+			</div>
+			<% end %>
+			<input class="knob" value="<%= task.value %>" style="<%= task.is_new && task.executor == current_user ? "display:none;" : ""%>">
+		</div>
+		<div class="inf f12">
+			<%= l task.end_date, :format => :short %><br>优先级：<span class="rwk_0<%= task.level%>"></span><br>
+			<% if my_create %>
+			负责人：<%= task.executor.name %>
+			<% else %>
+			创建人：<%= task.creator.name %>
+			<% end %>
+		</div>
+	</a>
+</div>

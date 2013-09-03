@@ -1,0 +1,5 @@
+<% content_for :title do%>新建制度类型<%end%>
+<%= form_for @rtype, :url => admin_rtypes_path(), :html=>{:onsubmit=>"return validate(this);"} do |f| %>
+
+<%= render 'form', :f => f %>
+<%end%>

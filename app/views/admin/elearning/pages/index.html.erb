@@ -1,0 +1,4 @@
+<% content_for :title do%>培训页<%end%>
+<%= render :partial => "admin/elearning/nav_training" ,:locals=>{:training => @training} %>
+<%= link_to '新建培训页', new_admin_elearning_training_page_path,:class=>"btn btn-primary" %>
+<%= render 'list' %>

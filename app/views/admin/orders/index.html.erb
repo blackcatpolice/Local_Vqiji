@@ -1,0 +1,31 @@
+<% content_for :title do%>订单列表<%end%>
+<table class="table"  >
+<thead>
+  <tr>
+  	<th>订单号</th>
+    <th>下单时间</th>
+    <th>顾客</th>
+    <th>订单积分</th>
+    <th>订单状态</th>
+    <th>操作</th>
+  </tr>
+</thead>
+<tbody>
+<% @orders.each do |order| %>
+  <tr>
+  	<td>
+  		<%= link_to order.order_no ,{:controller=>"orders",:action=>"show",:id=>order.id}%>
+  	</td>
+   	<td><%= order.submitted_at.strftime("%Y-%m-%d %H:%M:%S") if order.status != 0 %>  </td>
+   	<td><%= order.user.nickname if order.user%>  </td>
+   	<td><%= order.total || 0 %>  </td>
+   	<td><%= order_status_help order.status %> </td>
+   	<td>
+   		<%= link_to "删除",{:controller=>"orders",:action=>"destroy",:id=>order.id},:onclick=>"return confirm('确定删除当前订单');" %>
+   	</td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<%= will_paginate @orders %>
+<br />

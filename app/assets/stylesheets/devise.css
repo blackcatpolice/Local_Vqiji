@@ -1,0 +1,157 @@
+/*
+ *= require libs/bootstrap
+ */
+
+@charset "utf-8";
+body {
+  background-color:#2586c8; overflow-x:hidden;
+}
+
+.devise {
+  min-width: 960px;
+  min-height:750px;
+  width:100%;
+  height:100%;
+  background-image:url(images/login_cbg.jpg); background-position:100px 100px; background-repeat:no-repeat;
+}
+
+.devise .alert-old-brower {
+  position:absolute;
+  z-index: 100;
+  width: 100%;
+  text-align: center;
+  border-color: #eed3d7;
+  color: #484848;
+}
+
+.devise .alert-old-brower a {
+  color: #b94a48;
+  font-weight:bold;
+}
+
+.devise .navbar-fixed-top {
+  height:55px;
+  background-image:url(images/login_tbg.png);
+  text-align:center;
+}
+.devise .navbar-fixed-top img {
+  margin-top:8px;
+}
+
+.devise .main {
+  width: 100%;
+  padding-top: 50px;
+  height: auto;
+  min-height: 500px;
+}
+
+devise .plane {
+	width:100%;
+	height:95px;
+	background-image:url(images/plane.png);
+	background-repeat:no-repeat;
+	background-position:1450px 83px;
+	z-index:-50;
+	position:absolute;
+	bottom:-49px;
+	left:-6px;
+}
+.devise .fixed-bottom {
+  width: 100%;
+  height:150px;
+  position:fixed;
+  bottom: 0px;
+  left:0;
+  z-index: 50; background-image:url(images/clouds_d.png); background-repeat:no-repeat; background-position:left top;
+}
+.devise .tie { width:400px; height:83px; position:absolute; bottom:90px;left:800px; background-image:url(images/login_tie.png); background-repeat:no-repeat; z-index:5;}
+.devise .clouds2 { width:100%; height:150px; position:absolute; bottom:0px; background-image:url(images/clouds.png); background-repeat:no-repeat; z-index:55; background-position:-50px 20px;}
+.qiqiu { width:100%; height:219px; position:absolute; bottom:80px; left:0px; background-image:url(images/xqq.png); background-repeat:no-repeat; z-index:2; background-position:240px bottom;}
+.copy { width:100%; height:80px; position:fixed; bottom:0px; left:0px; z-index:2; text-align:center;}
+.devise #foot {
+  width: 100%;
+  position: fixed;
+  bottom: 25px;
+  z-index: 59;
+  text-align: center;
+}
+.devise .clouds span {
+  font-size:12px;
+}
+.devise .clouds a {
+  color:#4b7ea7;
+}
+
+/* sign-in */
+.devise .signin {
+  width:283px;
+  height:370px;
+  background-image:url(images/log_k.png);
+  position:absolute;
+  margin-top: -10px;
+  padding-top:133px;
+  padding-left:47px;
+  z-index:99;
+  right:10%;
+}
+
+.devise .form-signin .btn-signin,
+.devise .form-signin .btn-signup {
+  display: block;
+  width: 245px;
+  height: 45px;
+  margin-top: 20px 0 0 0;
+  padding: 0;
+  border: none;
+}
+
+.devise .signin .links {
+  width: 240px;
+  margin-top: 10px;
+  text-align: right;
+}
+.devise .signin .links a {
+  text-decoration: none;
+  color: white;
+}
+.devise .signin .links a:hover {
+  text-decoration: none;
+  color: rgb(0, 85, 128);
+}
+
+.devise .form-signin .notice {
+  margin-bottom: 20px;
+  z-index: 100;
+  width:240px;
+  height:30px;
+  color:#ffcc00;
+  text-align:center;
+  line-height:30px;
+}
+.devise .form-signin .btn-signin { margin-bottom:15px; background: url(images/btn-signin.png) no-repeat scroll 0 0 transparent; }
+.devise .form-signin .btn-signup { background: url(images/btn-signup.png) no-repeat scroll 0 0 transparent; }
+
+.devise .form-signin .ipt { width:192px; padding-left:49px; padding-top:2px; height:40px; margin-bottom:17px; background-image:url(images/login_ip.png); margin-top:10px; }
+.devise .form-signin .ipt input { width:190px; height:20px; line-height: 20px; background-color:#1778bb; border:none; color:#fff; font-size:20px; padding: 8px 0 8px 0; margin: 0; }
+
+.devise .form-signin .ipt input:focus{ outline:0 }
+.devise .form-signin .ipt1 { background-image:url(images/login_ip1.png);}
+.devise .form-signin .ip { width:240px; height:35px; }
+.devise .form-signin .ip #cc_proxy { width: 17px; cursor: pointer; height: 17px; background-image: url(images/ck.png); float:left; }
+.devise .form-signin .ip #cc_proxy.checked { background-image: url(images/ck-checked.png) !important; }
+.devise .form-signin .ip .ck_tip {width: auto;height: 22px; float:left; color:#fff; padding-left:10px; line-height:18px;}
+/* /sign-in */
+
+.devise .reg { width:986px; height:auto; margin-top:10px; position:absolute; z-index:99;}
+.devise .reg_con { width:986px;}
+.devise .reg .reg_t { width:986px; height:91px; background-image:url(images/reg_t.png); text-align:center; line-height:90px; font-size:20px; font-weight:bold; color:#d11e15;}
+.devise .reg .reg_c { width:860px; height:auto; padding-left:63px; padding-right:63px; background-image:url(images/reg_c.png); background-repeat: repeat-y;}
+.devise .reg .reg_c .control-label { font-size:15px;}
+.devise .reg .reg_c .control-label span { color:#c40100;}
+.devise .reg .reg_c .input-xlarge {-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px; height:24px; line-height:24px; border:1px solid #d1cdcd; float:left; margin-right:10px;}
+.devise .reg .reg_c .field_with_errors {float:left; margin-right:10px;}
+.devise .reg .reg_c .help-block { color:#F00; float:left; width:auto; height:34px; line-height:34px;}
+.devise .reg .reg_c .reg_line { width:860px; height:60px; background-image:url(images/reg_line.png); background-repeat:no-repeat; background-position:center center; text-align:center; line-height:60px; }
+.devise .reg .reg_c .reg_btn { width:680px; padding-left:180px; height:60px; color:#ff0000;}
+.devise .reg .reg_c .reg_btn a {color:#4f88de; margin-right:10px;}
+.devise .reg .reg_d { width:986px; height:40px; background-image:url(images/reg_d.png);}

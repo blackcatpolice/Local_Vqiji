@@ -1,0 +1,49 @@
+<div id="fileEncryptModal" class="modal" role="dialog" style="width: 400px; display:none;">
+	<div class="modal-header"><a class="close" data-dismiss="modal"></a><div class="model_tabs"><a href="javascript:;" class="tabs_rw">加密</a></div></div>
+	<div class="modal-body">
+		<div class="modal_form">
+			<div class="wd_zf">
+				<p class="f12" style="margin-bottom:5px;">加密文件不大于10M, 密码由6－16位数字、字母和常用符号组成</p>
+        		<p style="margin-bottom:5px;"><span>密码:&nbsp;&nbsp;</span><input type="password" name="encrypt" maxlength="16"><a href="javascript:void(0);" class="btn bn btn-danger" style="margin-top:3px;" data-action="encrypt_submit" data-dismiss="modal">提交</a></p>
+        		<p class="error-msg f12" style="display:none;margin-bottom:5px;margin-left:40px; color: #da4f49;"></p>
+       		</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$('#fileEncryptModal').on('hidden', function(){
+  		$(':password[name=encrypt]', this).val('');
+  	});
+  	$('a[data-action=encrypt_submit]', '#fileEncryptModal').click(function(){
+  		if($(':password[name=encrypt]', '#fileEncryptModal').val() == ''){
+  			$('.error-msg', '#fileEncryptModal').text('请输入加密密码.').show();
+	  		return false;
+	  	}else if($(':password[name=encrypt]', '#fileEncryptModal').val().length < 6 || $(':password[name=encrypt]', '#fileEncryptModal').val().length > 16){
+	  		$('.error-msg', '#fileEncryptModal').text('密码由6－16位数字、字母和常用符号组成.').show();
+	  		return false;
+	  	}else if(!/^[a-zA-Z0-9\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b\uFF01\u201c\u201d\u2018\u2019\u300e\u300f\u300c\u300d\uFF09\uFF08\.\_\-\?\~\!\@\#\$\%\^\&\*\\\+\`\=\[\]\(\)\{\}\|\;\'\:\"\,\/\<\>]+$/i.test($(':password[name=encrypt]', '#fileEncryptModal').val())){
+	  		$('.error-msg', '#fileEncryptModal').text('密码由6－16位数字、字母和常用符号组成.').show();
+	  		return false;
+	  	}
+	  	
+	  	var _fid = $('#moreFileOperate').attr('fid');
+  		WEIBO.fileEncrypt(_fid, {
+  			encrypt: $(':password[name=encrypt]', '#fileEncryptModal').val(),
+  			success: function(data) {
+  				$.alert('文件『' + $(data).attr('data-name') + '』加密成功.', '加密成功',1);
+  				$('<div id="appendFile" />').insertAfter($('#fid_' + _fid));
+  				$('#fid_' + _fid).remove();
+  				$(data).fileOperate().insertAfter('#appendFile');
+  				$('#appendFile').remove();
+    		},
+    		error: WEIBO.ui.errorHandler
+  		});
+  	});
+  	
+	$('a[data-action=fencrypt]', '#moreFileOperate').click(function(){
+		$('#moreFileOperate').hide();
+	  	$('#fileEncryptModal').modal('show');
+  	});
+  
+</script>

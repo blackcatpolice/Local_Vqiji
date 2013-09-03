@@ -1,0 +1,14 @@
+<div class="lb" data-type="talk-session" data-id="<%= session.id %>">
+  <div class="lb_tx"><%= image_tag talk_session_avatar_url(session) %></div>
+  <div class="lb_nr"><%= link_to talk_session_title(session), talk_session_url(session), class: 'title' %></div>
+  <div class="lb_nr"><%= link_to talk_session_subtitle(session), talk_session_url(session), class: 'subtitle' %></div>
+  <div class="lb_if f12">
+    <span class="left"><%= l session.created_at, format: :short %></span>
+    <span class="right">
+      <% if (session.unread_count > 0) %>
+        <a href="<%= talk_session_url(session) %>">未读消息 <b><%= session.unread_count %></b> 条</a>&nbsp;|&nbsp;
+      <% end %>
+      <a data-action="delete" href="javascript:void(0);">删除</a>
+    </span>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<%content_for :title do%>专家列表<%end%>
+<%= params[:notice]%>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>邮箱</th>
+			<th>姓名</th>
+			<th>领域</th>
+			<th>职称</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% @experts.each do |e| %>
+		<tr>
+			<td><%= e.user.email%></td>
+			<td><%= e.user.name%></td>
+			<td><%= e.expert_type.name if e.expert_type%></td>
+			<td><%= e.post%></td>
+			<td>
+				<%= link_to "#{e.status == 1 ? '禁用' : '启用'}","#{disable_admin_expert_path(e)}?status=#{e.status == 1 ? 0 : 1}", :confirm => "是否#{e.status == 1 ? '禁用' : '启用'}专家 #{e.user.name} ?"%>
+				&nbsp;&nbsp;&nbsp;<%= link_to "修改",edit_admin_expert_path(e)%>
+				&nbsp;&nbsp;&nbsp;<%= link_to "删除", admin_expert_path(e), :method => "delete", :confirm => "是否删除专家 #{e.user.name} ?"%>
+			</td>
+		</tr>
+		<% end %>
+		
+		<% if @experts.blank?%>
+		<tr>
+			<td colspan="5" style="text-align: center;">还没有专家信息，<%= link_to "添加专家", new_admin_expert_path %></td>
+		</tr>
+		<% end %>
+	</tbody>
+</table>
+<%= will_paginate @experts %>

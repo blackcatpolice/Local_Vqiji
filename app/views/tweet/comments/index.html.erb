@@ -1,0 +1,98 @@
+<% fav = current_user.favorite? @tweet %>
+
+<div class="bk" id="page-comments-header">
+	<div class="bk_t"></div>
+  <div class="bk_c">
+  	<div class="lb">
+  	  <div data-type="Tweet" data-id="<%= @tweet.id %>" data-favorite="<%= fav %>" style="border:none;" data-favorite="<%= fav %>">
+      	<div class="lb_tx" data-user-id="<%= @tweet.sender.to_param %>"><%= link_to image_tag(@tweet.sender.avatar_url('v50x50'), :class => 'avatar_v50x50'), user_path(:id => @tweet.sender.id) %></div>
+      	<div class="lb_nr">
+      	  <%= link_to @tweet.sender.name, user_path(:id => @tweet.sender.id) %>
+      	  <br /><%= rtext_tag @tweet.rtext %>
+      	</div>
+
+        <div class="cov_nr attachments" data-role="rtext-attachments">
+          <%= render(:partial => '/attachments/audio', :object => @tweet.audio) if @tweet.audio -%>
+          <%= render(:partial => '/attachments/picture', :object => @tweet.picture) if @tweet.picture -%>
+          <%= render(:partial => '/attachments/file', :object => @tweet.file) if @tweet.file -%>
+          <%= render(:partial => 'tweets/reftweet', :object=> @tweet.reftweet) if @tweet.reftweet -%>
+        </div>
+
+       	<div class="lb_if f12 red_a_dc5" data-role="counter">
+        	<span class="left"><%= l @tweet.created_at, format: :short %></span>
+        	<span class="right">
+        	  <% if @tweet.repostable? %>
+        		  <%= link_to "转发(#{@tweet.reposts_count})", tweet_reposts_path(@tweet)%> |
+        		<% end %>
+        		<%= link_to "评论(#{@tweet.comments_count})", "javascript:void(0);"%> |
+            <a href="javascript:void(0);" data-action="favorite"><%= fav ? "取消收藏" : "收藏"%></a>
+      		</span>
+        </div>
+      </div>
+    
+      <div class="comm_t"></div>
+    
+      <div data-type="CommentEditor" data-tweet-id="<%= @tweet.id %>">
+      	<div class="lb_comm" style="margin-bottom:0px;"> 
+      		<div class="comm_form ceditor" aria-disabled="false">
+      			<div class="comm_ip comm_pl">
+      			  <textarea class="texter chackTextarea" placeholder="请在这里输入您的评论" style="overflow-y: hidden;" aria-disabled="false"></textarea>
+      			</div>
+      			<div class="comments_list f12">
+      				<div class="clear" style=""></div>
+      			</div>
+      		</div>
+      	</div>
+      	<div class="lb_comm" style="border:none;">
+        	<div class="dhk_gn f12 toolbar" style="width:423px;" data-role="toolbar">
+        	  <a class="btn btn-danger bn submiter" href="javascript:void(0);">评论</a>
+        	</div>
+      	</div>
+    	</div>
+    </div>
+  
+	  <div class="clearfix"></div>
+	</div>
+  <div class="bk_t bk_d"></div>
+</div>
+
+<div class="bk" id="page-comments-body">
+  <div class="bk_t"></div>
+	<div class="bk_c">
+    <div class="tab">
+      <% if @tweet.repostable? %>
+        <%= link_to '转发', tweet_reposts_path(@tweet) %>
+      <% end %>
+      <a href="javascript:void(0);" class="on">评论</a>
+    </div>
+    <div data-type="CommentsList" data-tweet-id="<%= @tweet.id %>">
+      <% if @comments.any? %>
+        <%= render :collection => @comments, :partial => '/tweet/comments/comment' %>
+        <div class="lb text-center">
+          <%= will_paginate @comments %>
+        </div>
+	    <% else %>
+	      <div class="empty"><span>该条微博还没有评论哦～</span></div>
+	    <% end %>
+	  </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="bk_t bk_d"></div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("div[data-type=Tweet]").tweet();
+
+    var _commentEditor = $("#page-comments-header")
+      .find("[data-type=CommentEditor]").commentEditor();
+
+    $("#page-comments-body").find("[data-type=CommentsList]").commentList({
+      commentOptions: {
+        replayFunc: function(commentId, senderName) {
+          _commentEditor.commentEditor("replay", commentId, senderName);
+        }
+      }
+    });  
+  });
+</script>

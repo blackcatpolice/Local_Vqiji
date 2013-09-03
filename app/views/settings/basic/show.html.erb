@@ -1,0 +1,81 @@
+<% provide :title, '基本资料' %>
+
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="tab">
+      <a class="on" href="javascript:void(0);">基本资料</a>
+      <a class="qb" href="<%= edit_settings_avatar_url %>">修改头像</a>
+      <a class="qb" href="<%= edit_settings_password_url %>">安全设置</a>
+    </div>
+    <div class="sz_zl">
+      <% if flash.now[:message] %>
+        <div class="alert alert-success text-center">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <%= flash.now[:message] %>
+        </div>
+      <% end %>
+      <% unless current_user.errors.blank? %>
+        <div class="alert alert-error text-center">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <ul>
+            <% current_user.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      <form class="form-horizontal">
+        <fieldset>
+          <% if current_user.email %>
+          <div class="control-group">
+            <label class="control-label">Email：</label>
+            <div class="controls"><%= current_user.email %></div>
+          </div>
+          <% end %>
+          <div class="control-group">
+            <label class="control-label">姓名：</label>
+            <div class="controls"><%= current_user.name %></div>
+          </div>
+          <div class="control-group">
+              <label class="control-label">性别：</label>
+              <div class="controls">
+                <%= user_gender current_user %>
+              </div>
+          </div>
+          <% if current_user.birthday %>
+            <div class="control-group">
+              <label class="control-label" for="birthday">生日：</label>
+              <div class="controls">
+                <%= l current_user.birthday %>
+              </div>
+            </div>
+          <% end %>
+          <% if current_user.from %>
+            <div class="control-group">
+              <label class="control-label" for="birthday">家乡：</label>
+              <div class="controls">
+                <%= current_user.from.country %>&nbsp;
+                <%= current_user.from.province %>&nbsp;
+                <%= current_user.from.name %>
+              </div>
+            </div>
+          <% end %>
+          <% if current_user.job_no %>
+            <div class="control-group">
+              <label class="control-label">员工号：</label>
+              <div class="controls"><%= current_user.job_no %></div>
+            </div>
+          <% end %>
+          <!--
+          <div class="control-group">
+            <label class="control-label">积分：</label>
+            <div class="controls"><%#= current_user.jifen %></div>
+          </div> -->
+        </fieldset>
+      </form>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="bk_t bk_td"></div>
+</div>

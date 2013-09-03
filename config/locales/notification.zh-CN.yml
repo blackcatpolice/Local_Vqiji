@@ -1,0 +1,47 @@
+zh-CN:
+  mongoid:
+    models:
+      notification/base: '通知'
+    attributes:
+      notification/base:
+        user: '通知接收人'
+        created_at: '创建时间'
+
+  views:
+    notifications:
+      nb:
+        notification/base:
+          unit: '条新通知'
+        notification/fan:
+          unit: '个新粉丝'
+        notification/repost:
+          unit: '条新转发'
+        notification/comment:
+          unit: '条新评论'
+        notification/comment_mention:
+          unit: '条新评论提到我'
+        notification/tweet_mention:
+          unit: '条新微博提到我'
+        notification/replay_comment:
+          unit: '条回复我的新评论'
+        notification/new_advisory_question:
+          unit: '个新咨询'
+        notification/advisory_question_solved:
+          unit: '个咨询问题已解决'
+        notification/new_advisory_answer:
+          unit: '条新咨询回复'
+        notification/new_elearn_training:
+          unit: '个新培训'
+        notification/elearn_training_passed:
+          unit: '个培训已通过'
+        notification/elearn_training_not_pass:
+          unit: '个未通过培训'
+        notification/top_tweet:
+          unit: '条新重要微博'
+        notification/group_join:
+          unit: '个新加入工作组'
+        notification/new_todo_task:
+          unit: '个新任务'
+        notification/talk_group_join:
+          unit: '个新加入讨论组'
+

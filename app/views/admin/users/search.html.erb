@@ -1,0 +1,19 @@
+<% content_for :title do%>搜索用户<%end%>
+
+<ul class="nav nav-tabs">
+  <li><%= link_to raw('<i class="icon-home"></i>用户主页'), home_admin_users_path %></li>
+  <li class="active"><%= link_to raw('<i class="icon-list"></i>用户列表'), admin_users_path %></li>
+  <li><%= link_to raw('<i class="icon-plus"></i>新建用户'), new_admin_user_path %></li>
+  <li style="float:right;">
+  	<%= render "search_form"%>
+  </li>
+</ul>
+
+<div class="alert">
+<strong>提示信息:</strong>
+<span>共搜索到<%= @users.total_entries%>个关于 
+<i style="color:red;"><%= params[:key]%> </i> 的用户</span> 
+<%= link_to "查看所有用户 »",admin_users_path%>
+</div>
+
+<%= render "list" %>

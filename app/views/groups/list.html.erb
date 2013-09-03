@@ -1,0 +1,41 @@
+<% provide :title, '所有工作组' %>
+
+<div class="main_n">
+  <div class="bk">
+    <div class="bk_td f13">
+      <div class="gzz_jj">
+      	<span>
+        	所有工作组
+      		<a class="right btn btn-danger bn" href="/groups/new">新建工作组</a>
+      	</span>
+    	</div>
+    	<div class="gzz_tab">
+       <%= link_to "我的工作组",mine_groups_path()%>
+       <%= link_to "所有工作组",list_groups_path(),:class=>"on"%>
+       <div class="input-append">
+         <form action="/groups/list" method="get">
+           <input class="span2" type="text" name="key" placeHolder="小组名称">
+           <input name="" type="image" src="<%= asset_path('images/gz_ser.png') %>">
+         </form>
+       </div>
+      </div>
+    </div>
+
+    <div class="bk_c">
+      <div class="gzz_list">
+        <% @groups.each do |group|%>
+        <%= render :partial=> "group", :locals => {
+          :group=>group, :in_group=>group.has?(current_user.id),
+          :is_admin=>group.has_admin?(current_user.id) } %>
+        <% end %>
+        
+        <div class="lb text-center">
+          <%= will_paginate @groups, inner_window: 1, outer_window: 0 %>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+
+    <div class="bk_t bk_d"></div>
+  </div>
+</div>

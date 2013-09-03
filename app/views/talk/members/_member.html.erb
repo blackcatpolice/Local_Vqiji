@@ -1,0 +1,22 @@
+<div class="lb sx_nw member" data-type="TalkMember" data-id="<%= member.user.to_param %>">
+  <div class="lb_tx"><img src="<%= member.user.avatar.v50x50.url %>"></div>
+  <div class="lb_nr">
+    <%= image_tag user_gender_image_path(member.user) %>
+    <%= link_to member.user.name, member.user %>
+    <a class="n_sx" href="javascript:void(0);" data-action="new-talk-message-to-u" data-receiver-id="<%= member.user.to_param %>">私信</a>
+  </div>
+  <div class="lb_nr1">
+    <div class="zw left">
+      关注 <%= link_to member.user.followeds_count, followeds_user_path(member.user) %> | 
+		  粉丝 <%= link_to member.user.fans_count, fans_user_path(member.user) %> | 
+		  微博 <%= link_to member.user.tweets_count, user_path(member.user) %>
+		  <br />
+      部门：<%= user_department_title(member.user)  %>&nbsp;&nbsp;职位：<%= user_job_title(member.user) %>
+    </div>
+    <% if member.group.creater == member.user %>
+      <span class="right iscreater">创建人</span>
+    <% elsif member.group.creater == current_user %>
+      <a class="right remove" href="javascript:void(0)" data-action="remove-talk-member">移除会话</a>
+    <% end %>
+  </div>
+</div>

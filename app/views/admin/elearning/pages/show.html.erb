@@ -1,0 +1,7 @@
+<% content_for :title do%>培训页详细<%end%>
+<!-- -->
+<%= render :partial => "admin/elearning/nav_training" ,:locals=>{:training => @training} %>
+<!--- -->
+序号:<%=@page.number%><br/><br/>
+标题:<%=@page.title%><br/><br/>
+内容:<%=@page.context.html_safe%><br/><br/>

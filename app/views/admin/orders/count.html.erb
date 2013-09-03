@@ -1,0 +1,47 @@
+<% content_for :title do%>商城管理<%end%>
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+    <th colspan="3">订单统计</th>
+</tr>
+<tr>
+  <th>订单状态</th>
+  <th>订单数量</th>
+  <th>订单积分</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><%= order_status_help Store::Order::STATUS_INIT %></td>
+  <td><%= Store::Order.init_scope.count %></td>
+  <td><%= Store::Order.init_scope.sum("total")%></td>
+</tr>
+<tr>
+  <td><%= order_status_help Store::Order::STATUS_SUBMIT %></td>
+  <td><%= Store::Order.submit_scope.count %></td>
+  <td><%= Store::Order.submit_scope.sum("total")%></td>
+</tr>
+<tr>
+  <td><%= order_status_help Store::Order::STATUS_SHIP %></td>
+  <td><%= Store::Order.ship_scope.count %></td>
+  <td><%= Store::Order.ship_scope.sum("total")%></td>
+</tr>
+<tr>
+  <td><%= order_status_help Store::Order::STATUS_CONFIRM %></td>
+  <td><%= Store::Order.confirm_scope.count %></td>
+  <td><%= Store::Order.confirm_scope.sum("total")%></td>
+</tr>
+<tr>
+  <td><%= order_status_help Store::Order::STATUS_SUCCESS %></td>
+  <td><%= Store::Order.success_scope.count %></td>
+ <td><%= Store::Order.success_scope.sum("total") || 0%></td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+	<td>合计</td>
+	<td><%= Store::Order.count %></td>
+	<td><%= Store::Order.sum("total")%></td>
+</tr>
+</tfoot>
+</table>

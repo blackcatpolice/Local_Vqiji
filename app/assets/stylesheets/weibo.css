@@ -1,0 +1,16 @@
+/*
+ *= require _base
+ */
+
+*[data-role=weibo-pop-reposter] {
+  min-height: 350px;
+}
+
+*[data-role=weibo-pop-reposter] .modal-body {
+  text-align: center;
+}
+
+*[data-role=weibo-pop-reposter] .loading,
+*[data-role=weibo-pop-reposter] .error {
+  margin-top: 100px;
+}

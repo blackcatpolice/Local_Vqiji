@@ -1,0 +1,21 @@
+<div class="span8">
+    <fieldset>
+<div class="control-group">
+ <label class="control-label" for="input">标题</label>
+<%= form.text_field :title, :id=>"rule_title" %>
+</div>
+
+<div class="control-group">
+ <label class="control-label" for="input">详细内容</label>
+	<%= form.text_area :content, :width => 700, :height => 300, :class => "admin_editor" %>
+</div>
+  
+  
+<div class="form-actions">
+  <button type="submit" class="btn btn-primary" id="rule-submiter">提交</button>
+        &nbsp;&nbsp;&nbsp;
+  <button type="reset" class="btn" onclick="location.href='/admin/rules'">取消</button>
+</div>
+
+   </fieldset>
+</div>

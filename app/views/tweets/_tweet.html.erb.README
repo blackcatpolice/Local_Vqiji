@@ -1,0 +1,9 @@
+在一下位置有自定义 _tweet.html.erb, 为了风格统一，请在维护 _tweet.html.erb 时一并维护:
+
+/tweets/_tweet.html.erb
+/tweet/reposts/_tweet.html.erb
+
+/my/favorites/_tweet.html.erb
+/groups/_feed.html.erb
+
+/talk/feeds/_feed.html.erb

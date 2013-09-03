@@ -1,0 +1,11 @@
+/*
+ *= require libs/_base
+ *= require libs/datetimepicker
+ */
+
+body { padding-top:45px; }
+  form label.error {
+  margin: 3px 0 0 5px;
+  display: inline;
+  color: red;
+}

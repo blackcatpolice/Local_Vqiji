@@ -1,0 +1,9 @@
+"zh-CN":
+  mongoid:
+    models:
+      check: "用户检测"
+    attributes:
+      check:
+        name: "姓名"
+        id_number: "身份证"
+        job_no: "员工号"

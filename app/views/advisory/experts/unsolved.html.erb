@@ -1,0 +1,16 @@
+<div class="zx_hd"><a class="tit yjj" href="javascript:;">专家咨询</a></div>
+<div class="zx_bd">
+	<div class="zx_tab">
+		<%= link_to "我未解决的问题", unsolved_advisory_experts_path, :class=>"on"%>
+		<%= link_to "我已解决的问题", solved_advisory_experts_path %>
+	</div>
+	<% unless @questions.empty?%>
+	  <%= render :collection => @questions, :partial => 'advisory/tmpl/question', :locals => { :qtype => "e_unsolved"} %>
+	<%else %>
+	  <div class="empty"><span>还没有问题哦～</span></div>
+	<% end %>
+</div>
+<div class="zx_db"></div>
+<% if @questions.any?%>
+  <%= will_paginate @questions %>
+<% end %>

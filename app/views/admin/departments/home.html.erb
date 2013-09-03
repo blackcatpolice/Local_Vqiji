@@ -1,0 +1,28 @@
+<% content_for :title do%>部门主页<%end%>
+<ul class="nav nav-tabs">
+  <li class="active" ><a href="<%= admin_departments_path%>"><i class="icon-home"></i>部门主页</a></li>
+  <li class="dropdown">
+  	<a href="<%= list_admin_departments_path%>" class="dropdown-toggle" data-toggle="dropdown">部门列表<b class="caret"></b></a>
+  	<ul class="dropdown-menu">
+      <li><a href="<%= list_admin_departments_path %>">所有部门</a></li>
+      <li><a href="<%= list_admin_departments_path + "?level=0"%>">顶级部门</a></li>
+      <li><a href="<%= list_admin_departments_path + "?level=1"%>">一级部门</a></li>
+      <li><a href="<%= list_admin_departments_path + "?level=2"%>">二级部门</a></li>
+    </ul>
+  </li>
+  <li><a href="<%=new_admin_department_path %>"><i class="icon-plus"></i>新建部门</a></li>
+</ul>
+<table class="table">
+<tr>
+<td>顶级部门</td>
+<td>一级部门</td>
+<td>二级部门</td>
+<td>合计</td>
+</tr>
+<tr>
+<td><%= Department.top_scope.count %></td>
+<td><%= Department.first_scope.count %></td>
+<td><%= Department.second_scope.count %></td>
+<td><%= Department.all.count %></td>
+</tr>
+</table>

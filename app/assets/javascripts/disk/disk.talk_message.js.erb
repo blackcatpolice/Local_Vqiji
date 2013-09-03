@@ -1,0 +1,88 @@
+// require _base
+
+(function($, undefined) {
+  $.widget("disk.fileTalkMessage", $.rtext.rtextEditor, {
+    options: {
+      file: {},
+      allowBlank: false,
+      textMaxLength: <%= Talk::Message::User::TEXT_MAXLEN %>,
+      tools: [],
+      inputMention: false,
+      toolbarOptions: {
+            tip: {
+              csses: {
+                position: "fixed",
+                zIndex: 1060
+              }
+            }
+      },
+      placeHolder: "在这里输入私信"
+    },
+    
+    _create: function() {
+      
+      this._super();
+    },
+    
+    _submit: function(text, done) {
+      var self = this;
+      var _input = $('[data-role=query-by-user-name]',this.element).find(":input");
+      if(_input.val().replace(/(^\s*)|(\s*$)/g, '') == ''){
+	    _input.blink();
+        done();
+        return false;
+	  }
+        
+      var data = {
+        text: text
+      };
+      
+      if(this._audioRecorder) {
+        var audio = this._audioRecorder.audioRecorder("audio");
+        if (audio) {
+          data.audioId = audio.id;
+        }
+      }
+
+      if(this._pictureUploader) {
+        var picture = this._pictureUploader.pictureUploader("picture");
+        if (picture) {
+          data.pictureId = picture.id;
+        }
+      }
+
+      if(this._fileUploader) {
+        var file = this._fileUploader.fileUploader("file");
+        if (file) {
+          data.fileId = file.id;
+        }
+      }
+    
+      if(!data.fileId && this.options.file){
+      	data.fileId = this.options.file.id;
+      }
+      data.name = _input.val();
+      var _args = $.extend(true, {}, API.defaultOptions,
+      	{
+      	  type: "POST",
+          data: data,
+          dataType: 'json',
+      	  cache: false,
+          success: function() {
+            done();
+            $.alert("发送私信成功！", 1);
+            $(self.element).modal('hide');
+            $(self.element).remove();
+          },
+          error: function() {
+            App.error.handleXHRError.apply(this, arguments);
+            done();
+          }
+        }
+      );
+
+      $.ajax("/talk/messages/to_user/by_name", _args);
+    }
+  });
+  
+})(jQuery);

@@ -1,0 +1,30 @@
+<% if reftweet %>
+  <div class="quote_lb_nr f12" data-role="reftweet" data-id="<%= reftweet.id %>">
+    <div class="arrow">
+      <em class="line">◆</em>
+      <span class="bg">◆</span>
+    </div>
+    <div class="lb_nr">
+      <%= user_tag(reftweet.sender) %>：<%= rtext_tag reftweet.rtext %>
+    </div>
+
+    <div class="cov_nr attachments" data-role="rtext-attachments">
+      <%= render(:partial => '/attachments/audio', :object => reftweet.audio) if reftweet.audio -%>
+      <%= render(:partial => '/attachments/picture', :object => reftweet.picture) if reftweet.picture -%>
+      <%= render(:partial => '/attachments/file', :object => reftweet.file) if reftweet.file -%>
+    </div>
+    
+    <div class="lb_if f12 red_a_dc5">
+      <span class="left"><%= l reftweet.created_at , format: :short %></span>
+      <span class="right">
+        <%= link_to "转发(#{reftweet.reposts_count})", tweet_reposts_url(reftweet) %>
+        <span class="divider">|</span>
+        <%= link_to "评论(#{reftweet.comments_count})", tweet_comments_url(reftweet) %>
+ 	  </span>
+    </div>
+  </div>
+<% else %>
+  <div class="quote_lb_nr f12">
+    该微博已被删除！
+  </div>
+<% end %>

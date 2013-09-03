@@ -1,0 +1,343 @@
+// require _base
+
+(function($) {
+  $.widget("user.userMembersSelector", {
+    _create: function() {
+      this._findByDepartment = this.element.find("[data-role=query-by-department]");
+      this._findByDepartmentInput = this._findByDepartment.find(":text")
+        .on("textchange", $.proxy(this._onFindByDepartmentInputValChange, this))
+        .placeholder();
+        
+      this._on(this._findByDepartment, {
+        "enabled": this._onFindByDepartmentEnable,
+        "disabled": this._onFindByDepartmentDisabled,
+        "change :text": this._onFindByDepartmentInputValChange,
+        "keypress :text": this._onFindByDepartmentInputValChange,
+        "click a": this._onFindByDepartmentButtonClick
+      });
+
+      this._findByUserName = this.element.find("[data-role=query-by-user-name]");
+      this._findByUserNameInput = this._findByUserName.find(":text")
+        .on("textchange", $.proxy(this._onFindByUserNameInputValChange, this))
+        .typeahead({
+          source: this._findByUserNameInputTypeaheadSource,
+          matcher: function() {
+            return true;
+          },
+          limit: 5
+        }).placeholder();
+
+      this._on(this._findByUserName, {
+        "enabled": this._onFindByUserNameEnable,
+        "disabled": this._onFindByUserNameDisabled,
+        "change :text": this._onFindByUserNameInputValChange,
+        "keypress :text": this._onFindByUserNameInputValChange,
+        "click a": this._onFindByUserNameButtonClick
+      });
+      
+      this._found = this.element.find("ul[data-role=found]");
+      this._selected = this.element.find("ul[data-role=selected]");
+
+      this._on({
+        "click [name=find-by]": this._onFindByChange,
+        "click ul[data-role=found]>li": this._onFoundItemClick,
+        "click ul[data-role=selected]>li>span[data-action=delete]": this._onSelectedItemDeleteClick
+      });
+      
+      // 默认通过 department 查找
+      this._enableFindBy("department");
+    },
+    
+    _onFindByChange: function(e) {
+      this._enableFindBy( $(e.target).val() );
+    },
+    
+    _enableFindBy: function(by) {
+      var that = (by == "user-name") ? "department" : "user-name";
+      this.element.find("[data-role=query-by-" + that + "]")
+       .find(":text").attr("disabled", true)
+       .end().find("a").attr("disabled", true)
+       .end().trigger("disabled");
+
+      this.element.find("[data-role=query-by-" + by + "]")
+       .find("input").attr("disabled", false)
+       .end().find("a").attr("disabled", false)
+       .end().trigger("enabled");
+    },
+    
+    _onFindByDepartmentEnable: function() {
+      // 初始化 departments
+      this._loadDepartments(false, $.proxy(function(departments) {
+        if (departments) {
+          this._findByDepartmentInput.typeahead({
+            source: $.map(departments, function(department, _) {
+              return department.name;
+            }),
+            menu: '<ul class="typeahead dropdown-menu" style="width:auto;height:auto;"></ul>'
+          });
+        }
+      }, this));
+      // 清空
+      this._findByDepartmentInput.val("").change().focus();
+    },
+    
+    _onFindByDepartmentDisabled: function() {
+      this._findByDepartmentInput.val("").change().focus();
+    },
+
+    _loadDepartments: function(force, done) {
+      if (this._departments) {
+        if (!force) {
+          done.call(this, this._departments);
+          return;
+        } 
+        this._departments = null;
+      }
+      var self = this;
+
+      $.ajax({
+        url: "/departments/flat.json",
+        method: "GET",
+        dataType: "JSON",
+        success: function(departments) {
+          self._departments = departments;
+          self._departmentsMapByName = {};
+          $.each(departments, function(_, deparment) {
+            self._departmentsMapByName[ deparment.name ] = deparment;
+          });
+        },
+        error: function() {
+          self._departments = null;
+          self._departmentsMapByName = null;
+        },
+        complete: function() {
+          done.call(self, self._departments);
+        }
+      });
+    },
+    
+    fillFound: function(members) {
+      this._found.empty();
+      var self = this;
+      $.each(members, function(_, member) {
+        self._appendFoundMember(member);
+      });
+      return this;
+    },
+    
+    _appendFoundMember: function(member) {
+      var added = (this._selected.find("li[data-id=" + member.id + "]").length > 0);
+      $.tmpl(""
+        + "<li data-id=\"${id}\""
+        + " class=\"" + (added ? "on" : "") + "\""
+        + ">${name}</li>"
+      + "", member).appendTo(this._found);
+    },
+    
+    _addSelectedItem: function(member, saved, strategy) {
+      $.tmpl(""
+        + "<li data-id=\"${id}\""
+          +" data-saved=\"" + (saved ? "true" : "false") + "\""
+        + "><label>${name}</label>"
+          + (saved ? "" : "<span title=\"删除该成员\" data-action=\"delete\"></span>")
+        + "</li>", member)[strategy || "prependTo"](this._selected);
+      this._found.find("li[data-id=" + member.id + "]").addClass("on");
+      
+      /* 如果添加/删除一个为保存的 selected 项，会触发 change 事件 */
+      if ( !saved ) {
+        this._trigger("change");
+      }
+    },
+    
+    _removeSelectedItem: function(item) {
+      var $target = $(item)
+        , id = $target.attr("data-id");
+      this._found.find("li[data-id=" + id + "]").removeClass("on");
+      $target.remove();
+
+      if ($target.is("[data-saved!=true]")) {
+        this._trigger("change");
+      }
+    },
+    
+    _removeSelectedMember: function(member) {
+      this._removeSelectedItem( this._selected.find("li[data-id=" + member.id + "]") );
+    },
+    
+    presetSelected: function(members) {
+      var self = this;
+      this._found.find("li[data-saved=true]")
+        .each(function(_, member) {
+          self._removeSelectedMember(member);
+        });
+      $.each(members, function(_, member) {
+        self._addSelectedItem(member, true, "appendTo");
+      });
+      return this;
+    },
+    
+    _onFindByDepartmentInputValChange: function(e) {
+      var disabled = true;
+      if ( this._departmentsMapByName ) {
+        var department = this._departmentsMapByName[ this._findByDepartmentInput.val() ];
+        if (department) {
+          // 通过 typeahead 或者 按下 enter 键才发起部门查找查询
+          if ( (e.type == "change") || (e.type == "keypress" && e.which == 13) ) {
+            e.preventDefault();
+            this._QueryByDepartment(department.id);
+          }
+          disabled = false;
+        }
+      }
+      this._findByDepartment.find("a").attr("disabled", disabled);
+    },
+    
+    // 通过点击查询按钮发起部门查找查询
+    _onFindByDepartmentButtonClick: function(e) {
+      if (this._departmentsMapByName) {
+        var department = this._departmentsMapByName[ this._findByDepartmentInput.val() ];
+        if (department) {
+          this._QueryByDepartment(department.id);
+        }
+      }
+    },
+    
+    _QueryByDepartment: function(department_id) {
+      if (this._QueryByDepartmentXHR) {
+        this._QueryByDepartmentXHR.abort();
+      }
+      this.disable();
+      this._found.spin("small");
+      this._QueryByDepartmentXHR = $.ajax({
+        url: "/departments/" + department_id + "/members.json",
+        method: "GET",
+        dataType: "JSON",
+          cache: true,
+        success: $.proxy(function(members) {
+          this.fillFound(members);
+        }, this),
+        error: function(jqXHR, textStatus, errorThrown) {
+          if (textStatus != "abort") {
+            var errorMsg = App.error.XHRError.call(this, jqXHR, textStatus, errorThrown, "获取成员失败");
+            $.alert(errorMsg, 2);
+          }
+        },
+        complete: $.proxy(function() {
+          this._QueryByDepartmentXHR = null;
+          this._found.spin(false);
+          this.enable();
+        }, this)
+      });
+    },
+    
+    _onFindByUserNameEnable: function() {
+      this._findByUserNameInput.val("").change().focus();
+    },
+    
+    _onFindByUserNameDisabled: function() {
+      this._findByUserNameInput.val("").change().focus();
+    },
+    
+    _onFindByUserNameInputValChange: function(e) {
+      var disabled = true;
+      var query = this._findByUserNameInput.val();
+      if (query) {
+        if ( (e.type == "change") || (e.type == "keypress" && e.which == 13) ) {
+          e.preventDefault();
+          this._QueryByUserName(query);
+        }
+        disabled = false;
+      }
+      this._findByUserName.find("a").attr("disabled", disabled);
+    },
+    
+    _findByUserNameInputTypeaheadSource: function(query, process) {
+      if (this._findByUserNameInputTypeaheadSourceXHR) {
+        this._findByUserNameInputTypeaheadSourceXHR.abort();
+      }
+      var self = this;
+      this._findByUserNameInputTypeaheadSourceXHR = App.api.searchUserByName(query, {
+        success: function(users) {
+          process.call(this, $.map(users, function(user, _) {
+            return user.name;
+          }));
+        },
+        complete: function() {
+          self._findByUserNameInputTypeaheadSourceXHR = null;
+        }
+      });
+    },
+
+    // 
+    _onFindByUserNameButtonClick: function(e) {
+      var query = this._findByUserNameInput.val();
+      if (query) {
+        this._QueryByUserName(query);
+      }
+    },
+
+    _QueryByUserName: function(query) {
+      if (this._QueryByUserNameXHR) {
+        this._QueryByUserNameXHR.abort();
+      }
+      this.disable();
+      this._found.spin("small");
+      this._QueryByUserNameXHR = App.api.searchUserByName(query, {
+        success: $.proxy(function(members) {
+          this.fillFound(members);
+        }, this),
+        error: function(jqXHR, textStatus, errorThrown) {
+          if (textStatus != "abort") {
+            var errorMsg = App.error.XHRError.call(this, jqXHR, textStatus, errorThrown, "获取成员失败");
+            $.alert(errorMsg, 2);
+          }
+        },
+        complete: $.proxy(function() {
+          this._found.spin(false);
+          this._QueryByUserNameXHR = null;
+          this.enable();
+        }, this)
+      });
+    },
+    
+    _onFoundItemClick: function(e) {
+      var $target = $(e.target)
+        , id = $target.attr("data-id")
+        , member = $target.tmplItem().data;
+      if ( this._selected.find( "li[data-id=" + id + "]" ).length > 0 ) {
+        /* 为了避免操作混淆，不在这里(找到的成员列表)删除
+        // 如果未保存，可以删除
+        if ( this._selected.find("li[data-id=" + id + "][data-saved=true]").length == 0 ) {
+          this._removeSelectedMember(member);
+        }*/
+      } else {
+        this._addSelectedItem(member);
+      }
+    },
+    
+    _onSelectedItemDeleteClick: function(e) {
+      var $target = $(e.target).closest("li[data-id]");
+      if ( !$target.is("[data-saved=true]")) {
+        var id = $target.attr("data-id");
+        if ( !$target.is("[data-saved=true]") ) {
+          this._removeSelectedItem($target);
+        }
+      }
+    },
+    
+    selectedMemberIds: function() {
+      return $.map(this._selected.find("li[data-saved!=true]"), function(elem, i) {
+        return $(elem).attr("data-id");
+      });
+    },
+    
+    reset: function() {
+      var self = this;
+      this._selected.find("li[data-saved!=true]")
+        .each(function(_, item) {
+          self._removeSelectedItem(item);
+        });
+      return this;
+    }
+  });
+})(jQuery);

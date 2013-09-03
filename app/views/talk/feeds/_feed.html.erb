@@ -1,0 +1,25 @@
+<div class="lb" data-type="talk-message" data-id="<%= feed.id %>">
+  <% message = feed.message -%>
+  <% unless message.sys? -%>
+    <div class="lb_tx"><%= image_tag message.sender.avatar.v50x50.url %></div>
+    <div class="lb_nr"><%= link_to message.sender.name, message.sender %></div>
+    <div class="lb_nr"><%= message.rtext_html %></div>
+    
+    <div class="cov_nr attachments" data-role="rtext-attachments">
+      <%= render(:partial => '/attachments/audio', :object => message.audio, :formats => :html) if message.audio -%>
+      <%= render(:partial => '/attachments/picture', :object => message.picture, :formats => :html) if message.picture -%>
+      <%= render(:partial => '/attachments/file', :object => message.file, :formats => :html) if message.file -%>
+    </div>
+    <div class="lb_if f12">
+      <span class="left"><%= l feed.created_at, format: :short %></span>
+      <span class="right"><a data-action="delete" href="javascript:void(0);">删除</a></span>
+    </div>
+  <% else -%>
+    <% case message.type -%>
+    <% when Talk::Message::Sys::TYPE_USER_JOIN -%>
+      <div class="lb_in f13"><%= message.actor.name %>加入了会话组</div>
+    <% when Talk::Message::Sys::TYPE_USER_QUIT -%>
+      <div class="lb_in f13 lb_out"><%= message.actor.name %>退出了会话组</div>
+    <% end -%>
+  <% end -%>
+</div>

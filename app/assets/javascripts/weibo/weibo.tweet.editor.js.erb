@@ -1,0 +1,315 @@
+// 微波编辑器
+
+(function($, undefined) {
+  $.widget("weibo.tweetEditor", $.rtext.rtextEditor, {
+    options: {
+      placeHolder: "在这里输入您想说的话",
+      isShare: false,
+      groupId: 0,
+      allowBlank: false,
+      refTweetId: null,
+      textMaxLength: <%= Tweet::TEXT_MAXLEN %>,
+      tools: ["emotion", "topic", "picture", "video", "file", "bigAudio", "sendTo"],
+      toolbarOptions: null,
+      inputMention: true
+    },
+    
+    _getCreateOptions: function() {
+      return {
+        sendToTipOptions: {
+          defaultGroup: {
+            id:  this.element.attr("data-default-group-id") || SendToTip.group0.id,
+            is_admin: (this.element.attr("data-default-group-is-admin") == "true"),
+            cancelable: (this.element.attr("data-default-group-cancelable") == "true")
+          }
+        }
+      };
+    },
+
+    _create: function() {
+      this._super();
+      var self  = this;
+
+      if ( $.inArray("sendTo", this.options.tools) != -1 ) {
+        var sendToBtn = this._toolbar.find("a[data-action=send_to]");
+        
+        this._toolbar.toolbar("addTool", sendToBtn, function() {
+          self._sendToTip = new SendToTip( sendToBtn, self._toolbar, self, self.options.sendToTipOptions );
+          return self._sendToTip.$content;
+        }, {
+          tipClass: "tip-tweet-to-groups-picker"
+        });
+        
+        this.element.find("[name=is_top]:checkbox").one("click.weibo-editor", $.proxy(function(e) {
+          if ( $(e.target).is(":checked") ) {
+            if (!this._sendToTip) { // 还没有点击过 “分发” 按钮
+              if ( ! (this.options.sendToTipOptions && this.options.sendToTipOptions.defaultGroup && this.options.sendToTipOptions.defaultGroup.is_admin) ) {
+                // 打开分发组选择器
+                this._toolbar.toolbar("triggerTool", this._toolbar.find("a[data-action=send_to]"), "open");
+              }
+            }
+          } 
+        }, this));
+      }
+    },
+
+    reset: function() {
+      if (this._sendToTip) {
+        this._sendToTip.reset();
+      }
+      return this._super();
+    },
+
+    _submit: function(text, done) {
+      var self = this
+        , groupId = self.options.groupId;
+
+      var data = {
+        text: text,
+        groupId: groupId
+      };
+      
+      /* 将录音机的音频赋值给 附件 */
+      if (this._audio) {
+      	data.audioId = this._audio.id;
+      }
+      
+      if (this._file) {
+        data.fileId = this._file.id;
+      }
+      
+      if (!this._file && this.options.file){
+      	data.fileId = this.options.file.id;
+      }
+      /* 附件选择网盘文件 */
+      if(!data.fileId && this._selectedFile){
+      	data.fileId = this._selectedFile.id;
+      }
+      
+      if (this._picture) {
+        data.pictureId = this._picture.id;
+      }
+
+      if (this._sendToTip) {
+        data.group_ids = this._sendToTip.selectedGroupIds();
+      }
+      
+      // 如果没有通过 SendToTip 获取到 group_ids, 则根据 SendToTip 的默认选项获取 group_ids
+      if (!data.group_ids && this.options.sendToTipOptions) {
+        var defaultGroup = this.options.sendToTipOptions.defaultGroup;
+        if (defaultGroup) {
+          data.group_ids = [ defaultGroup.id ];
+        }
+      }
+      
+      data.to_fans = ($.inArray( "0", data.group_ids ) != -1);
+      if (data.to_fans) { // 删除 "0"
+        data.group_ids.splice( $.inArray( "0", data.group_ids ), 1);
+      }
+      data.is_top = this.element.find("input[name=is_top]").is(":checked");
+      
+      if (!data.to_fans && (!data.group_ids || data.group_ids.length == 0)) {
+        $.alert("请至少选择一个分发组！", function() {
+          if (self._toolbar && ($.inArray("sendTo", self.options.tools) != -1)) {
+            self._toolbar.toolbar("triggerTool", self._toolbar.find("a[data-action=send_to]"), "open");
+          }
+          done.apply(self);
+        });
+        return;
+      }
+      
+      // console.log(data);
+
+      WEIBO.tweet(data, {
+        success: function(tweet) {
+          self.reset();
+          if(self.options.isShare){
+            $.alert("文件分享成功!", 1);
+          }
+          done.apply(self);
+          self._trigger("submit", tweet);
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+          done.apply(self);
+          $.alert( App.error.XHRError(jqXHR, textStatus, errorThrown, "发送微博失败！"), 2 );
+        }
+      });
+    } // _submit
+  }); // weidget weibo.editor
+  
+  function SendToTip(button, toolbar, editor, options) {
+    this.$button = button;
+    this.$toolbar = toolbar;
+    this.$editor = editor;
+    this.options = $.extend(true, {}, SendToTip.defaults, options);
+    this._init(this.options);
+    //return this.$content;
+  }
+  
+  $.extend(true, SendToTip.prototype, {
+    _init: function(options) {
+      this.$content = $.tmpl(options.tmpl);
+      
+      // 阻止默认组的取消
+      if ( this.options.defaultGroup && !this.options.defaultGroup.cancelable ) {
+        this.$content.on("click.send-to-tip", "[name=group_ids][value=" + this.options.defaultGroup.id + "]:checkbox", function(e) {
+          e.preventDefault();
+        });
+      }
+      
+      // 根据 “重要” 按钮设置工作组选项上的  [ 重要 ] 标记
+     this.$toolbar.on("click.send-to-tip", "[name=is_top]:checkbox", $.proxy(function(e) {
+        this._topMark( $(e.target).is(":checked") );
+     }, this));
+
+      this._loadGroups();
+    },
+    
+    _loadGroups: function(force) {
+      if (this._groups && !force) {
+        this._fillGroupsContent(this._groups);
+        return;
+      } else if (this._loadGroupsXHR) {
+        return;
+      }
+
+      var self = this;
+      // 载入工作组列表
+      $.tmpl(this.options.loadingTmpl)
+        .find("spin").spin("small").end()
+        .appendTo( this.$content.empty() );
+
+      this._loadGroupsXHR = WEIBO.api.queryGroups({
+        success: function(groups) {
+          self._group = groups;
+          self._fillGroupsContent(groups);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          if (textStatus != "abort") {
+            $.tmpl(self.options.errorTmpl, {
+               error: App.error.XHRError(jqXHR, textStatus, errorThrown, "获取工作组失败！")
+             })
+            .appendTo( self.$content.empty() );
+          }
+        },
+        complete: function() {
+          self._loadGroupsXHR = null;
+        }
+      });
+    },
+
+    _fillGroupsContent: function(groups) {
+      var _ul = $.tmpl(this.options.ulTmpl);
+      
+      // 对组进行排序:
+      // - 默认组 | [工作分享]
+      // - [工作分享]
+      // - 其他组 （根据服务器返回排序）
+      var _groups = groups.slice(0);
+      // [工作分享]
+      _groups.splice(0, 0, SendToTip.group0);
+      
+      // 找到默认组的位置
+      if (this.options.defaultGroup) {
+        for(var i in _groups) {
+          if (this.options.defaultGroup.id == _groups[i].id) {
+            if (i != 0) {
+              // 将默认组从原位置删除，并放到第一个
+              var defaultGroup = _groups[i];
+              _groups.splice(i, 1);
+              _groups.splice(0, 0, defaultGroup);
+            }
+            break;
+          }
+        }
+      }
+
+      $.tmpl(this.options.liTmpl, _groups).appendTo(_ul);
+
+      if (this.options.defaultGroup) { // 选中默认工作组
+        /*var item = _ul.find("[value=" + this.options.defaultGroup.id + "]:checkbox")
+           , data = item.closest("li").tmplItem().data;
+        item.prop("checked", true)
+            .sibling(".name").text( data.name + " [ 默认 ]" );*/
+        _ul.find("[name=group_ids][value=" + this.options.defaultGroup.id + "]:checkbox").prop("checked", true);
+      }
+
+      _ul.appendTo( this.$content.empty() );
+      // 重要微薄选项
+      this._topMark( this.$toolbar.find("[name=is_top]:checkbox").is(":checked") );
+    },
+    
+    // 只有可以发送重要微薄的组可以选
+    _topMark: function(top) {
+      if (top) {
+        // 禁用不能发送重要微博的工作组选项，为可以发送重要微薄的工作组添加 [ 重要 ] 标记
+        this.$content
+          .find("li[data-is-admin=false]").hide().end()
+          .find("li[data-is-admin=true]").each(function(_, item) {
+            var $item = $(item)
+              , data = $item.tmplItem().data;
+            $item.find(".name").text( data.name + " [ 重要 ]" );
+          });
+      } else  {
+        this.$content
+          .find("li[data-is-admin=false]").show().end()
+          .find("li[data-is-admin=true]").each(function(_, item) {
+            var $item = $(item)
+              , data = $item.tmplItem().data;
+            $item.find(".name").text( data.name );
+          });
+        if (this.options.defaultGroup) {
+          // 恢复默认选项
+          this.$content
+            .find("li[data-is-admin=false] [name=group_ids][value=" + this.options.defaultGroup.id + "]:checkbox").prop("checked", true);
+        }
+      }
+    },
+
+    // 选取到的 ids
+    selectedGroupIds: function() {
+      var _ul = this.$content.find("ul");
+      if (_ul.length > 0) {
+        return _ul.find("[name=group_ids]:checkbox:enabled:checked").map(function(_, item) {
+          return $(item).attr("value");
+        }).get();
+      } else {
+        return nil;
+      }
+    },
+    
+    destroy: function() {
+      this.$button = nil;
+      this.$editor = nil;
+      this.$toolbar.off("click.send-to-tip");
+      this.$toolbar = nil;
+      this.$content.off("click.send-to-tip").remove();
+      this.$content = nil;
+    },
+    
+    reset: function() {
+      if (this._groups) {
+        this._fillGroupsContent(this._groups);
+      }
+    }
+  });
+
+  SendToTip.defaults = {
+    tmpl: "<div class=\"_content\"><div class=\"loading\"><div class=\"spin\"></div>正在获取分组</div></div>",
+    loadingTmpl: "<div class=\"loading\">正在获取分组</div>",
+    errorTmpl: "<div class=\"error\">${error}</div>",
+    ulTmpl: "<ul></ul>",
+    liTmpl: "<li data-is-admin=\"${is_admin}\" title=\"${name}${is_admin ? \"，可以发重要微博\" : \"\"}\"><label><input name=\"group_ids\" type=\"checkbox\" value=\"${id}\"><span class=\"name\">${name}</span></label></li>"/*,
+    defaultGroup: {
+      id: "0",
+      is_admin: false,
+      cancelable: false
+    }*/
+  };
+  
+  SendToTip.group0 = {
+    id: "0",
+    name: "工作分享 (任何人可见)",
+    is_admin: false
+  };
+})( jQuery );

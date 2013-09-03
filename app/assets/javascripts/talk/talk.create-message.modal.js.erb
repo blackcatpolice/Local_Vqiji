@@ -1,0 +1,122 @@
+// require _base
+
+// 私信按钮
+
+(function($, undefined) {
+  $.widget("talk.talkCreateMessageDialog", {
+    options: {
+      autoOpen: true
+    },
+    
+    _create: function() {
+      var self = this;
+    
+      this._editor = this.element.find("[data-role=editor]")
+        .rtextEditor({
+          textMaxLength: <%= Talk::Message::User::TEXT_MAXLEN %>,
+          tools: [ "bigAudio", "emotion", "picture", "file" ],
+          toolbarOptions: {
+            tip: {
+              csses: {
+                position: "fixed",
+                zIndex: 1060
+              }
+            }
+          },
+          submit: function(text, done) {
+            self._submit.call(this, text, done, self);
+          }
+        });
+
+      this._on({
+        shown: this._onOpen,
+        hidden: this._onClose
+      });
+    },
+    
+    _init: function() {
+      if (this.options.autoOpen) {
+        this.open();
+      }
+    },
+    
+    _onOpen: function() {
+      this._trigger("open");
+    },
+    
+    _onClose: function() {
+      this._trigger("close");
+    },
+    
+    open: function() {
+      this.element.modal("show");
+      return this;
+    },
+    
+    close: function() {
+      this.element.modal("hide");
+      return this;
+    },
+    
+    _submit: function(text, done, self) {
+      var receiver_id = self.element.attr("data-receiver-id");
+        
+      var data = {
+        text: text
+      };
+
+      if (this._audio) {
+        data.audioId = this._audio.id;
+      }
+      if (this._picture) {
+        data.pictureId = this._picture.id;
+      }
+      if (this._file || this._selectedFile) {
+        data.fileId = (this._file || this._selectedFile).id;
+      }
+    
+      var _args = $.extend(true, {}, API.defaultOptions,
+      	{
+      	  type: "POST",
+          data: data,
+          dataType: 'json',
+      	  cache: false,
+          success: function() {
+            done();
+            setTimeout(function() {
+              $.alert("发送私信成功！", 1);            
+            }, 50);
+            self.close();
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            var errorMsg = App.error.XHRError.call(this, jqXHR, textStatus, errorThrown, "发送失败！");
+            $.alert(errorMsg, 2);
+            done();
+          }
+        }
+      );
+
+      $.ajax("/talk/messages/to_u/" + receiver_id, _args);
+    }
+  });
+  
+  $.talk.talkCreateMessageDialog.create = function(user_id) {
+    $.ajax("/talk/messages/to_u/" + user_id + "/new_modal", {
+      dataType: 'text',
+      success: function(tmpl) {
+        var dialog = $(tmpl).talkCreateMessageDialog()
+          .on("talkcreatemessagedialogclose", function() {
+            dialog.remove();
+          });
+      },
+      error: App.error.handleXHRError
+    });
+  };
+  
+  $(function() {
+    $(document).on("click", "[data-action=new-talk-message-to-u]", function(e) {
+      var user_id = $(e.target).attr("data-receiver-id");
+      $.talk.talkCreateMessageDialog.create(user_id);
+    });
+  });
+})(jQuery);

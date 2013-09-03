@@ -1,0 +1,56 @@
+<div style="margin-top:20px;">
+	<form class="form-inline" action="<%= admin_questions_path %>" method="get">
+		<label>关键字: </label>
+		<input type="text" name="keyword" class="input-small" placeholder="请输入关键字">
+		<label style="margin-left: 20px;">问题类型: </label>
+		<select class="span2" name="question_type">
+            <option value="">---请选择---</option>
+            <% @question_types.each do |type|%>
+            <option value="<%= type.id%>"><%= type.name%></option>
+            <% end %>
+        </select>
+		<label style="margin-left: 20px;">公开问题: </label>
+		<select class="span2" name="incognito">
+			<option value="">---请选择---</option>
+            <option value="是">是</option>
+        	<option value="否">否</option>
+        </select>
+		<button style="margin-left: 20px;" type="submit" class="btn">Search</button>
+	</form>
+</div>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>问题名称</th>
+			<th>问题内容</th>
+			<th>问题类型</th>
+			<th>公开</th>
+			<th>解决</th>
+			<th>点击率</th>
+			<th>提问人</th>
+			<th>专家</th>
+			<th style="width:180px;">创建时间</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% if @questions.empty? %>
+		<tr>
+			<td colspan="9">还没有问题......</td>
+		</tr>
+		<% end %>
+		<% @questions.each do |q|%>
+		<tr>
+			<td><%= link_to(truncate_u(q.title, 10), advisory_question_path(q), :target => "_blank") %></td>
+			<td><%= truncate_u(q.text, 15) %></td>
+			<th><%= q.question_type.name if q.question_type%></th>
+			<td><%= q.incognito ? "匿名" : "公开"%></td>
+			<td><%= q.solved ? "是" : "否"%></td>
+			<td><%= q.clicks%></td>
+			<th><%= link_to q.owner.name, user_path(q.owner), :target => "_blank" %></th>
+			<th><%= link_to(q.expert.user.name, advisory_expert_path(q.expert), :target => "_blank") if q.expert%></th>
+			<td><%= q.created_at.strftime('%Y-%m-%d %H:%M:%S') %></td>
+		</tr>
+		<% end %>
+	</tbody>
+</table>
+<%= will_paginate @questions %>

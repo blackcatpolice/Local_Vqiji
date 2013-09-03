@@ -1,0 +1,82 @@
+<%= form_for(@group,:url => save_admin_group_members_path,:html=>{:class=>"form-horizontal",:onsubmit=>"validate(this);"}) do |f|  %>
+<div class="control-group">
+<label class="control-label">选择部门:</label>
+<div class="controls">
+ <%= render :partial => "admin/departments/select", 
+:locals => { :id => "group_department_id",:name=> "group[department_id]",:default=>true, :level => 2} %>
+</div>
+</div>
+<div class="control-group">
+<label class="control-label">选择用户:</label>
+<div class="controls docs-input-sizes">
+<select  multiple="true" style="height:190px;" id="left_users" onchange="left(this);" ></select>
+<input type="button" value=">>>" id="btnAdd" onclick="add();" class="btn" />
+<input type="button" value="<<<" id="btnDel" onclick="del();" class="btn" style="display:none;" />
+<select name="users[]" multiple="true" style="height:190px;" id="right_users" >
+  <% @members.each do |m|%>
+    <option value="<%= m.user.id%>"><%= m.user.name %></option>
+  <%end%>
+</select>
+</div>
+</div>
+<div class="control-group">
+<div class="controls">
+  <%= f.submit "保存",:class=>"btn btn-primary" %>
+</div>
+</div>
+<%end%>
+
+<script type="text/javascript">
+
+/**/
+function getUsers(slt){
+  var department_id = $(slt).val();
+  if(department_id == null || department_id == ""){return;}
+  $.get("<%= gets_admin_users_path %>.json",{departId:slt.value},function(d,s){
+  $("#left_users").children().remove();
+    for(var i=0;i<d.users.length;i++){
+      var u = d.users[i];
+      $("#left_users").append("<option value='"+u.id+"'>"+u.name+"</option>");
+    }
+  });
+}
+
+$(function(){
+  $("#group_department_id").change(function(){
+   getUsers(this);
+  });
+
+  $("#left_users").focus(function(){
+  $("#btnAdd").show();
+  $("#btnDel").hide();
+  });
+  $("#right_users").focus(function(){
+    $("#btnAdd").hide();
+    $("#btnDel").show();
+  });
+  /**/
+  $("#btnAdd").click(function(){
+     var opts = $("#left_users :selected");
+     for(var i=0;i<opts.length;i++){
+        var id = $(opts[i]).val();
+        var name = $(opts[i]).text();
+        if($("#right_users option[value='"+id+"']").length == 0){
+           $("#right_users").append("<option value='"+id+"'>"+name+"</option>");
+        }
+     }
+  });
+  /**/
+  $("#btnDel").click(function(){
+     var opts = $("#right_users :selected");
+   for(var i=0;i<opts.length;i++){
+      $(opts[i]).remove();
+   }
+  });
+});
+
+
+/**/
+function validate(form){
+  $("#right_users option").attr("selected","selected");
+}
+</script>

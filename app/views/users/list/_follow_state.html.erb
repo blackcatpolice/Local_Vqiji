@@ -1,0 +1,29 @@
+<% followship = current_user.followed(user) %>
+
+<div data-name="followed" class="right" style="<%= 'display:none;' unless followship %>">
+  <% if followship %>
+    <% if user.following?(current_user, true) %>
+      <div class="gz_yj"><span>相互关注</span>
+    <% elsif followship.follow_type == Followship::FOLLOW_TYPE_WHISPER %>
+      <div class="gz_yj gz_qq"><span>悄悄关注</span>
+    <% elsif followship.follow_type == Followship::FOLLOW_TYPE_PARTICULAR %>
+      <div class="gz_yj gz_tb"><span>特别关注</span>
+    <% else %>
+      <div class="gz_yj gz_dx"><span>已关注</span>
+    <% end %>
+  <% else %>
+    <div class="gz_yj"><span></span>
+  <% end %>
+    | <a data-action='unfollow' class="xhgz" href="javascript:void(0);">取消</a>
+  </div>
+</div>
+<div data-name="follow" class="right" style="width: 108px; <%= 'display:none;' if followship %>">
+  <div class="btn-group gz_weik">
+    <button class="gz_wei" data-action='follow' data-value="<%= Followship::FOLLOW_TYPE_DEFAULT %>">关注</button>
+    <button class="gz_wei1" data-toggle="dropdown"><span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      <li><a data-action='qqfollow' data-value="<%= Followship::FOLLOW_TYPE_WHISPER%>" href="javascript:void(0);">悄悄关注</a></li>
+      <li><a data-action='tbfollow' data-value="<%= Followship::FOLLOW_TYPE_PARTICULAR%>" href="javascript:void(0);">特别关注</a></li>
+    </ul>
+  </div>
+</div>

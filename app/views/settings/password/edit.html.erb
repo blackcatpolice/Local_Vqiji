@@ -1,0 +1,66 @@
+<% provide :title, '安全设置' %>
+
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="tab">
+      <a class="qb" href="<%= settings_basic_url %>">基本资料</a>
+      <a class="qb" href="<%= edit_settings_avatar_url %>">修改头像</a>
+      <a class="on" href="javascript:void(0);">安全设置</a>
+    </div>
+    <div class="sz_zl">
+      <% if flash.now[:message] %>
+        <div class="alert alert-success text-center">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <%= flash.now[:message] %>
+        </div>
+      <% end %>
+      <% if current_user.errors.any? %>
+        <div class="alert alert-error text-center">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <ul>
+            <% current_user.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      <%= form_for current_user, url: settings_password_path, html: { class: 'form-horizontal', :id => 'edit-password-form' } do |form| %>
+        <fieldset>
+          <div class="control-group">
+            <label class="control-label">当前密码：</label>
+            <div class="controls">
+              <%= form.password_field :current_password, class: 'input-large', required: true %>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">新密码：</label>
+            <div class="controls">
+              <%= form.password_field :password, class: 'input-large', required: true, minlength: 8 %>
+              <div class="progress password-strength hide" style="width: 220px;">
+                <div class="bar bar-danger password-status password-status-weak hide" style="width: 30%;"></div>
+                <div class="bar bar-warning password-status password-status-good hide" style="width: 60%;"></div>
+                <div class="bar bar-success password-status password-status-strong hide" style="width: 100%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">确认密码：</label>
+            <div class="controls">
+              <%= form.password_field :password_confirmation, class: 'input-large', required: true,  equalTo: '#user_password' %>
+            </div>
+          </div>
+          <div class="control-group btns">
+            <input type="reset" class="btn bn" value="重置" />
+            <%= form.submit '保 存', class: 'btn btn-danger bn' %>
+          </div>
+        </fieldset>
+      <% end %>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="bk_t bk_td"></div>
+
+  <%= stylesheet_link_tag 'settings/password' %>
+  <%= javascript_include_tag 'settings/password' %>
+</div>

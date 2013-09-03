@@ -1,0 +1,16 @@
+//= require jquery
+//= require jquery_ujs
+//= require libs/jquery/jquery.placeholder
+
+(function($) { 
+  /*function initPlanes() {
+    $('.plane').delay(1000)
+               .css('backgroundPositionX', '1400px')
+               .animate({'backgroundPositionX':'-3024px'}, 200000, 'linear'); 
+  }*/
+
+  $(document).ready(function() {
+    $().add("#user_login").add("#user_password").placeholder();
+  });
+})(jQuery);
+

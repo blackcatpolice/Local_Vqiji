@@ -1,0 +1,24 @@
+<div class="modal hide" style="width:420px;">
+  <div class="modal-header">
+    <a class="close" data-dismiss="modal"></a>
+    <div class="model_tabs"><a href="#" class="tabs_rw">回复评论</a></div>
+  </div>
+  <div class="modal-body">
+    <div class="modal_form" data-role="comment-editor" data-tweet-id="<%= @comment.tweet_id%>">
+      <div class="wd_zf">
+        <div class="wd_zf_nr"><%= link_to @comment.sender.name, @comment.sender %> : <%= rtext_tag @comment.rtext %></div>
+        <div class="foo">
+          <span class="remain_counter">您还可以输入<span class="remain">140</span>个字</span>
+        </div>
+        <div class="wd_zf_k">
+          <textarea class="texter" placeholder="请输入评论内容"></textarea>
+          <div class="toolbar" style="display: block;">
+           <!--  <a class="ly" href="javascript:void(0);" data-action="audio">录音</a>
+            <a class="bq" href="javascript:void(0);" data-action="emotion">表情</a> -->
+            <a href="javascript:void(0);" class="btn btn-danger bn submiter">评论</a>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </div>
+</div>

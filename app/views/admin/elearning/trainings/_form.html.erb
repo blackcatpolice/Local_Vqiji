@@ -1,0 +1,42 @@
+<%= form_for(@training,:url => {:controller => "trainings",:action=>@action},:html=>{:onsubmit=>"return validate(this);",:class=>"form-horizontal"}) do |f|  %>
+<div class="control-group">
+<label class="control-label">培训名称</label>
+<div class="controls docs-input-sizes">
+  <%= f.text_field :name ,:class=>"inline",:maxlength=>"32",:required=>"required" %>
+  <%= f.select 'type_id', TrainingType.all.collect { |type| [ type.name, type.id ] } %>
+  <%= link_to "管理",admin_elearning_types_path%>
+</div>
+</div>
+<!-- -->
+<div class="control-group"><label class="control-label">简要</label>
+<div class="controls docs-input-sizes">
+  <%= f.text_area :summary,:class=>"input-xlarge",:rows=>4,:maxlength=>"56" %>
+</div>
+</div>
+<!---->
+<div class="control-group">
+<label class="control-label">通过分数</label>
+<div class="controls docs-input-sizes">
+  <%= f.text_field :pass_score ,:class=>"input-small",:class=>"numbersOnly",:maxlength=>"3" %>分
+</div>
+</div>
+<div class="control-group"><%= f.label :培训时间 ,:class=>"control-label" %>
+  <div class="controls docs-input-sizes">
+    <%= f.text_field :begin_date,:id=>"datepicker_begin",:class=>"input-small" %>
+      <span class="add-on">至</span>
+    <%= f.text_field :end_date,:id=>"datepicker_end",:class=>"input-small" %>
+  </div>
+</div>
+<div class="form-actions">
+<%= f.submit "保存",:class=> "btn btn-primary"%>
+</div>
+<%end%>
+
+<script type="text/javascript">
+$(function() {
+  $("form").validate();
+	$("#datepicker_begin").datepicker({ dateFormat: "yy-mm-dd" });
+	$("#datepicker_end").datepicker({ dateFormat: "yy-mm-dd" });
+});
+
+</script>

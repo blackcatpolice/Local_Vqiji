@@ -1,0 +1,38 @@
+<div class="main_zx">
+  <div class="px_tab">
+    <a class="<%= 'on' if controller.action_name == 'index'%>" href="<%= elearn_trainings_path %>">
+    未通过的培训</a>
+    <a class="<%= 'on' if controller.action_name == 'pass'%>" href="<%= pass_elearn_trainings_path %>">已通过的培训</a>
+  </div>
+
+  <% if @items.any? %>
+    <div class="px_list">
+      <% @items.each do |item|%>
+        <div class="list_k">
+          <%= link_to_training_status item %>
+
+          <div class="list_if">
+	        	<%= link_to truncate(item.training.name, :length => 20),elearn_training_path(item.training),:class=>"left"%>
+          		<br />
+          		<% unless item.pass %>
+            		已学习：<span><%= (item.pages.length*100/item.training.pages_count).to_i %>%</span>
+            		<br />
+          		<% end %>
+        		<% if item.training.timeout || item.pass %>
+			        <%= item.training.end_date.strftime('%Y年%m月%d日') %>
+		      	<% else %>
+              到期时间: <%= (item.training.end_date-Date.today).to_i %>天
+		      	<% end %>
+	        </div>
+        </div>
+      <% end %>
+
+      <div class="clearfix"></div>
+    </div>
+    <div class="lb text-center">
+      <%= will_paginate @items %>
+    </div>
+  <% else %>
+    <div class="empty"><span>暂时没有培训哦～ :)</span></div>
+  <% end %>
+</div>

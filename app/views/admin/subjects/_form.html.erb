@@ -1,0 +1,33 @@
+<div class="span8">
+        <fieldset>
+ <div class="control-group">
+		 <label class="control-label" for="input">标题</label>
+		<%= form.text_field :title, :id => "blog_title" %>
+</div>
+
+<div class="control-group">
+	<%= form.text_area :detail, :width => 700, :height => 300, :class => "admin_editor" %>
+</div>
+
+<div class="control-group">
+  <label class="control-label" for="select01">专题类型(只列出显示的类型)</label>
+  <div class="controls">
+    
+	<%=select("blog_subject", "spheres", @blog_types.collect {|p| [ p.name, p.id ] }, {:include_blank=>"请选择"}, :class=>"span3")%>
+	<%if @blog_types.blank?%>
+		还没有添加或者显示专题类型，前往<a href="/admin/atype/blogtypes">添加</a>
+	<%end%>
+    
+  </div>
+</div>
+
+
+<div class="form-actions">
+	<button type="submit" class="btn btn-primary" id="blog-submiter">提交</button>
+		    &nbsp;&nbsp;&nbsp;
+	<button type="reset" class="btn" onclick="location.href='/admin/blog'">取消</button>
+</div>
+ </fieldset>
+</div>
+
+

@@ -1,0 +1,120 @@
+===
+快速发布：
+  mina shutdown && mina deploy
+
+===
+安装
+
+请根据该文档指示配置本应用运行环境
+
+系统要求：
+  * ubuntu >= 10.04
+  * ruby   =~ 2.0.0.p0
+  * rails  =~ 3.2.13
+  * mongodb = 2.0.1
+  * redis   = 2.2.13
+  * node >= v0.10.5
+  * java >= 6
+
+ruby 安装:
+  * 安装 rvm, 详细查看：http://rvm.io
+  * 安装 ruby 依赖项目，使用 `rvm requirements` 查看
+  * 安装 ruby 2.0.0, `rvm install 2.0.0`
+  * 安装 bundler,    `gem install bunder`
+
+rubygems 引用包：
+ libmysql++-dev, libmagick++-dev, ffmpeg++-dev
+ 
+node 安装：
+  请参照 node.js 官方网站(http://nodejs.org/) 安装说明
+
+===
+配置
+
+谷歌短域名服务（Google Url Shortener）:
+  申请Google帐号，申请短域名服务, 获取 google_api_key 并修改配置文件：
+  /config/initializers/google_url_shortener.rb
+  
+土豆视频api:
+  申请土豆帐号，建立应用，获取tudou_app_key，并修改文件：
+    /app/modules/rt/url/tudou_video.rb
+  的APP_KEY值，已经存在的tudou_app_key为测试帐号
+
+thin:
+  应用服务器，用于rails请求处理，示例配置放置在 /config/thin.yml.example
+  thin 配置危机 在 /etc/thin 下
+  使用示例：
+    启动： thin -C /config/thin.yml start
+    停止： thin -C /config/thin.yml stop
+    重启： thin -C /config/thin.yml restart
+
+  详见官方网站 http://code.macournoyer.com/thin/usage/
+  
+nginx:
+  WEB服务器，用于静态文件托管，请求转发，示例配置放置在 /config/nginx.conf.example
+  该配置假设项目放置在 /var/site/vqiji
+
+  使用示例：
+    启动： nginx -c /config/thin.yml
+    停止： nginx -c /config/thin.yml -s stop
+    ps -ef | grep nginx
+  
+  详见官方网站 http://nginx.org/en/docs/（可能需要翻墙）
+
+resque:
+  resque 是一个后台任务处理框架，基于 redis
+  查看 resque 运行状态 server_domain:port/resque
+  配置文件 /config/initializers/resque.rb
+  
+  启动: QUEUE=* rake environment resque:work
+  停止: CLTR + C
+  后台运行：
+    启动: PIDFILE=./tmp/pids/resque.pid BACKGROUND=yes QUEUE=* rake environment resque:work
+    停止：kill -QUIT pid #12363
+
+whenever:
+  通过方便的 ruby way 配置 linux 定时服务 crontab，默认配置文件在 /config/schedule.rb
+  启动: whenever -w
+  清除: whenever -c
+  查看定时任务： crontab -l
+
+realtime:
+  请参见 realtime/README.md
+
+mina:
+  使用 mina 进行远程快速部署，配置文件示例参见 config/deplay.rb.example
+  该配置文件不需要在远程服务器上配置
+
+其他配置参见 config/*.example
+
+mongodb, redis 配置不再赘述
+
+===
+启动
+
+安装 gem: bundle install
+
+启动数据库：
+mysql, mongodb, redis
+
+(以下任务可能需要设置 RAILS_ENV)
+<选择性任务>
+  创建数据库: rake db:create
+  迁移数据库： rake db:migrate
+  初始化数据库: rake db:seed
+  创建 mongodb 索引: rake db:mongoid:create_indexes
+  编译资源: rake assets:precompile
+
+启动应用：
+  thin, nginx, resque, realtime
+
+启动 whenever:
+  whenever -w
+
+启动 realtime
+  node realtime/index.js
+
+维护：
+  定时请求 log/*
+  清理用户上传的临时文件：rake weibo:tmps:clear
+  清理rails请求临时文件：rake tmp:cear

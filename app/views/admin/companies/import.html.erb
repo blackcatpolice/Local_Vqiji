@@ -1,0 +1,26 @@
+<% content_for :title do%>公司导入<%end%>
+<br/>
+<%= @worksheet.class %>
+<%= @tmp.id %>
+<table class="table">
+  <thead>
+  <tr>
+    <th>行号</th><th>公司ID</th><th>公司名称</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @worksheet.each do |row| %>
+    <tr>
+      <td><%= row.idx %></td>
+      <% row.each do |cell|%>
+        <td> <%= cell.to_s if cell && cell.to_s.length >0 %></td>
+      <%end%>
+    </tr>
+  <%end%>
+  </tbody>
+</table>
+
+<%= form_tag(:controller=>"companies",:action=>"save") do %>
+  <input type="text" name="id" value="<%= @tmp.id %>" />
+  <div><%= submit_tag 'Save' %></div>
+<% end %>

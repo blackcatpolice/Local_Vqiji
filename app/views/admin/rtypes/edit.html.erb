@@ -1,0 +1,4 @@
+<% content_for :title do%>编辑制度类型<%end%>
+<%= form_for @rtype, :url => admin_rtype_path(), :html=>{:onsubmit=>"return validate(this);"} do |f| %>
+<%= render :partial =>'form', :locals => {:f => f} %>
+<%end%>

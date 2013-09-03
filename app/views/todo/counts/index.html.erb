@@ -1,0 +1,36 @@
+<% provide(:title, '任务统计') %>
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="gz_t f18"><span>任务中心</span></div>
+    <div class="tab">
+	    <%= link_to "任务统计",todo_counts_path() ,:class=>"qb on"%>
+	    <%= link_to "我的任务",mine_todo_tasks_path() %>
+	    <%= link_to "所有任务",todo_tasks_path() %>
+    </div>
+  <div class="gz_tab">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>用户</th>
+          <th>创建任务</th>
+          <th>处理任务</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @counts.each do |count|%>
+          <tr>
+          <td><%= user_tag count.user %></td>
+          <td><%= link_to count.create, bycreate_todo_tasks_path(:user_id=>count.user.id)%></td>
+          <td><%= link_to count.execute,byexecute_todo_tasks_path(:user_id=>count.user.id) %></td>
+          <td><%= link_to "详细",todo_count_path(count) %></td>
+          </tr>
+        <%end%>
+      </tbody>
+    </table>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="bk_t bk_d"></div>
+</div>

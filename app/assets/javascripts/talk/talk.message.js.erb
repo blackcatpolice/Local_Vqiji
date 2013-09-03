@@ -1,0 +1,22 @@
+// require jquery
+// require jquery.ui.widget
+// require talk.api
+
+(function($) {
+  $.widget("talk.talkMessage", $.rtext.rtextMessage, {
+    options: {
+    },
+    
+    _create: function() {
+      this._super();
+      var context = this;
+      
+      $.extend(true, this.options, {
+        delete_: {
+          confirm: "确认删除这条私信吗？",
+          apiFunc: Talk.api.deleteMessage
+        }
+      });
+    }
+  });
+})(jQuery);

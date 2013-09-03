@@ -1,0 +1,26 @@
+hello index<br/>
+<% @role = Role.first%>
+<% tops = @role.top_menu %>
+<% tops.each do |top| %>
+<%= top.id%>=<%= top.name %>--<br/>
+<% heads = @role.head_menu top.id %>
+<% heads.each do |h|%>
+<div>-<%= h.name %></div>
+<% menus = @role.menu h.id%>
+<% menus.each do |m|%>
+<div>----<%= m.name %></div>
+<%end%>
+<%end%>
+<%end%>
+<hr/>
+<% @role.temp.each do |t| %>
+<%= t.name %>
+<% t.heads.each do |h| %>
+<div>--<%= h.name%></div>
+<% if h.menus %>
+<% h.menus.each do |m|%>
+----<%= m.name %>
+<%end%>
+<%end%>
+<%end%>
+<%end%>

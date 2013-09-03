@@ -1,0 +1,21 @@
+<% @training_type.errors.full_messages %>
+<%= form_for(@training_type,:url => {:controller => "types",:action=>@action },:html=>{:onsubmit=>"return validate(this);"}) do |f| %>
+<div class="field">
+  <%= f.label :名称 %>
+  <%= f.text_field :name %>
+</div>
+<div class="actions">
+  <%= f.submit "保存",:class=>"btn btn-primary" %>
+</div>
+<% end %>
+<script type="text/javascript">
+/**/
+function validate(form){
+var type_name = $("#training_type_name").val();
+if(!type_name.replace(/\s/g,'')){
+  alert("请输入类型名称");
+  return false;
+}
+return true;
+}
+</script>

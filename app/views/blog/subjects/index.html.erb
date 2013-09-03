@@ -1,0 +1,37 @@
+<% content_for :title do %>专题首页<%end%>
+<div class="sz_nav f12"><b>服务首页</b></div>
+
+<% unless @blog_types.blank?%>
+<% 
+   @blog_types.each do |t| 
+   	subjects = t.subjects.desc(:created_at)
+%>
+<div class="adv">
+	<div class="adv_t"></div>
+    <div class="adv_dhk">
+    	<div class="fw_kt"><img src="<%= t.header_image.url%>" /></div>
+        <div class="zx_k_nr">
+          	<div class="zx_k_lt"><img src="<%= t.body_image.url%>" /></div>
+          	<div class="zx_k_rnr">
+          		<% fsubjects = subjects.first%>
+            	<div class="tit f14"><%= link_to(truncate(fsubjects.title, :length => 18), blog_subject_path(fsubjects), :target => "_blank") unless fsubjects.blank? %></div>
+            	<div class="sum f12 gray_a6"><%= sub_string(fsubjects.detail, "&nbsp;", 55) unless fsubjects.blank?%></div>
+            	<div class="lb gray_9b">
+              		<ul>
+              			<% subjects.each do |s| next if s.id == fsubjects.id%>
+                		<li><%= link_to truncate(s.title, :length => 18), blog_subject_path(s), :target => "_blank" %></li>
+                		<% end %>
+              		</ul>
+            	</div>
+            	<p class="more"><a href="<%= spheres_blog_subject_path(t.id)%>">进入版块 »</a></p>
+          	</div>
+        </div>
+	</div>
+	<div class="adv_t adv_d"></div>
+</div>
+<% end %>
+<%else %>
+<div>空的~!</div>
+<% end %>
+
+

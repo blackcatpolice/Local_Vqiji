@@ -1,0 +1,21 @@
+<% content_for :title do %>参加培训<%end%>
+<div class="zx_hd">
+	<a class="tit t_px" href="/elearn/trainings">我的培训</a> &gt;&gt; <%= @training.name %>
+</div>
+<div class="zx_bd">
+    
+<div class="bk_t"></div>
+<div class="bk_c">
+    <div class="px_t">
+    	<%= image_tag "logo.png" %>
+    </div>
+    <div class="px_wz f13"><h4><%= @page.title %></h4>
+    	<%= @page.context.html_safe %>
+   </div>
+</div>
+<div class="bk_t bk_d"></div>
+
+</div>
+<div class="zx_db"></div>
+
+<%= will_paginate @pages %>

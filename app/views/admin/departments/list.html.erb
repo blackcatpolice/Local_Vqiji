@@ -1,0 +1,23 @@
+<% provide :title, '所有部门' %>
+
+<ul class="nav nav-tabs">
+  <li><a href="<%= admin_departments_path%>"><i class="icon-home"></i>部门主页</a></li>
+  <li class="active dropdown" >
+  	<a href="<%= list_admin_departments_path%>" class="dropdown-toggle" data-toggle="dropdown">部门列表<b class="caret"></b></a>
+  	<%= render 'departments.dropdown-menu' %>
+  </li>
+  <li><a href="<%=new_admin_department_path %>"><i class="icon-plus"></i>新建部门</a></li>
+  <li style="float:right;"><%= render "search_form"%></li>
+</ul>
+<div class="pagination" style="margin:0px;">
+  <ul>
+    <li><a class="alert">统计:  <%=@departments.total_entries%>个部门</a></li>
+    <li><a href="<%= list_admin_departments_path + (params[:level] ? "?level=#{params[:level]}" : "") %>">所有</a></li>
+    <% ("A" .. "Z").each do |c|%>
+      <li><a href="?<%= "level=#{params[:level]}&" if params[:level]%>ch=<%= c %>"><%= c %></a></li>
+    <%end%>
+    <li><a href="?<%= "level=#{params[:level]}&" if params[:level]%>ch=!">其他</a></li>
+  </ul>
+</div>
+
+<%= render 'list' %>

@@ -1,0 +1,48 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th>培训类型</th>
+      <th>培训名称</th>
+      <th>有效时间</th>
+      <th>内容页</th>
+      <th>题目</th>
+      <th>参与人</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @trainings.each do |training| %>
+    <tr>
+      <td><%= training.type.name if training.type %></td>
+      <td><%= training.name %></td>
+      <td><%= training.end_date %> <%= training.released ? "<span style='color:green;'>[已发布]<span>".html_safe : "<span style='color:red;'>[未发布]<span>".html_safe%>   
+      </td>
+      <td>
+        <%= link_to "#{training.pages_count} 页", admin_elearning_training_pages_path(training)%>
+      </td>
+      <td>
+        <%= link_to "#{training.tests_count} 道", admin_elearning_training_tests_path(training)%>
+      </td>
+      <td>
+        <%= link_to "#{training.users_count} 人", admin_elearning_training_users_path(training)%>
+      </td>
+    <td>
+    <div class="btn-group">
+    <%= link_to "查看", admin_elearning_training_path(training),:class=>"btn" %>
+    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li>
+          <%= link_to raw("<i class='icon-edit'></i>修改"),edit_admin_elearning_training_path(training)%>
+      </li>
+      <li>
+          <%= link_to raw("<i class='icon-trash'></i>删除"),admin_elearning_training_path(training),confirm: 'Are you sure?',:method => :delete%>
+      </li>
+    </ul>
+    </div>
+    </td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+<%= will_paginate @trainings %>
+

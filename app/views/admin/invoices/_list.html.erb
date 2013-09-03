@@ -1,0 +1,46 @@
+<table class="table">
+<thead>
+<tr>
+	<th>序列号</th>
+	<th>商品类型</th>
+    <th>商品名称</th>
+    <th>价格</th>
+    <th>报销金额</th>
+    <th>申请人</th>
+    <th>状态</th>
+    <th>操作</th>
+ </tr>
+</thead>
+<tbody>
+<% @invoices.each do |invoice| %>
+  <tr>
+  	<td>
+  		<%= link_to invoice.serial_no,{:controller=>"invoices",:action=>"show",:id=>invoice.id},{:title=>invoice.reason}%>
+  	</td>
+  	<td><%= invoice.product_type %>  </td>
+    <td><%= invoice.product.name if invoice.product %></td>
+    <td>
+    	<%= number_to_currency(invoice.price, :unit =>'')%>
+    </td>
+    <td>
+    	<%= number_to_currency(invoice.money, :unit =>'')%>
+    </td>
+   	<td><%= invoice.user.nickname if invoice.user %></td>
+    <td>
+    	<% if invoice.stop %>
+    		已被拒绝
+    	<%else%>
+    	<%= invoice_step_help invoice.step  %>
+    	<%end%>
+    </td>
+   	<td>
+   		<%= link_to "删除",{:controller=>"invoices",:action=>"destroy",:id=>invoice.id},:onclick=>"return confirm('确定删除当前申请');"%>
+   		<%= link_to "0",:controller=>"invoices",:action=>"update_step",:id=>invoice.id,:step=>"0"%>
+   		<%= link_to "1",:controller=>"invoices",:action=>"update_step",:id=>invoice.id,:step=>"1"%>
+   		<%= link_to "2",:controller=>"invoices",:action=>"update_step",:id=>invoice.id,:step=>"2"%>
+   		<%= link_to "3",:controller=>"invoices",:action=>"update_step",:id=>invoice.id,:step=>"3"%>
+   	</td>
+  </tr>
+<% end %>
+</table>
+<%= will_paginate @invoices %>

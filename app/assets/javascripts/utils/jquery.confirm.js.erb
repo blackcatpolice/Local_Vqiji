@@ -1,0 +1,65 @@
+// confirm
+//
+// jquery
+// jquery.ui.dialog
+
+// $.confirm("msg", callback)
+// $.confirm("msg", options)
+
+(function($) {
+  "use strict";
+  // confirm
+  var confirm = function(msg, callback, options) {
+    var _options = $.extend(true, {}, confirm.defaultOptions),
+        _confirm = confirm.create(msg, _options.title),
+        sure = false;
+
+    var onSure = function() {
+      sure = true;
+    },
+    
+    onHidden = function() {
+      callback(sure);
+      setTimeout(function() {
+        _confirm.remove();
+      }, 10);
+    };
+
+    _confirm
+      .on("click.confirm", "a[data-action=sure]", onSure)
+      .one("hidden.confirm", onHidden)
+      .modal();
+
+    return _confirm;
+  };
+  
+  confirm.defaultOptions = {
+    title: '确认'
+  };
+  
+  confirm.TMPL = ''
+    + '<div class="modal hide jc" role="dialog" style="display:; width:400px;">'
+      + '<div class="modal-header">'
+        + '<a class="close" data-dismiss="modal"></a>'
+        + '<div class="model_tabs">${title}</div>'
+      + '</div>'
+      + '<div class="modal-body">'
+        + '<div class="modal_form">'
+		    + '<div class="zx_del">'
+		      + '<div class="if f14"><i></i>${msg}</div>'
+       	      + '<a href="javascript:void(0)" class="btn btn-danger bn" data-dismiss="modal" data-action="sure">确 定</a>'
+       	      + '<a href="javascript:void(0)" class="btn bn" data-dismiss="modal">取 消</a>'
+            + '</div>'
+        + '</div>'
+      + '</div>'
+    + '</div>';
+  
+  confirm.create = function(msg, title) {
+    return $.tmpl(confirm.TMPL, {
+      msg: msg,
+      title: title
+    });
+  };
+  
+  $.confirm = confirm;
+})(jQuery);

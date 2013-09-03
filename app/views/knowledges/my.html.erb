@@ -1,0 +1,82 @@
+<div class="bk">
+	<div class="bk_t zsk_t f16">
+		知识库<%= link_to "",new_knowledge_path, :'data-skip-pjax' => true%>
+	</div>
+	<div class="bk_c">
+		<div class="tab zsk_tab">
+			<ul>
+				<li>
+					<%= link_to "所有文档", knowledges_path%>
+				</li> 
+				<li class="zsk_j">
+					<%= link_to "小组文档", groups_knowledges_path%>
+					<span></span>
+					<div class="zsk_tlb">
+					  <% current_user.groups.each do |g|%>
+        			<%= link_to truncate_u(g.name, 4), "#{groups_knowledges_path}?group=#{g.id}", :title => "#{g.name}"%>
+        		<% end %>
+    			</div>
+				</li>
+				<li>
+					<%= link_to "我创建的", my_knowledges_path, :class => "qb on"%> 
+				</li>
+				<div class="right gz_ser ip">
+					<form action="<%= my_knowledges_path %>" data-pjax method="get">
+					<input class="iput" id="knowledge_keyword" name="keyword" type="search">
+					<p>
+						<input type="image" src="<%= asset_path "gz_s.png"%>"/>
+					</p>
+					</form>
+				</div>
+			</ul>
+		</div>
+		<div class="zsk_lb f12">
+			<% if @knowledges.any? %>
+			  <%= render :collection => @knowledges, :partial => 'knowledges/knowledge' %>
+		    <div class="clearfix"></div>
+			  <div class="text-center">
+          <%= will_paginate @knowledges %>
+        </div>
+			<% else %>
+			  <div class="empty"><span>还没有文档哦～</span></div>
+			<% end %>
+		  <div class="clearfix"></div>
+		</div>
+	</div>
+
+	<div class="bk_t bk_d"></div>
+</div>
+<form action="<%= delete_knowledges_path %>" data-pjax id="knowledges_form" method="post">
+	<input type="hidden" id="knowledge_id" name="id" value="" />
+</form>
+<script>
+	$(document).ready(function(){
+  		$(".zsk_j span").click(function(){
+  			$(".zsk_tlb").slideToggle();
+  		});
+  		$("form[data-pjax]").on('submit', function(e){
+			$.pjax.submit(e, '[data-pjax-container]');
+		});
+		
+		$('a[data-action=delete]', 'div[node-type=Knowledge]').click(function(){
+			var _knowledge = $(this).parents('div[node-type=Knowledge]');
+			$.confirm('是否删除 [ ' + _knowledge.attr('data-title') + '] ?', function(tag){
+				if(tag){
+					$('#knowledge_id').val(_knowledge.attr('data-id'));
+					$('#knowledges_form').submit();
+				}
+			});
+		});
+		$('#knowledge_keyword').typeahead({
+			source: function(query, process){
+				return $.get('/knowledges/my.json', {keyword: query}, function(data){
+					console.log(data);
+					return process(data);
+				});
+			},
+			matcher: function (param) {
+				return true;
+			}
+		});
+	});
+</script>

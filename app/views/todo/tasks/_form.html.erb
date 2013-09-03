@@ -1,0 +1,132 @@
+<div id="error_message_box">
+	<% if @service.msgs[:sup]%>
+	<div class="alert alert-error">
+		<div style="padding: 7px 0;" class="f12"><%= @service.msgs[:sup] %></div>
+	</div>
+	<% end %>
+	<% if @service.msgs[:date]%>
+	<div class="alert alert-error">
+		<div style="padding: 7px 0;" class="f12"><%= @service.msgs[:date] %></div>
+	</div>
+	<% end %>
+	<% if @service.msgs[:executor]%>
+	<div class="alert alert-error">
+		<div style="padding: 7px 0;" class="f12"><%= @service.msgs[:executor] %></div>
+	</div>
+	<% end %>
+</div>
+
+<%= form_for([@task]) do |f| %>
+<input type="hidden" name="picture_id" id="todo_picture_id" />
+<input type="hidden" name="file_id" id="todo_file_id" />
+<%= f.hidden_field :level%>
+<% if @task.sup%>
+	<%= f.hidden_field :sup_id%>
+<%end%>
+
+<div class="rw_xjk">
+    <label for="todo_task_title">任务名称：</label>
+    <%= f.text_field :title, :placeholder => "请输入任务名称" %>
+	<span class="help-block"></span>
+</div>
+
+<div class="rw_xjk">
+    <label for="todo_task_details">任务描述：</label>
+	<%= f.text_area :details, :rows => 8, :class=>"texter", :required=>"required", :placeholder=>"请输入任务描述" %>
+</div>
+
+<div class="dhk_gn f12 toolbar">
+</div>
+
+<div class="rw_xjk1">
+    <label for="todo_task_executor_name">负责人：</label>
+    <%= f.text_field :executor_name, :required=>"required"%>
+</div>
+
+<div class="rw_xjk1" data-type="todo-task-level">
+    <label>优先级：</label>
+    <div class="rw_xz">
+    	<a href="javascript:void(0)" data-class="" data-value="0"></a>
+    	<a href="javascript:void(0)" data-class="rw_xz1" data-value="1"></a>
+    	<a href="javascript:void(0)" data-class="rw_xz2" data-value="2"></a>
+    </div>
+</div>
+
+<div class="rw_xjk1">
+	<label for="todo_task_start_date">开始时间：</label>
+	<div class="input-append date form_datetime">
+		<%= f.text_field :start_date, :required=>"required", :readonly=>"", :class=>"span2", :value=>"#{l(@task.start_date, :format => :en_long) if @task.start_date}", :style=>"cursor: pointer;" %>
+		<span class="add-on"><i class="icon-calendar"></i></span>
+	</div>
+</div>
+
+<div class="rw_xjk1">
+	<label for="todo_task_end_date">结束时间：</label>
+	<div class="input-append date form_datetime">
+		<%= f.text_field :end_date, :required=>"required", :readonly=>"", :class=>"span2", :value=>"#{l(@task.end_date, :format => :en_long) if @task.end_date}", :style=>"cursor: pointer;" %>
+		<span class="add-on"><i class="icon-calendar"></i></span>
+	</div>
+</div>
+
+<div class="rw_tj"><a href="javascript:;" class="submiter"></a></div>
+<%end%>
+
+
+<script type="text/javascript">
+$(function(){
+	
+	$(".form_datetime").datetimepicker({
+        format: "yyyy-mm-dd hh:ii",
+        autoclose: true,
+        pickerPosition: "bottom-left"
+    });
+	
+	$('[data-type=todo-task-level] a').click(function(){
+		$('#todo_task_level').val($(this).attr('data-value'));
+		$(this).parent().removeClass('rw_xz1').removeClass('rw_xz2').addClass($(this).attr('data-class'));
+	});
+	
+	$('#todo_task_executor_name').typeahead({
+		source: function(query, process){
+			return $.get('/todo/tasks/executors', {name: query}, function(data){
+				return process(data);
+			});
+		},
+		matcher: function (param) {
+			return true;
+		}
+	});
+	$("#new_todo_task, #edit_todo_task_<%= @task.id%>").validate({
+		rules: {
+			'todo_task[title]': {
+				required: true,
+  				maxlength: 25
+			}
+		},
+		messages: {
+			'todo_task[title]': {
+				required: '请输入任务标题.',
+				maxlength: '任务标题长度不超过25字.'
+			},
+			'todo_task[details]': '请输入任务描述.',
+			'todo_task[executor_name]': '请输入任务负责人.',
+			'todo_task[start_date]': '请选择任务开始日期.',
+			'todo_task[end_date]': '请选择任务结束日期.'
+		},
+		onkeyup: false,
+		onfocusout: false,
+		invalidHandler: function(){
+			$('#error_message_box').html('');
+		},
+		showErrors: function(errorMap, errorList){
+			if(errorList.length > 0){
+				var _errorTmpl = '<div style="padding: 7px 0;" class="f12">${message}</div>';
+				$.template( "errorTemlate", _errorTmpl );
+				var _errorDiv = $('<div class="alert alert-error" />');
+				$.tmpl( "errorTemlate", errorList ).appendTo(_errorDiv)
+    			$(_errorDiv).appendTo('#error_message_box');
+    		}
+		}
+  	});
+});
+</script>

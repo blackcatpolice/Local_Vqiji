@@ -1,0 +1,93 @@
+<% content_for :title do%>发票报销申请 <%= @invoice.serial_no %><%end%>
+<% content_for :menu_url do%><%= url_for :controller=>"invoices",:action=>"index" %><%end%>
+<table class="table table-striped table-bordered table-condensed">
+<thead>
+	<tr>
+		<td colspan="2" style="text-align: center;">
+			<%= invoice_step_help @invoice.step %>
+		</td>
+	</tr>
+    <tr>
+       <th colspan="2">申请详细</th>
+    </tr>
+    <tr>
+ 		<th style="width:20%;">申请人:</th>
+ 		<td><%= @invoice.user.nickname if @invoice.user %></td>
+ 	</tr>
+ 	 <tr>
+ 		<th >审批流程:</th>
+ 		<td><%= invoice_step_help @invoice.step %></td>
+ 	</tr>
+ 	<tr>
+ 		<th style="width:20%;">商品类型:</th>
+ 		<td><%= @invoice.product_type  %></td>
+ 	</tr>
+ 	<tr>
+ 		<th>商品名称:</th>
+ 		<td><%= @invoice.product_name  %></td>
+ 	</tr>
+ 	<tr>
+ 		<th>商品价格:</th>
+ 		<td>
+ 			<%= number_to_currency(@invoice.price , :unit =>'')%>
+ 		</td>
+ 	</tr>
+ 	<tr>
+ 		<th>报销金额:</th>
+ 		<td>
+ 			<%= number_to_currency(@invoice.money, :unit =>'')%>
+ 		</td>
+ 	</tr>
+ 	<tr>
+ 		<th>报销理由:</th>
+ 		<td><%= @invoice.reason  %></td>
+ 	</tr>
+ 	<tr>
+ 		<th>申请时间:</th>
+ 		<td> <%= @invoice.created_at.strftime("%Y-%m-%d %H:%M:%S") if @invoice.created_at %></td>
+ 	</tr>
+ </thead>
+ </table>
+<table class="table table-striped table-bordered table-condensed">
+<thead>
+    <tr>
+       <th colspan="5">审批记录</th>
+    </tr>
+    <tr>
+       <th>步骤</th>
+       <th>审批意见</th>
+       <th>意见详细</th>
+       <th>审批时间</th>
+       <th>审批人</th>
+     </tr>
+</thead>
+<tbody>
+	<% i = 1 %>
+	<% @invoice.logs.each do |log|%>
+	<tr>
+		<td><%= i%></td>
+		<td><%= log.pass ? "<span class='label label-success'>通过</span>".html_safe : "<span class='label label-important'>拒绝</span>".html_safe%></td>
+		<td><%= log.msg %></td>
+		<td><%= log.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+		<td><%= log.user.nickname %></td>
+	</tr>
+	<% i = i+1 %>
+	<%end%>
+</tbody>
+</table>
+<% if @invoice.can_audit %>
+<%= form_for(@invoice,:url => {:controller => "invoices",:action => "update" },:html=>{:onsubmit=>"validate(this);",:class=>"form-inline"}) do |f|  %>
+审批意见:
+<label><input type="radio" name="step" checked="checked"  value="<%= @invoice.step+1%>" title=""   />通过</label>
+<label><input type="radio" name="step" value="0" />不通过</label><br/>
+<label id="lab_msg">意见详细:<input type="text" id="msg" name="msg" value=""  /></label>
+<br/><br/>
+<input id="btn_sub" class="btn btn-primary" type="submit" value="确定"  title="<%= invoice_step_msg_help @invoice.step %>" >
+<% end%>
+<% else %>
+<%= link_to "返回申请列表",{:controller=>"invoices",:action=>"index"},{:id=>"btn_sub",:title=>""}%>
+<%end%>
+<script type="text/javascript">
+
+</script>
+

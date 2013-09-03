@@ -1,0 +1,14 @@
+zh-CN:
+  mongoid:
+  
+    models:
+      store/invoice:
+        '发票'
+    
+    attributes:
+      store/invoice:
+        product_type: '商品类型'
+        product_name: '商品名称'
+        price: '商品价格'
+        money: '报销金额'
+        user_id: '申请人'

@@ -1,0 +1,19 @@
+<div class="main_dhk" data-type="tweet-editor" data-default-group-id="<%= @group.id %>" data-default-group-is-admin="<%= admin_of_group?(@group) %>">
+  <div class="dhk_zs f12 remain_counter"></div>
+  <div class="dhk">
+    <div class="phone left" data-type="audio-button"><a href="javascript:void(0);">30</a></div>
+    <div class="txt left"><textarea class="texter"></textarea></div>
+  </div>
+  <div class="dhk_gn f12 toolbar" data-type="toolbar">
+    <a class="btn btn-danger bn submiter" href="javascript:void(0);">发 布</a>
+
+    <% if admin_of_group?(@group) %>
+      <span class="zy">
+        <input name="is_top" type="checkbox" value="" /> 重要
+      </span>
+    <% end %> 
+    <a class="send_to" data-action="send_to" >分发</a>
+  </div>
+
+  <input type="hidden" data-type="group-id" value="<%= @group.id %>" />
+</div>

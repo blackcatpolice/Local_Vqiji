@@ -1,0 +1,51 @@
+<% provide(:title, '私信') %>
+
+<div class="bk talk-session-widget">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="tab">
+      <%= link_to '私信', talk_url, class: 'qb on' %>
+      <div class="right">
+        <a class="btn bn an f12" href="javascript:void(0);" data-action="new-talk-session">发私信</a>
+      </div>
+    </div>
+    <div data-type="TalkSessionsList">
+      <% if @sessions.any? %>
+        <%= render @sessions %>
+        <div class="lb text-center">
+          <%= will_paginate @sessions, inner_window: 1, outer_window: 0 %>
+        </div>
+      <% else %>
+        <div class="empty"><span>您还没收到或者发出任何私信哦～</span></div>
+      <% end %>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+
+  <div class="bk_t bk_d"></div>
+</div>
+
+<%= render 'talk/sessions/dialog.new-session' %>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    var _newSessionForm;
+
+    $("[data-action=new-talk-session]").click(function() {
+      if (_newSessionForm) {
+        _newSessionForm.talkNewSessionDialog("open");
+        return false;
+      }
+      _newSessionForm = $("div[data-type=TalkNewSessionDialog]")
+        .talkNewSessionDialog({
+          submit: function(e, session) {
+            _newSessionForm.talkNewSessionDialog("close");
+            /* 跳转到会话详细页面 */
+            $.pjax({ url: "/talk/sessions/" + session.id, container: "[data-pjax-container]" });
+          }
+        });
+    });
+
+    $("[data-type=TalkSessionsList]").talkSessionsList();
+  });
+</script>

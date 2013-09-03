@@ -1,0 +1,66 @@
+//
+// 视频链接验证
+//
+// require jquery
+// require jquery_ui
+// require jquery.blink
+// rtext.api
+// 
+
+$.widget("rtext.videoURLInstaller", {
+  options: {
+  },
+  _create: function() {
+    this._view = this.element.empty();
+    this._view.html('' +
+      '<form>' +
+        '<div class="input-append">' +
+          '<input type="text" class="input-large url-input" name="url" />' +
+          '<input type="submit" class="btn" value="确定" />' +
+        '</div>' +
+        '<p class="error"></p>' +
+        '<p class="notice">目前已支持 <b>土豆网</b> 等网站的视频播放链接</p>' +
+      '</form>' +
+    '');
+
+    this._errorView = this._view.find(".error");
+    
+    // 清除错误提示
+    this._urlInput = this._view.find(".url-input")
+      .bind("textchange", $.proxy(function() {
+        this._errorView.text("");
+      }, this));
+
+    this._form = this._view.find("form")
+      .submit($.proxy(this._submit, this));
+  },
+  
+  _submit: function() {
+    var self = this;
+    if ($.isBlank(this._urlInput.val())) {
+      this._errorView.text("请输入视频链接").show();
+      this._urlInput.blink();
+      return false;
+    }
+    
+    this._urlInput.attr("disabled", true);
+    Rtext.api.validVideoURL(this._urlInput.val(), {
+      success: function(url) {
+        self._install(url);
+        self._urlInput.val("");
+      },
+      error: function(jqXHR, httpStatus, throwErrors) {
+        var error = App.error.XHRError(jqXHR, httpStatus, throwErrors);
+        self._errorView.text(error).show();
+      },
+      complete: function() {
+        self._urlInput.attr("disabled", false)
+      }
+    });
+    return false;
+  },
+  
+  _install: function(url) {
+    this._trigger("install", null, url);
+  }
+});

@@ -1,0 +1,83 @@
+// alert
+//
+// jquery
+// jquery.tmpl
+// bootstrap.modal
+
+(function($) {
+  "use strict";
+  // $.alert(msg[, title][, cbClosed][, type]])
+  var alert = function(msg, arg1, arg2, arg3) {
+    var title, cbClosed, type = alert.ALERT;
+    
+    if ($.isNumeric(arg1)) { // (msg, type)
+      type = arg1; 
+    } else if ($.isFunction(arg1)) { // (msg, cbClosed[, type])
+      cbClosed = arg1;
+      if ($.isNumeric(arg2)) {
+        type = arg2;
+      }
+    } else { // (msg, title[, cbClosed][, type])
+      title = arg1;
+      if ($.isFunction(arg2)) { // (msg, cbClosed[, type])
+        cbClosed = arg2;
+        if ($.isNumeric(arg3)) { // (msg, type)
+          type = arg3;
+        }
+      } else if ($.isNumeric(arg2)) { // (msg, type)
+        type = arg2; 
+      }
+    }
+    
+    var onHidden = function() {
+      if (cbClosed) {
+        cbClosed.apply(this);
+      }
+      setTimeout(function() {
+        _alert.remove();
+      }, 10);
+    };
+    
+    var _alert = alert.create(msg, title, type);
+
+    _alert.one("hidden.alert", onHidden).modal();
+    
+    return _alert;
+  };
+  
+  alert.TMPL = ''
+    + '<div class="modal hide ja-type-${type}" role="dialog" style="width:400px;">'
+      + '<div class="modal-header">'
+        + '<a class="close" data-dismiss="modal"></a>'
+        + '<div class="model_tabs">${title}</div>'
+      + '</div>'
+      + '<div class="modal-body">'
+        + '<div class="modal_form">'
+		    + '<div class="zx_del">'
+		      + '<div class="if f14"><i></i>${msg}</div>'
+       	      + '<a href="javascript:void(0)" class="btn bn" data-dismiss="modal" data-action="sure">确 定</a>'
+            + '</div>'
+        + '</div>'
+      + '</div>'
+    + '</div>';;
+
+  alert.create = function(msg, title, type) {
+     return $.tmpl(alert.TMPL, {
+       msg: msg,
+       title: (title || alert.titles[type]),
+       type: type
+     });
+  };
+  
+  alert.titles = {
+    0: "提示",
+    1: "成功",
+    2: "错误"
+  };
+
+  alert.ALERT = 0;
+  alert.SUCCESS = 1;
+  alert.ERROR = 2;
+
+  $.alert = alert;
+})(jQuery);

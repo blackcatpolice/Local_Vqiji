@@ -1,0 +1,45 @@
+<div class="modal_form">
+  <div class="wd_zf">
+    <div class="foo" data-role="query-by-user-name"><input style="width:430px;margin-bottom:10px;" placeholder="请输入用户名" name="username" type="text"></div>
+    <div class="foo"><span class="remain_counter">您还可以输入<span class="remain">140</span>个字</span></div>
+    <div class="wd_zf_k wd_wb">
+      <textarea class="texter" style="width: 430px;"></textarea>
+      <div class="toolbar"></div>
+      <a href="javascript:void(0);" class="btn bn btn-danger submiter" style="margin-top:12px;">发 送</a>
+    </div>
+    <div class="wd_wb_fj">
+      <div class="cg">
+        <a href="javascript:void(0)"  data-skip-pjax title="<%= @share_file.name%>">
+          <%= truncate_u(@share_file.name,12)%>
+          <br /><%= number_to_human_size @share_file.size%>
+        </a>
+      </div>
+    </div>
+  </div>    
+</div>
+
+<script>
+  $(':input', '[data-role=query-by-user-name]').typeahead({
+    source: function(query, process) {
+      if (this._findByUserNameInputTypeaheadSourceXHR) {
+        this._findByUserNameInputTypeaheadSourceXHR.abort();
+      }
+      var self = this;
+      this._findByUserNameInputTypeaheadSourceXHR = App.api.searchUserByName(query, {
+        success: function(users) {
+          process.call(this, $.map(users, function(user, _) {
+            return user.name;
+          }));
+        },
+        complete: function() {
+          self._findByUserNameInputTypeaheadSourceXHR = null;
+        }
+      });
+    },
+    matcher: function() {
+      return true;
+    },
+    limit: 10
+  });
+  $('#talkMessageModel').fileTalkMessage({file: {id: "<%= @share_file.id%>"},});
+</script>

@@ -1,0 +1,4 @@
+<div class="attachment <%= "encrypt" if file.encrypt %> lb_fj file" data-role="rtext-attachment" data-type="file">
+  <%= link_to truncate(file.name), download_attachment_path(file), :target => '_blank', :title => file.name, :'data-skip-pjax' => true, :'data-id' => file.id %>
+  <%= number_to_human_size(file.size) %>
+</div>

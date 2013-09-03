@@ -1,0 +1,45 @@
+<% content_for :title do%>Excel数据导入<%end%>
+  <%= render 'form' %>
+  <% unless @excel.errors.blank? %>
+    <label class="alert alert-error">
+      <%= @excel.errors.full_messages.join(',') %>
+    </label>
+  <% end %>
+  <table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>备注</th>
+      <th>上传时间</th>
+      <th>上传人</th>
+      <th>导入结果</th>
+      <th>导入时间</th>
+      <th>错误信息</th>
+      <th>#</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @excels.each do |e|%>
+      <tr>
+        <td><%= e.remark %></td>
+        <td><%= l e.created_at %></td>
+        <td>
+          <%= e.uploader.try :name %>
+        </td>
+        <% if e.imported? %>
+          <td><%= excel_import_status(e) %></td>
+          <td><%= l e.imported_at %></td>
+          <td><%= excel_import_errors(e) %></td>
+        <% else %>
+          <td colspan="3" style="text-align:center;">未导入</td>
+        <% end %>
+        <td>
+          <%= link_to '下载', e.file.url %>
+          <% unless e.imported? %>
+            &nbsp;|&nbsp;
+            <%= link_to "导入", :controller=>"excels", :action=>"import", :id => e.to_param %>
+          <% end %>
+        </td>
+      </tr>
+    <%end%>
+  </tbody>
+</table>

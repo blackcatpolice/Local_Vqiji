@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<link href="../assets/stylesheets/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../assets/stylesheets/common.css" media="screen" rel="stylesheet" type="text/css">
+<script src="js/jquery.js"></script>
+<script src="../assets/javascripts/bootstrap/bootstrap/bootstrap-dropdown.js"></script>
+<script src="../assets/javascripts/bootstrap/bootstrap/bootstrap-transition.js"></script>
+</head>
+
+<body>
+<div class="row main_top navbar-fixed-top">
+  <div class="span2 logo"><img src="../assets/images/logo.png" /></div>
+  <div class="span8 nav_top"><a href="index.html">首页</a>　|　<a href="#">弹性福利</a>　|　<a href="#">专题</a></div>
+  <div class="span2 nav_top2"><a href="#">设置</a>　|　<a href="#">退出</a></div>
+</div>
+
+
+
+<div class="popover ntb fade bottom in" style="top: 41px; left: 1158px; display: block;">
+    <div class="arrow"></div>
+    <div class="popover-content" style="padding:0px;">
+    <div data-role="content">
+      <ul class="unreads-list">
+          <li><a href="#"><span>1</span>条新私信</a></li>
+          <li><a href="#"><span>24</span>条新医生回复</a></li>
+          <li><a href="#"><span>5</span>条新@我</a></li>
+          <li><a href="#"><span>100</span>条新评论</a></li>
+      </ul>
+    </div>
+    </div>
+</div>
+
+
+
+<div class="container main">
+
+
+  <div class="nav_l left">
+    <div class="nav_l left">
+      <div class="bk_t"></div>
+      <div class="bk_c">
+        <div class="nav_lb">工作分享</div>
+        <div class="nav_lb"><i class="nav_icon"></i><a href="index.html">工作大厅</a></div>
+        <div class="nav_lb"><i class="nav_icon"></i><a href="gz_04.html">我的工作组</a></div>
+        <div class="nav_lb nav_bm">
+          <ul id="collapseOne" style="height:70px;">
+            <li><a href="gz_01.html">人力资源部</a></li>
+            <li><a href="gz_01.html">客舱服务部</a></li>
+            <li><a href="#">客舱服务部</a></li>
+            <li><a href="#">客舱服务部</a></li>
+          </ul>
+          <ul>
+            <li><a data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">展开</a></li>
+          </ul>
+        </div>
+        <div class="nav_lb"><i class="nav_icon"></i><a href="weibo_05.html">@提到我的</a></div>
+        <div class="nav_lb"><i class="nav_icon"></i><a href="weibo-03.html">评论</a></div>
+        <div class="nav_lb"><i class="nav_icon"></i><a href="#">私信</a></div>
+        <div class="nav_lb"><i class="nav_icon"></i><a href="weibo-04.html">收藏</a></div>
+        <div class="nav_lb">专属咨询</div>
+        <div class="nav_lb"><i class="nav_icon"></i><a href="#">提问大厅</a></div>
+        <div class="nav_lb"><i class="nav_icon"></i><a href="#">我的问题</a></div>
+        <div class="nav_lb">考试培训</div>
+        <div class="nav_lb"><i class="nav_icon"></i><a href="#">我的培训</a></div>
+        <div class="nav_lb">我的网盘</div>
+        <div class="nav_lb">文档中心</div>
+      </div>
+      <div class="bk_t bk_d"></div>
+    </div>
+  </div>
+  
+
+  
+  <div class="main_ct left">
+    <div class="bk">
+      <div class="bk_t"></div>
+      <div class="bk_c">
+        <div class="gz_t f18"><span>人力资源部</span></div>
+        <div class="tab"><a href="gz_02.html">基本信息</a><a class="on" href="gz_07.html">添加成员</a><a href="gz_03.html">成员管理</a></div>
+        <div class="gz_tab">
+        
+        <form accept-charset="UTF-8" action="/groups/51e3bcf61d41c823b1000003/members/save" class="form-horizontal" id="add_group_members_form" method="post" onsubmit="return validate(this)">
+         <fieldset data-role="members-selector">
+        <div class="control-group">
+          <div class="control-tr" data-role="query-by-department">
+            <label><input name="find-by" type="radio" value="department" checked="checked">按部门查找：</label>
+            <input type="text" placeholder="请输入部门名" autocomplete="off">&nbsp;<a href="javascript:void(0)" class="btn" disabled="disabled">查找</a>
+          </div>
+          <div class="control-tr" data-role="query-by-user-name">
+            <label><input name="find-by" type="radio" value="user-name">按姓名查找：</label>
+            <input type="text" placeholder="请输入名字" disabled="disabled">&nbsp;<a href="javascript:void(0)" class="btn" disabled="disabled">查找</a>
+          </div>
+          <div class="control-tr">
+            <div class="left">成员列表</div>
+            <div class="left" style="margin:0px;">已选成员</div>
+            <ul data-role="found">
+                  <li class="on">张某人</li>
+                  <li>王某人</li>
+                  <li>李某人</li>
+                  <li class="on">张某人</li>
+            
+            </ul>
+            <ul style="margin:0px;" data-role="selected">
+                  <li data-saved="false">李某人</li>
+                  <li data-saved="true">江某人</li>
+                  <li data-saved="true">张某人</li>
+            </ul>
+          </div>
+        </div>
+      </fieldset>
+
+      <p>
+        <input class="btn" name="" type="submit" value="保  存">
+      </p>
+</form>
+
+        </div>
+
+        <div class="clearfix"></div>
+      </div>
+      <div class="bk_t bk_d"></div>
+    </div>
+  </div>
+  <div class="main_rt left">
+  <img src="../assets/images/02.jpg" width="560" height="912" /></div>
+<div class="clearfix"></div>
+</div>
+<div class="foot"><a href="#">免责声明</a>　｜　<a href="#">关于我们</a>　｜　<a href="#">联系我们</a>　｜　<a href="#">网站帮助</a><br /><small>copyright &copy;2002-2013 www.vqiji.com All Rights Reserved</small></div>
+</body>
+</html>

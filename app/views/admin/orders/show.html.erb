@@ -1,0 +1,166 @@
+<% content_for :title do%>订单 <%= @order.order_no%><%end%>
+<% content_for :menu_url do%><%= url_for :controller=>"orders",:action=>"index" %><%end%>
+<div class="alert">
+<strong>提示信息:</strong>
+<span id="span_alert"></span>
+</div>
+<table class="table table-striped table-bordered table-condensed">
+<thead>
+	<tr>
+		<td colspan="5" style="text-align: center;">
+			<%= order_status_help @order.status %>
+		</td>
+	</tr>
+    <tr>
+       <th colspan="5">购买的商品</th>
+    </tr>
+    <tr>
+       <th>商品编号</th>
+       <th>商品名称#款式</th>
+       <th>积分</th>
+       <th>数量</th>
+       <th>小计</th>
+     </tr>
+</thead>
+<tbody>
+<% 
+@order.items.each do |item|%>
+	<tr class="">
+    <td>
+    	<%= link_to item.product_no.html_safe,{:controller=>"store/products",:action=>"show",:id=>item.product_id},{:target=>"_blank",:title=>"单击查看商品详细"}  %>
+    </td>
+    <td>
+    	<% text = item.name%>
+    	<% text = "#{item.name}<span style='font-size:10px;color:black;'> ##{item.style}</span>".html_safe if item.style? %>
+    	<%= link_to text.html_safe,{:controller=>"store/order_items",:action=>"show",:id=>item.id},{:target=>"_blank",:title=>"单击查看商品快照"}  %>
+    </td>
+    <td><%= item.price %></td>
+    <td><%= item.quantity %></td>
+    <td><%= item.subtotal %></td>
+</tr>
+<%end%>
+</tbody>
+<tfoot>
+	<tr>
+		<td colspan="4"></td>
+		<td >总计:<%= @order.total %>
+			
+		</td>
+	</tr>
+</tfoot>
+</table>
+
+<table class="table table-striped table-bordered table-condensed">
+<thead>
+    <tr>
+       <th colspan="2">顾客信息</th>
+    </tr>
+    <tr>
+ 		<th style="width:20%;">顾客姓名:</th>
+ 		<td><%= @order.customer  %></td>
+ 	</tr>
+ 	<tr>
+ 		<th style="width:20%;">收货地址:</th>
+ 		<td>
+ 			<% if @order.address%>
+ 			 <%= Address.find(@order.address).province  %>-<%= Address.find(@order.address).city  %>
+ 			<%end%>
+ 		</td>
+ 	</tr>
+ 	<tr>
+ 		<th style="width:20%;">详细地址:</th>
+ 		<td><%= @order.address_detail %></td>
+ 	</tr>
+ 	<tr>
+ 		<th style="width:20%;">邮编:</th>
+ 		<td><%= @order.code %></td>
+ 	</tr>
+ 	<tr>
+ 		<th style="width:20%;">联系电话:</th>
+ 		<td> <%= @order.phone %> / <%= @order.telephone %></td>
+ 	</tr>reason
+ 	<tr>
+ 		<th style="width:20%;">订单备注:</th>
+ 		<td> <%= @order.remark %></td>
+ 	</tr>
+ 	<tr>
+ 		<th style="width:20%;">快递单号:</th>
+ 		<td><%= @order.ship.name unless @order.ship.nil?%> # <%= @order.ship_no %></td>
+ 	</tr>
+ 	<tr>
+ 		<th style="width:20%;">提交时间:</th>
+ 		<td> <%= @order.submitted_at.strftime("%Y-%m-%d %H:%M:%S") if @order.submitted_at %></td>
+ 	</tr>
+ 	<% if @order.reason%>
+ 	<tr>
+ 		<th style="width:20%;">拒绝理由:</th>
+ 		<td> <%= @order.reason %></td>
+ 	</tr>
+ 	<%end%>
+ </thead>
+ </table>
+<%= form_for(@order,:url => {:controller => "orders",:action => "update" },:html=>{:onsubmit=>"return validate(this);",:class=>"form-inline"}) do |f|  %>
+<input type="hidden" id="status" name="status" value="<%= @order.status+1 if @order.status < 5%>" />
+<% onclick = "return confirm('您是否要'+this.value+'?');" %>
+<% if @order.status == 0 %>
+	<%= link_to "返回订单列表",{:controller=>"orders",:action=>"index"},{:id=>"btn_sub",:title=>"订单未提交，等待顾客提交!"}%>
+<% elsif @order.status == 1%>
+货运方式:<select name="ship_id">
+		<option value="">---请选择---</option>
+		<% @couriers.each do |c|%>
+		<option value="<%= c.id%>"><%= c.name%></option>
+	   <%end%>
+	   </select>
+	快递单号:<input type="text" name="ship_no" />
+ 	<input id="btn_sub" class="btn btn-primary" type="submit" value="发货"  title="订单已提交请发货!" onclick="<%= onclick%>" >
+  <label><input type="checkbox" onclick="check_refuse(this);"  />拒绝订单</label><br/><br/>
+  <div id="div-refuse" style="display:none;" >
+    拒绝理由:<input type="text" id="reason" name="reason" value="没有库存" /> <input class="btn btn-primary" type="button" value="拒绝订单" onclick="refuse();"></div>
+<% elsif @order.status == 2%>
+ 	<input id="btn_sub"  class="btn btn-primary" type="submit" value="确认收货" title="订单已送货，等待顾客确认收货，也可以与顾客联系后确认!" onclick="<%= onclick%>" >
+<% elsif @order.status == 3%>
+ 	<input id="btn_sub" class="btn btn-primary" type="submit" value="完成订单" title="已确认收货,请完成订单!" onclick="<%= onclick%>" >
+<% elsif @order.status == 4%>
+	<%= link_to "返回订单列表",{:controller=>"orders",:action=>"index"},{:id=>"btn_sub",:title=>"订单已经完成"}%>
+<%end%>
+<%end%>
+<script type="text/javascript">
+function check_refuse(chk){
+  if(chk.checked){
+    $("#div-refuse").show();
+  }else{
+    $("#div-refuse").hide();
+  }
+}
+function refuse(){
+  var reason = $("#reason").val();
+  if(!$("#reason").val().replace(/\s/g,'')){
+    alert("请填写拒绝理由");
+    return;
+  }
+  if(confirm("您确定要取消订单")){
+    $("#status").val("-1");
+    document.forms[0].submit();
+  }
+}
+
+function validate(f){
+	var flag = true;
+	var error = "";
+	if(!f.ship_id.value || f.ship_id.value == ""){
+		error += "请选择货运方式!\n";
+		flag = false;
+	}
+	if((typeof(f.ship_id) == 'object' && f.ship_id.options[f.ship_id.selectedIndex].text != '自提') && (!f.ship_no.value || f.ship_no.value == "")){
+		error += "请输入货运单号!";
+		flag = false;
+	}
+	if(!flag)alert(error);
+	return flag;
+}
+$(function(){
+	$("#span_alert").text($("#btn_sub").attr("title"));
+});	
+</script>
+
+ 

@@ -1,0 +1,77 @@
+<% provide :title, @group.name %>
+
+<%= render "/groups/tweet_editor" %>
+
+<div class="bk">
+  <div class="gz_nt">
+    <div class="gz_ntt">
+      <%= @group.name %>
+      <% if @group.quitable %>
+        <%= link_to("", "javascript:void(0)", :class=>"quit", :title=>"退出小组", "data-action" => "quit-group") %>
+      <% end %>
+      <%= link_to("", edit_group_path(@group), :class=>"gl", :title=>"管理工作组") if @member.is_admin %> 
+    </div>
+    <div class="gz_nti">
+      <span title="微博数量" class="wb"><%= @group.tweets_count %></span>
+      <span title="成员数量" class="rs"><%= @group.members_count %></span>
+      <div class="gly" title="管理员">
+        <% @group.admin_users.each_with_index do |user, i|%>
+          <% break if i >= 3%>
+          <%= user_tag user %>
+        <% end %>
+      <%= link_to(">>>", group_members_path(@group)) if @group.admin_users.length > 3 %>
+      </div>
+    </div>
+    <div class="gz_nti f13">公告:<%= @group.notice %></div>
+  </div>
+
+  <div class="bk_c">
+    <div class="tab">
+      <% if action_name =="show" %>
+        <%= link_to "全部",group_path(@group),:class=>"qb on"%>
+      <% else %>
+        <%= link_to "全部",group_path(@group),:class=>"qb"%>
+      <% end %>
+
+      <% if action_name == "tops" %>
+        <%= link_to "重要", tops_group_path(@group), :class=>"zy on" %>
+      <% else %>
+        <%= link_to tops_group_path(@group),:class=>"zy" do %>
+          重要
+          <% if ( (unreads = Notification::TopTweet.unreads_count_of(current_user, @group)) > 0) %>
+            <span class="f12">（<font color="#dc5f5e"><%= unreads %></font>）</span>
+	        <% end %>
+        <% end %>
+      <% end %>
+
+      <%= link_to "成员",group_members_path(@group),:class=>"qq"%>
+    </div>
+    <div data-type="TweetList">
+      <% if @feeds.any? %>
+        <%= render :collection => @feeds, :partial => 'feed' %>
+        <div class="lb text-center">
+          <%= will_paginate @feeds %>
+        </div>
+      <% else %>
+        <div class="empty"><span>该工作组还没有工作微博哦～</span></div>
+      <% end %>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="bk_t bk_d"></div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('a[data-action=quit-group]').click(function(){
+      $.confirm("是否退出当前小组? ", function(tag) {
+        if(tag) {
+          window.location.href = "<%= quit_group_member_path(:group_id=>@group.id,:id=>@member.id)%>";
+        }
+      });
+    });
+
+    $("[data-type=tweet-editor]").tweetEditor({ groupId: "<%= @group.id %>" });
+    $("div[data-type=TweetList]").tweetList({ action_name: "<%= action_name %>" });
+  });
+</script>

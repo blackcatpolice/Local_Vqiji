@@ -1,0 +1,35 @@
+<div class="modal hide" style="width:560px;" data-type="TalkNewSessionDialog">
+  <div class="modal-header">
+    <a class="close" data-dismiss="modal"></a>
+    <div class="model_tabs">新建会话</div>
+  </div>
+  <div class="modal-body" style="max-height:none; height:450px;">
+    <div class="modal_form" data-role="weibo-members-selector">
+      <form class="form-horizontal">
+        <fieldset>
+          <div class="control-group">
+            <div class="control-tr" data-role="query-by-department">
+              <label><input name="find-by" type="radio" value="department" checked="checked">按部门查找：</label>
+              <input type="text" placeholder="请输入部门名" autocomplete="off" />&nbsp;<a href="javascript:void(0)" class="btn">查找</a>
+            </div>
+            <div class="control-tr" data-role="query-by-user-name">
+              <label><input name="find-by" type="radio" value="user-name">按姓名查找：</label>
+              <input type="text" placeholder="请输入名字" disabled="disabled" />&nbsp;<a href="javascript:void(0)" class="btn" disabled="disabled">查找</a>
+            </div>
+            <div class="control-tr">
+              <div class="left">成员列表</div>
+              <div class="left" style="margin:0px;">已选成员</div>
+              <ul data-role="found"></ul>
+              <ul style="margin:0px;" data-role="selected"></ul>
+            </div>
+            <div class="control-tr hide" data-role="topic-p">
+              <label>聊天主题：</label>
+              <input class="w350" name="topic" type="text" placeholder="请输入聊天主题" />
+            </div>
+          </div>
+        </fieldset>
+        <p><input class="btn btn-danger bn f12 right" type="submit" data-action="submit" value="创  建"></p>
+      </form>
+    </div>
+  </div>
+</div>

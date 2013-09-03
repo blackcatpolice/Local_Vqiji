@@ -1,0 +1,38 @@
+<% provide(:title, '任务首页') %>
+<div class="rw_zx">
+	<%= render :partial =>"todo/top_nav"%>
+	<div class="rw_xjt rw_lbt1 f18">待确认任务</div>
+	<div class="rw_zx_lb">
+		<% if  @will_finish_tasks.any? %>
+		  <%= render :collection => @will_finish_tasks,:as=>"task", :partial => '/todo/tasks/item', :locals => { :my_create => (params[:action] == "mycreate" ? true : false) } %>
+    <% else %>
+		  <div class="empty"><span>暂时没有任务哦～</span></div>
+		<% end %>
+    <div class="clearfix"></div>
+	</div>
+	<div class="rw_xjt rw_lbt1 f18">即将到期的任务</div>
+	<div class="rw_zx_lb">
+		<% if  @will_timeout_tasks.any? %>
+		<%= render :collection => @will_timeout_tasks,:as=>"task", :partial => '/todo/tasks/item', :locals => { :my_create => (params[:action] == "mycreate" ? true : false) }  %>
+		<% else %>
+		  <div class="empty"><span>暂时没有任务哦～</span></div>
+		<% end %>
+    <div class="clearfix"></div>
+	</div>
+	<div class="rw_xjt rw_lbt1 f18">已超时的任务</div>
+	<div class="rw_zx_lb">
+		<% if  @timeout_tasks.any? %>
+		  <%= render :collection => @timeout_tasks, :as=>"task", :partial => '/todo/tasks/item', :locals => { :my_create => (params[:action] == "mycreate" ? true : false) }  %>
+		<% else %>
+		  <div class="empty"><span>暂时没有任务哦～</span></div>
+		<% end %>
+    <div class="clearfix"></div>
+	</div>
+  <script>
+	  $(function(){
+		  try {
+			  $(".knob").knob();
+		  } catch(e) {}
+	  });
+  </script>
+</div>

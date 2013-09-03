@@ -1,0 +1,64 @@
+
+(function($) {
+	$.widget('disk.fileOperate', {
+  		options: {
+    	},
+    	_create: function(options) {
+      		var self = this;
+			$('a[data-action=more]', self.element).on({
+				click: function(e){
+	      			e.stopPropagation();
+	      			if($(self.element).attr('data-encrypt') == "true"){
+	      				$('#moreFileOperate').css({'height': 60});
+	      				$('[data-action=fencrypt]', '#moreFileOperate').hide();	
+	      			}else{
+	      				$('[data-action=fencrypt]', '#moreFileOperate').show();
+	      				$('#moreFileOperate').css({'height': 80});
+	      			}
+	      			$('#moreFileOperate').css({'position': 'absolute', 'top': (e.target.offsetTop + 17), 'left': e.target.offsetLeft, 'display': 'block'})
+	      				.attr('fid', self.element.attr('data-id')).show();
+	      		}
+			});
+      		$('#moreFileOperate').hover(function(e){
+      			e.stopPropagation();
+      			$(this).show();
+      		}, function(e){
+      			e.stopPropagation();
+      			$(this).hide();
+      		});
+      		
+      		//分享
+    		$('a[data-action=file_share]', self.element).click(function(){
+    			var shareFid = $(this).attr('data-id');
+    			var _shareTmpl = self._shareHtml();
+    			$(_shareTmpl).modal({
+    				remote: "/network_disks/share.html?fid=" + shareFid
+    			});
+    		});
+    		//分享
+    		$('a[data-action=talk_message]', self.element).click(function(){
+    			var shareFid = $(this).attr('data-id');
+    			var _messageTmpl = self._messageHtml();
+    			$(_messageTmpl).modal({
+    				remote: "/network_disks/message.html?fid=" + shareFid
+    			}).on('hidden', function(){
+    				$(this).remove();
+    			});
+    		});
+      		
+    	},
+    	
+    	_shareHtml: function(){
+	    	return '<div class="modal" id="fileModal" style="display:; width:500px;display:none;">' + 
+	    		'<div class="modal-header"><a class="close" data-dismiss="modal"></a><div class="model_tabs"><a href="#" class="tabs_rw">分享到微博</a></div></div>' +
+	    		'<div class="modal-body"></div>' +  
+	    	'</div>';
+	    },
+	    _messageHtml: function(){
+	    	return '<div class="modal" id="talkMessageModel" style="display:; width:500px;display:none;">' + 
+	    		'<div class="modal-header"><a class="close" data-dismiss="modal"></a><div class="model_tabs"><a href="#" class="tabs_rw">发私信</a></div></div>' +
+	    		'<div class="modal-body"></div>' +  
+	    	'</div>';
+	    }
+ 	}); 
+})(jQuery);

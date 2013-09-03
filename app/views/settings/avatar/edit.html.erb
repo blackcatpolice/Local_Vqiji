@@ -1,0 +1,67 @@
+<% provide :title, '修改头像' %>
+
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="tab">
+      <a class="qb" href="<%= settings_basic_url %>">基本资料</a>
+      <a class="on" href="javascript:void(0);">修改头像</a>
+      <a class="qb" href="<%= edit_settings_password_url %>">安全设置</a>
+    </div>
+
+    <div class="sz_zl">
+      <% if flash.now[:message] %>
+        <div class="alert alert-success text-center">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <%= flash.now[:message] %>
+        </div>
+      <% end %>
+      
+      <% if current_user.errors.any? %>
+        <div class="alert alert-error text-center">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <ul>
+            <% current_user.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      
+      <%= form_for current_user, url: settings_avatar_path, html: { class: 'form-horizontal' } do |form| %>
+        <div id="image-uploader" style="display:block; text-align:left;">
+          <div style="width:400px; margin-left:40px; border:1px outset #ccc; background-color:#efefef; padding:10px;">
+            <%= image_tag 'flashplayer_100x100.jpg', style: 'float:left; margin-right:10px;' %>
+            <h4 style="margin-top:10px;">请安装 11.10 版本以上的 Flash 播放器. </h4>
+            <p>
+              <a href="http://get.adobe.com/flashplayer/" title="获取 Adobe Flash 播放器">获取 Adobe Flash 播放器</a>
+            </p>
+          </div>
+        </div>
+
+        <script type="text/javascript">
+          $(function() {
+            var flashvars = {
+              photo: "<%= current_user.avatar.v84x84.url %>",
+              url: "<%= settings_avatar_url %>"
+            };
+            var params = {
+              version: [11, 1],
+              width: 490, height: 340,
+              src: "<%= asset_path 'avatar-uploader/ImgUploader.swf' %>",
+              quality: "high",
+              bgcolor: "#ffffff",
+              allowfullscreen: "false",
+              wmode: "transparent",
+              expressInstall: "<%= asset_path 'expressinstall.swf' %>"
+            };
+                      
+            $("#image-uploader").flashembed(params, flashvars);
+          });
+        </script>
+        <div class="t d"></div>
+      <% end %>
+    </div>
+  </div>
+  <div class="bk_t bk_td"></div>
+</div>

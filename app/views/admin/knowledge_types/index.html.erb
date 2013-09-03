@@ -1,0 +1,29 @@
+<ul class="nav nav-tabs">
+ 	<li class="active"><a href="<%= admin_knowledge_types_path%>"><i class="icon-list"></i>类型列表</a></li>
+ 	<li><a href="<%= new_admin_knowledge_type_path%>"><i class="icon-plus"></i>新建类型</a></li>
+</ul>
+<table class="table table-bordered" id="qas_doctors">
+	<thead>
+		<tr>
+			<th>知识库类型</th>
+			<th>图片</th>
+			<th>优先级</th>
+			<th>创建时间</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% @knowledge_types.each do |kt|%>
+		<tr>
+			<td><%= kt.name%></td>
+			<td><%= kt.image%></td>
+			<td><%= kt.priority%></td>
+			<td><%= kt.created_at.to_s%></td>
+			<td>
+				<%= link_to "修改", edit_admin_knowledge_type_path(kt)%>&nbsp;&nbsp;&nbsp;
+				<%= link_to "删除", admin_knowledge_type_path(kt), :confirm => "是否删除知识库类型", :method => :delete%>
+			</td>
+		</tr>
+		<% end %>
+	</tbody>
+</table>

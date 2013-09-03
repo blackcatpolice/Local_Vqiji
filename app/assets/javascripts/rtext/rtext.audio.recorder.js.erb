@@ -1,0 +1,153 @@
+//
+//  audio recorder 
+//
+(function($) {
+  "use strict";
+
+  $.widget("weibo.audioRecorder", {
+    options: {
+      width: 296,
+      height: 140
+    },
+
+    _create: function() {
+      this._id = $.weibo.audioRecorder.generateId();
+      $.weibo.audioRecorder.add(this.element);
+      this._initRecorder();
+    },
+    
+    _initRecorder: function() {
+      if (this._recorder) {
+        return;
+      }
+      
+      var self = this;
+      this.element.empty();
+      
+      this._recorder = $(''
+        + '<div class="recorder">'
+          + '<div style=\"width:280px; margin:0 auto; padding:8px;\">'
+            + '<%= image_tag 'flashplayer_100x100.jpg', style: 'float:left; margin-right:10px;' %>'
+            + '<h4 style="margin-top:10px;">请安装 11.10 版本以上的 Flash 播放器. </h4>'
+            + '<p>'
+              + '<a href="http://get.adobe.com/flashplayer/" title="获取 Adobe Flash 播放器">获取 Adobe Flash 播放器</a>'
+            + '</p>'
+            + '<div style="clear: both;" />'
+          + '</div>'
+        + '</div>'
+      + '')
+    	  .appendTo(this.element)
+      	.flashembed({
+        	src: "<%= asset_path 'audio/recorder.swf' %>",
+        	version: [11, 1], // 要求 flash player 版本大于 11.1
+        	id: this._id,
+        	width:  this.options.width,
+        	height: this.options.height,
+        	bgcolor: "#ffffff",
+        	allowfullscreen: "false",
+          quality: "high",
+          expressInstall: "<%= asset_path 'expressinstall.swf' %>"
+        });
+    },
+
+    _destroy: function() {
+      $.weibo.audioRecorder.remove(this.element);
+      if (this._recorder) {
+        this._recorder.remove();
+      }
+      this._audio = null;
+      this._id = null;
+    },
+
+    id: function() {
+      return this._id;
+    },
+    
+    /* 获取录音文件信息 */
+    audio: function() {
+      return this._audio;
+    },
+    
+    _onDeleted: function() {
+    	if (this._audio) {
+    	  this._audio = null;
+    	  this._trigger("deleted");
+    	}
+    	return this;
+    },
+    
+    // 重置
+    reset: function() {
+    	if (this._audio) {
+    	  this._audio = null;
+    	}
+    	// 重新初始化 recorder
+    	if (this._recorder) {
+        this._recorder.remove();
+        this._recorder = null;
+      }
+      this._initRecorder();
+      return this;
+    },
+    
+    done: function() {
+  	  this._trigger("done");
+    },
+
+    flashTrigger: function(event, data) {
+      switch(event) {
+        // 录音上传成功
+        case "uploadSuccess":
+          this._audio = $.parseJSON(data);
+          this._trigger("uploadSuccess", null, { audio: this._audio });
+          break;
+        case "done":
+          this.done();
+          break;
+        case "delete":
+          this._onDeleted();
+          break;
+        case "reset":
+          this.reset();
+          break;
+        /* error */
+        default: $.error("Unsupport event!");
+      }
+      return this;
+    }
+  });
+  
+  $.extend($.weibo.audioRecorder, {
+    _recorders: {},
+    // 生成 id
+    generateId: function() {
+      if (!$.weibo.audioRecorder._recorderIdOffset) {
+        $.weibo.audioRecorder._recorderIdOffset = 0;
+      }
+      return 'audio-recorder-' + ++$.weibo.audioRecorder._recorderIdOffset;
+    },
+    // 添加录音机
+    add: function(recorder) {
+      $.weibo.audioRecorder._recorders[recorder.audioRecorder("id")] = recorder;
+    },
+    // 删除录音机
+    remove: function(recorder) {
+      $.weibo.audioRecorder._recorders[recorder.audioRecorder("id")] = null;
+    },
+    // 回调 audio recorder
+    //
+    // jQuery.weibo.audioRecorder._trigger('audio-recorder-1', 'uploadSuccess', {url: 'http://g.cn'});
+    // 
+    // event:
+    //   uploadSuccess, reset, done, delete
+    //
+    _trigger: function(recorder_id, event, data) {
+      var _recorder = $.weibo.audioRecorder._recorders[recorder_id];
+      if (!_recorder) {
+        $.error("Can't find recorder with id: " + recorder_id);
+      }
+      _recorder.audioRecorder("flashTrigger", event, data);
+    }
+  });
+
+})(jQuery);

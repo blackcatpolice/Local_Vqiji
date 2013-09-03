@@ -1,0 +1,110 @@
+<% followship = current_user.followed(@expert.user_id) %>
+<div class="zx_zj">专家简介</div>
+<div class="zx_bd" node-type="Expert"  data-id="<%= @expert.user_id%>">
+	<div class="bk ys_bk">
+        <div class="bk_c">
+          	<div class="ys_jj">
+            	<div class="ys_tx">
+            		<%= image_tag(@expert.user.avatar.url('v80x80'), :class => 'avatar_v80x80')%>
+            		<a class="btn <%= followship ? "" : "btn-warning"%>" href="javascript:;" data-action="expert-follow" data-value="<%= followship ? 1 : 0%>"><i class="<%= followship ? "icon-minus" : "icon-plus"%>"></i> <%= followship ? "取消关注" : "关注"%></a>
+            	</div>
+
+            	<div class="ys_js">
+            		<p><%= @expert.user.name%>&nbsp;<%= @expert.post%></p>
+            		<div>
+            			<b class="f15">详细介绍：</b>
+            			<div style="margin-top:10px;">
+            				<span data-type="less-description"><%= truncate(@expert.description, :length => 180, :omission => "...")%></span>
+            				<span data-type="more-description" style="display: none;"><%= @expert.description %></span>
+            				<%= raw "&nbsp;&nbsp;<a href='javascript:;' data-action='description-action' class='f12' style='color:rgb(218, 79, 73);'>更多</a>" if (@expert.description && @expert.description.length > 180) %>
+            			</div>
+            		</div>
+            	</div>
+          	</div>
+  	      	<div class="clearfix"></div>
+        </div>
+        <div class="bk_t bk_d"></div>
+	</div>
+</div>
+<div class="zx_db"></div>
+<%= form_for([:advisory, @question], :html => {:id=>"question_form" ,:onsubmit => "return validate();"}) do |f|%>
+	<input type="hidden" id="question_question_type" name="question[question_type]" value="<%= @expert.expert_type_id%>"/>
+	<input type="hidden" id="question_expert_id" name="question[expert_id]" value="<%= @expert.id%>"/>
+	<input type="hidden" id="display" name="display" value="<%= @expert.expert_type.display ? 1 : 0 %>"/>
+	<input type="hidden" id="question_audio" name="audio_id" value=""/>
+<div class="zx_hd"><a class="tit yjj">填写问题</a></div>
+<div class="zx_bd" id="question_editor">
+	<div class="bk ys_bk">
+        <div class="bk_t"></div>
+        <div class="bk_c ys_wt">
+          	<div class="ys_ipt f12"><span>*</span>标题: <input id="question_title" name="question[title]" placeholder="请输入问题标题" style="width:420px;" type="text"></div>
+          	<% if @expert.expert_type.display %>
+          	<div class="ys_ipt f13">
+          		<span>*</span>性别: <select name="info[sex]" style="width:60px;">
+          			<option value="<%= User::GENDER_MALE%>" <%= 'selected="selected"' if current_user.gender == User::GENDER_MALE%>>男</option>
+          			<option value="<%= User::GENDER_FEMALE%>"  <%= 'selected="selected"' if current_user.gender == User::GENDER_FEMALE%>>女</option>
+          		</select>&nbsp;
+          		<span>*</span>年龄: <input id="info_age" name="info[age]" placeholder="年龄" type="text" value="<%= get_age_by_id_number(current_user.id_number)%>">岁&nbsp;
+          		身高: <input name="info[hight]" type="text">cm&nbsp;
+          		体重: <input name="info[weight]" type="text">kg
+          	</div>
+          	<% end %>
+          	<div class="ys_lyk">
+           		<div class="ly_time" data-type="audio-button"><a href="javascript:;"></a></div>
+            	<div class="ly_txt"><textarea id="question_text" name="question[text]" placeholder="请输入问题内容" class="texter"></textarea></div>
+          	</div>
+          <!--成功上传语音-->
+          	<div class="ys_xz toolbar">
+          		<span><input name="question[incognito]" type="checkbox" value="0">公开问题</span>
+          	</div>
+          	<div class="ys_tj"><a href="javascript:;" class="btn bn">取消</a><a href="javascript:;" class="btn bn btn-danger submiter" node-type="question-submit">提交问题</a></div>
+        </div>
+        <div class="bk_t bk_d"></div>
+	</div>
+</div>
+<div class="zx_db"></div>
+<% end %>
+<script>
+	$('#question_editor').questionEditor({caseHistory: <%= @expert.expert_type.display %>});
+	$('div[node-type=Expert]').follow();
+	
+	$('a[node-type="question-submit"]').click(function() {
+	  var form = $('#question_form');
+		form.find(':checkbox[name="case_history[]"]').remove();
+		$.tmpl( '<input type="checkbox" class="hide" value="${id}" name="case_history[]" checked="checked" />'
+		, $('#question_editor').questionEditor("files") ).appendTo( form );
+		form.submit();
+	});
+	
+	$('a[data-action=description-action]', '[node-type=Expert]').click(function(){
+		if($(this).text() == "更多"){
+			$(this).text('收起');
+			$('[node-type=Expert]').find('[data-type=more-description]').show().end().find('[data-type=less-description]').hide().end(); 
+		}else{
+			$(this).text('更多');
+			$('[node-type=Expert]').find('[data-type=more-description]').hide().end().find('[data-type=less-description]').show().end();
+		}
+	});
+	
+	function validate(){
+		var flag = true;
+		if($('#display').val() == 1){
+			var _infoAge = $('#info_age').val();
+			if(_infoAge.replace(/(^\s*)|(\s*$)/g, '') == '' || !/^[0-9]*[1-9][0-9]*$/.test(_infoAge)){
+				$('#info_age').blink();
+				flag = false;
+			}
+		}
+		var _questionTitle = $('#question_title').val();
+		if(_questionTitle.replace(/(^\s*)|(\s*$)/g, '') == ''){
+			$('#question_title').blink();
+			flag = false;
+		}
+		var _questionText = $('#question_text').val();
+		if(_questionText.replace(/(^\s*)|(\s*$)/g, '') == ''){
+			$('#question_text').blink();
+			flag = false;
+		}
+		return flag;
+	}
+</script>

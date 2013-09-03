@@ -1,0 +1,23 @@
+<div class="lb" data-type="Comment" data-id="<%= comment.id %>" data-sender-name="<%= comment.sender.name %>">
+	<div class="lb_tx" data-user-id="<%= comment.sender.to_param %>"><%= link_to image_tag(comment.sender.avatar_url('v50x50')), user_path(:id => comment.sender.id) %>
+  </div>
+  <div class="lb_nr">
+  	<%= link_to "#{comment.sender.name}：", user_path(:id => comment.sender.id), :'data-user-id' => comment.sender.to_param %>
+  	<%= rtext_tag comment.rtext %>
+  </div>
+  <div class="attachments" data-role="rtext-attachments">
+    <%= render(:partial => '/attachments/audio', :object => comment.audio, :formats => [ :html ]) if comment.audio -%>
+  </div>
+  <div class="lb_if f12 red_a_dc5">
+  	<span class="left"><%= l comment.created_at, format: :short %></span>
+  	<span class="right">
+      <% if (comment.tweeter == current_user) or (comment.sender == current_user) %>
+        <div class="delete-wraper">
+    	 	  <a data-action="delete" href="javascript:void(0);">删除</a>
+    	 	  <span class="divider">|</span>
+  	 	  </div>
+  		<% end %>
+  		<a data-action="replay" href="javascript:void(0);">回复</a>
+		</span>
+  </div>
+</div>

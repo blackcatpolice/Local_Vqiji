@@ -1,0 +1,149 @@
+//
+// 病历选择器
+
+// require jquery
+// require jquery.ui.widget
+// require jquery.tmpl
+
+$.widget("rtext.historySelector", {
+  _create: function() {
+    this._files = [];
+    this.element.html(""
+      + "<div>"
+        + "<div class=\"zx_fj_lb\" data-role=\"list\"></div>"
+        + "<hr />"
+        + "<div class=\"zx_fj\" style=\"position: relative;\" data-role=\"uploader\">"
+          + '<span class="file-button">'
+            + '<input type="file" size="1" name="tmp_file[file]" style="z-index: 1;" />'
+            + '<a href="javascript:void(0)">上传病例</a>'
+          + '</span>'
+        + "</div>"
+      + "</div>");
+      
+    this._list = this.element.find("[data-role=list]");
+    this._uploader = this.element.find("[data-role=uploader]");
+
+    this._on(this._list, {
+      "click :checkbox": this._onListCheckboxClick
+    });
+    
+    this._initUploader();
+    this._loadList();
+  },
+  
+  _onListCheckboxClick: function(e) {
+    var $target = $(e.target)
+      , file = $target.parent("label.checkbox").tmplItem().data;
+
+    var idx = -1; //$.inArray(file, this._files);
+    
+    for ( var i in this._files) {
+      if (this._files[i].id == file.id) {
+        idx = i; break;
+      }
+    }
+
+    if ( $target.prop("checked") ) { // checked
+      if (idx == -1) {
+        this._files.push( file );
+        this._trigger("changed");
+      }
+    } else {
+      if (idx > -1) {
+        this._files.splice( idx, 1 );
+        this._trigger("changed");
+      }
+    }
+  },
+  
+  _loadList: function() {
+    var self = this
+      , _loading = $(''
+      + '<div class="zx_fj_lb" node-type="case-history">'
+        + '<%= image_tag 'loading.gif'%>病历加载中, 请稍后...'
+      + '</div>');
+  
+    this._list.empty().append( _loading );
+    
+    WEIBO.getCaseHistory({
+  		success: function(files) {
+  		  _loading.remove();
+  			if(files.length == 0) {
+  				self._list.append('<div class="empty">您没有可选病历, 请先上传～</div>');
+  			} else {
+  			  _loading.remove();
+  			  $.tmpl(''
+  			    + '<label class="checkbox" title="${name}">'
+  			      + '<input type="checkbox" data-name="case_history" name="case_history[]" value="${id}" >${$.truncate(name, 20)}'
+  			    +'</label>', files).appendTo( self._list );
+  			}
+  		},
+  		error: function() {
+  			self._list.append('<div class="error">病历加载失败!</div>');
+  		}
+  	});
+  },
+  
+  _initUploader: function() {
+  	var self = this
+  	  , _btn = this._uploader.find(".file-button")
+  	  , _loading, _error;
+
+    $("input[type=file]",_btn).fileupload({
+       url: "/attachments/history.json",
+       type: "POST",
+       dataType: "json",
+       dropZone: _btn,
+       sequentialUploads: true
+     })
+     .bind("fileuploadsubmit", function (e, data) {
+        _btn.hide();
+        _loading = $('<div class="loading">'
+          + '<%= image_tag 'loading.gif' %>'
+          + '<span>正在上传，请稍后</span>'
+        + '</div>')
+         .prependTo(self._uploader);
+     })
+     .bind("fileuploaddone", function (e, data) {
+        var _file = data.result;
+        $.tmpl(''
+  			    + '<label class="checkbox" title="${name}">'
+  			      + '<input type="checkbox" value="${id}">${$.truncate(name, 20)}'
+  			    +'</label>', _file).prependTo( self._list )
+  			                       .find(":checkbox").trigger("click"); // 默认选中
+  			_loading.remove();
+  			_btn.show();
+     })
+     .bind("fileuploadfail", function (e, data) {
+        _loading.remove();
+        _error = $(''
+          + '<div class="error">'
+            + '<span>上传失败！</span>'
+            + '<a data-action="back" href="javascript:void(0)">返回</a>' +
+          + '</div>').prependTo(self._uploader);
+
+       _error.find("[data-action=back]").click(function() {
+         _btn.show();
+         _error.remove();
+       });
+     })
+     .bind("fileuploadalways", function (e, data) {
+       // nothing to-do.
+     });
+  },
+  
+  reset: function() {
+    this._files = [];
+    this._list.find(":checkbox").prop("checked", false);
+    return this;
+  },
+
+  // 获取上传的临时文件
+  files: function() {
+    return this._files;
+  },
+  
+  filesCount: function() {
+    return this._files.length;
+  }
+});

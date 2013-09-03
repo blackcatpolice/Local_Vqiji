@@ -1,0 +1,4 @@
+<% content_for :title do%>编辑商品类型<%end%>
+<% content_for :menu_url do%><%= url_for :controller=>"product_types",:action=>"index" %><%end%>
+<%= render 'form' %>
+<%= link_to '返回', admin_product_types_path %>

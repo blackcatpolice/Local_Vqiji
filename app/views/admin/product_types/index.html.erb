@@ -1,0 +1,27 @@
+<% content_for :title do%>商品类型列表<%end%>
+<%= link_to '新建商品类型', new_admin_product_type_path,:class=>"btn btn-primary" %>
+<table class="table">
+<thead>
+<tr>
+  <th>类型名称</th>
+  <th>父类级</th>
+  <th>优先级</th>
+  <th>子类型</th>
+  <th>操作</th>
+</tr>	
+</thead>
+<tbody>
+<% @store_product_types.each do |store_product_type| %>
+<tr>
+  <td><%= store_product_type.name %></td>
+  <td><%= store_product_type.parent %></td>
+  <td><%= store_product_type.priority || 0 %></td>
+  <td><%= store_product_type.child_types_str %></td>
+  <td>
+  <%= link_to '编辑', edit_admin_product_type_path(store_product_type) %>
+  <%= link_to '删除', {:controller=>"product_types",:action=>"destroy",:id=>store_product_type.id},{:onclick=>"return confirm('您确定要删除商品类型？');"} %></td>
+</tr>
+<% end %>
+</tbody>
+</table>
+

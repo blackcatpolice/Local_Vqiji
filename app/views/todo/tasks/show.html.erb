@@ -1,0 +1,176 @@
+<!-- 任务基本信1息 -->
+
+<div class="bk bk_rw">
+	<div class="bk_t rw_t f17" title="<%= @task_info.title%>"><%= truncate_u @task_info.title,20 %></div>
+	<div class="bk_c rw_c">
+		<div class="tx f13"><%= image_tag(@task_info.creator.avatar_url('v50x50'), :class => '') %><br><%= user_tag @task_info.creator %></div>
+	   	<div class="xx">
+          <%= @task_info.details %>
+	   		<% if @task_info.file %>
+			<div class="rw_fj"><%= link_to @task_info.file.name, "/download/#{ @task_info.file.id }", :target => '_blank', :'data-skip-pjax' => true, :title=>@task_info.file.name %></div>
+			<% end %>
+			<% if @task_info.picture %>
+			<div class="rw_fj rw_tp"><%= link_to @task_info.picture.name || @task_info.picture.filename, @task_info.picture.file.thumb.url, :target => '_blank', :'data-skip-pjax' => true, :title=>@task_info.picture.filename %></a></div>
+			<% end %>
+          	<p>
+          	截止时间：<%= l(@task_info.end_date, :format => :long) %>
+          	<span>负责人：<%= user_tag @task_info.executor %></span></p>
+        </div>
+        <div class="clearfix"></div>
+	</div>
+	<div class="bk_t bk_d"></div>
+</div>
+<!-- 操作表单  -->
+<% if @task_info.schedule == Todo::Task::SCHEDULE_CONFIRM && @task_info.creator == current_user %>
+	<!-- 确认完成 -->
+	<%= render_cell Todo::Task, :confirm_form, :service => @service, :task => @task_info %>
+<% end %>
+
+<div class="rw_tabw" data-type="todo-task-tabs" style="<%= "display:none;" if @task_info.schedule == Todo::Task::SCHEDULE_CONFIRM && @task_info.creator == current_user %>">
+	<div class="rw_tab <%= "rw_tab2" if @service.msgs[:date] || @service.msgs[:executor]%>">
+		<a href="javascript:;" data-action="todo-task-logs"></a>
+		<a href="javascript:;" data-action="todo-task-tree"></a>
+		<a href="javascript:;" data-action="todo-task-child"></a>
+	</div>
+</div>
+
+<div class="bk bk_rw" data-type="todo-task-tree" style="display:none;">
+	<div class="bk_t"></div>
+	<div class="bk_c"> 
+    	<div class="rw_xjt rw_xjt1 f18">任务层级</div>
+      	<div class="rw_tv">
+      		<ul id="todo_task_treeview" class="filetree"></ul>
+      	</div>
+    </div>
+	<div class="bk_t bk_d"></div>
+</div>
+
+<% if @task_info.schedule != Todo::Task::SCHEDULE_COMPLETED && (@task_info.creator == current_user || @task_info.executor == current_user)%>
+<!-- 调整进度 -->
+<div class="bk bk_rw" data-type="todo-task-edit" data-id="<%= @task_info.id%>" style="<%= "display:none;" if @task_info.schedule != Todo::Task::SCHEDULE_ING || @service.msgs[:date] || @service.msgs[:executor]%>">
+<%= render_cell Todo::Task, :value_form, :service => @service, :task => @task_info, :user => current_user  %>
+</div>
+<%end%>
+
+
+<!-- 任务日志 -->
+<div class="rw_lb" data-type="todo-task-logs" style="<%= "display:none;" if @service.msgs[:date] || @service.msgs[:executor]%>">
+<%= render_cell Todo::Task, :logs,:task=>@task_info  %>
+</div>
+<!-- -->
+
+<% if @task_info.schedule != Todo::Task::SCHEDULE_COMPLETED || @task_info.schedule != Todo::Task::SCHEDULE_CONFIRM %>
+<div class="bk bk_rw" data-type="todo-task-child" style="<%= (@service.msgs[:date] || @service.msgs[:executor]) ? "display:block;" : "display:none;"%>">
+	<div class="bk_t"></div>
+	<div class="bk_c">
+		<div class="rw_xjt f18">新建 『<span title="<%= @task_info.title%>" style="color:#1584c6;"><%= truncate_u(@task_info.title, 15)%></span>』 的子任务</div>
+		<div class="rw_xj">
+			<%= render "form"%>
+		</div>
+		<div class="clearfix"></div>		
+	</div>
+	<div class="bk_t bk_d"></div>
+</div>
+<% end %>
+
+<div class="clearfix"></div>
+
+<script>
+	$(function(){
+		$('div[data-type=todo-task-child]').task({preset: "<%= @task.details%>"});
+		$('[data-type=todo-task-edit]').log();
+	  try {
+	    // FIXME: IE 上错误
+		  $(".knob").knob();
+		} catch (e) { }
+
+		$('[data-action=task-edit]', '[data-type=todo-task-confirm]').click(function(){
+			$('[data-type=todo-task-confirm]').hide();
+			$('[data-type=todo-task-tabs]').show();
+			$('[data-type=todo-task-edit]').show();
+		});
+		
+		$('[data-type=todo-task-tabs]').find('[data-action=todo-task-tree]').on('click', function(){
+			$(this).parent().removeClass('rw_tab2').addClass('rw_tab1');
+			$('[data-type=todo-task-logs]').hide();
+			$('[data-type=todo-task-confirm]').hide();
+			$('[data-type=todo-task-edit]').hide();
+			$('[data-type=todo-task-child]').hide();
+			$('[data-type=todo-task-tree]').show();
+			
+			$('#todo_task_treeview').treeview({
+				url: "/todo/tasks/treeview",
+				ajax: {
+					type: "post",
+					data: { id: "<%= @task_info.id%>"}
+				}
+			});
+		}).end().find('[data-action=todo-task-logs]').on('click', function(){
+			$(this).parent().removeClass('rw_tab1').removeClass('rw_tab2');
+			$('[data-type=todo-task-logs]').show();
+			$('[data-type=todo-task-edit]').show();
+			$('[data-type=todo-task-child]').hide();
+			$('[data-type=todo-task-tree]').hide();
+		}).end().find('[data-action=todo-task-child]').on('click', function(){
+			<% if @task_info.schedule == Todo::Task::SCHEDULE_COMPLETED || @task_info.schedule == Todo::Task::SCHEDULE_CONFIRM %>
+			$.alert("任务待确认中或已完成，不可新建子任务.");
+			return false;
+			<% end %>
+			$(this).parent().removeClass('rw_tab1').addClass('rw_tab2');
+			$('[data-type=todo-task-logs]').hide();
+			$('[data-type=todo-task-edit]').hide();
+			$('[data-type=todo-task-tree]').hide();
+			$('[data-type=todo-task-child]').show();
+			
+		});
+		
+		
+        var options = {
+            colors:["#00c2c2"],
+            series: {
+                lines: {
+                    show: true,
+                    fill: true,
+                    fillColor:"rgba(239, 255, 255, 0.5)" 
+                },
+                points: { 
+                    show: true,
+                    radius: 2
+                }
+            },
+            yaxis: {
+                min: 0, 
+                max: 100,
+                ticks: 5
+            }
+        };
+
+        WEIBO.todoTaskProgress("<%= @task_info.id %>", {
+            success: function(data) {
+                options.xaxis = {
+                    show: true,
+                    mode: "time",
+                    min: data.min,
+                    max: data.max,
+                    ticks: data.ticks,
+                    timeformat: "%m月%d日"
+                };
+                options.grid = {
+                    borderWidth:0,
+                    hoverable: true,
+                    markings: data.markings
+                };
+                $.plot("#placeholder", [data.data], options);
+                $('#placeholder').bind('plothover', function(event, pos, item){
+                    if(item){
+                        $('[data-type=progress-flag]').css({'position': 'absolute', 'top': (item.pageY -35), 'left': (item.pageX -18)}).text(item.datapoint[1] + "%").show();
+                    }else{
+                        $('[data-type=progress-flag]').hide();
+                    }
+                });
+            },
+            error: WEIBO.ui.errorHandler
+        });
+		
+	});
+</script>

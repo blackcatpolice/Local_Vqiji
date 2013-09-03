@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+
+	<script type="text/javascript">
+    <% if user_signed_in? %>
+   		$CURRENT_USER = <%= raw current_user.to_builder.target! %>;
+	  <% end %>
+ 	</script>
+
+	<%= stylesheet_link_tag    'weibo' %>
+	<%= javascript_include_tag 'weibo' %>
+	<%= javascript_include_tag 'talk.realtime', defer: 'defer' %>
+</head>
+<body>
+	<%= render '/layouts/nav/top' %>
+
+	<div class="container main">
+    <%= render '/layouts/partials/old_brower_alert' %>
+		<%= render '/layouts/nav/left' %>
+
+		<div class="main_ct left" data-pjax-container>
+ 			<%= yield %>
+		</div>
+		<div class="main_rt left">
+  		<div class="mr_row mr_mar" wrl-row1>
+    		<%= render 'widgets/user_card' %>
+    		<%= render '/schedule/calendar' %>
+    		<%= render '/todo/tasks/widget/my_tasks' %>
+  		</div>
+  		<div class="mr_row" wrl-row2>
+    		<div class="bk" asynch-widget aw-url="<%= asset_path 'widgets/weather.asynch.js' %>" aw-title="天气插件" wrl-strategy="prepend"></div>
+    		<%= render "/network_disks/widgets/files_widget" %>
+    		<%= render '/knowledges/widgets/knowledges_widget' %>
+  		</div>
+  	</div>
+		<div class="clearfix"></div>
+	</div>
+
+	<%= render '/layouts/nav/foot' %>
+</body>
+</html>

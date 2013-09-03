@@ -1,0 +1,6 @@
+<%  first_question_type = QuestionType.enables.asc(:priority).first %>
+<div class="nav_lb">专属咨询</div>
+<% if first_question_type %>
+<div class="nav_lb <%= params[:controller] == "advisory/question_types" || (params[:controller] == "advisory/questions" && params[:qtype] == "advisory") || (params[:controller] == "advisory/experts" && params[:action] == "show") ? "nav_on" : ""%>"><%= link_to "问题大厅", "/advisory/#{first_question_type.id}", :class => "ic_dt" %></div>
+<% end %>
+<div class="nav_lb <%= params[:controller] == "advisory/questions" && (params[:action] != "show" || params[:qtype].blank?) ? "nav_on" : ""%>"><%= link_to "我的问题", unsolved_advisory_questions_path, :class=>"ic_wt" %></div>

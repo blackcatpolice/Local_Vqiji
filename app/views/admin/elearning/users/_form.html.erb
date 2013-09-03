@@ -1,0 +1,83 @@
+<%= form_for(@training,:url => {:controller => "users",:action=>"save"},:html=>{:onsubmit=>"return validate(this);",:class=>"form-horizontal"}) do |f|  %>
+<div class="control-group">
+<label class="control-label">培训名称</label>
+<div class="controls docs-input-sizes">
+  <%= @training.name %>
+</div>
+</div>
+
+<div class="control-group">
+<label class="control-label">参与用户</label>
+<div class="controls docs-input-sizes">
+ 
+
+<%= render :partial => "admin/departments/select", 
+:locals => { :id => "department_id",:name=> "department_id",:default=>true, :level => 2} %>
+  <br/>
+  <select  multiple="true" style="height:190px;" id="left_users" ></select>
+  <input type="button" value=">>>" id="btnAdd"  />
+  <input type="button" value="<<<" id="btnDel" style="display:none;" />
+  <select name="users[]" multiple="true" style="height:190px;" id="right_users" >
+    <% @training_users.each do |tu|%>
+      <option value="<%= tu.user.id%>"><%= tu.user.name || tu.user.nickname %></option>
+    <%end%>
+  </select>
+</div>
+</div>
+
+<div class="form-actions">
+<%= f.submit "保存",:class=> "btn btn-primary"%>
+</div>
+
+<%end%>
+
+<script type="text/javascript">
+$(function(){
+
+  $("#department_id").change(function(){
+   getUsers(this);
+  });
+
+  $("#left_users").focus(function(){
+  $("#btnAdd").show();
+  $("#btnDel").hide();
+  });
+  $("#right_users").focus(function(){
+    $("#btnAdd").hide();
+    $("#btnDel").show();
+  });
+  /**/
+  $("#btnAdd").click(function(){
+     var opts = $("#left_users :selected");
+     for(var i=0;i<opts.length;i++){
+        var id = $(opts[i]).val();
+        var name = $(opts[i]).text();
+        if($("#right_users option[value='"+id+"']").length == 0){
+           $("#right_users").append("<option value='"+id+"'>"+name+"</option>");
+        }
+     }
+  });
+  /**/
+  $("#btnDel").click(function(){
+     var opts = $("#right_users :selected");
+   for(var i=0;i<opts.length;i++){
+      $(opts[i]).remove();
+   }
+  });
+});
+
+/**/
+function getUsers(slt){
+  $.get("<%= gets_admin_users_path %>.json",{departId:slt.value},function(d,s){
+  $("#left_users").children().remove();
+    for(var i=0;i<d.users.length;i++){
+      var u = d.users[i];
+      $("#left_users").append("<option value='"+u.id+"'>"+u.name+"</option>");
+    }
+  });
+}
+/**/
+function validate(form){
+  $("#right_users option").attr("selected","selected");
+}
+</script>

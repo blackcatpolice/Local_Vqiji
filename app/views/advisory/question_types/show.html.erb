@@ -1,0 +1,21 @@
+<div class="zx_hd"><a class="tit yjj" >问题大厅</a></div>
+<div class="zx_bd">
+	<div class="zx_tabs">
+		<% 
+			i = 0
+			@question_types.each do |type|
+				i+=1
+		%>
+		 <%= link_to type.name, "/advisory/#{type.id}", :class=>"xz#{i} #{type.id == @question_type.id ? 'on' : ''}"%>
+		<% end %>
+	</div>
+	<% unless @questions.empty?%>
+	<%= render :collection => @questions, :partial => 'advisory/tmpl/question', :locals => { :qtype => "advisory"} %>
+	<%else %>
+	<div>还没有问题！</div>
+	<% end %>
+</div>
+<div class="zx_db"></div>
+<% unless @questions.empty?%>
+<%= will_paginate @questions %>
+<% end %>

@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>登录</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="川航云平台" />
+
+  <link href="../assets/stylesheets/libs/bootstrap.css" media="screen" rel="stylesheet" type="text/css" />
+  <link href="../assets/stylesheets/devise.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+  <div class="devise">
+    <div class="navbar navbar-fixed-top">
+      <img alt="Logo" src="../assets/images/logo.png" />
+    </div>
+
+    <div class="main">
+      <div id="page-new-session">
+        <div class="signin">
+          <form accept-charset="UTF-8" action="#" class="form-horizontal form-signin" id="new_user" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="Iv/8uC0kCTu5Ri9qAXwVP8bG3M2qo3V5pOYO0RnCKeg=" /></div>
+            <div class="tips"></div>
+            
+            <div class="ipt">
+              <input autofocus="autofocus" id="user_login" name="user[login]" placeholder="邮箱，员工号" size="30" type="text" />
+            </div>
+            
+            <div class="ipt ipt1" style="margin-bottom:11px;">
+              <input id="user_password" name="user[password]" placeholder="密码" size="30" type="password" />
+            </div>
+            
+              <div class="ip">
+                <input name="user[remember_me]" type="hidden" value="0" /><input class="hide" id="cc" name="user[remember_me]" type="checkbox" value="1" />
+                <div class="ck" id="cc_proxy">&nbsp;</div>
+                <div class="ck_tip">下次自动登录</div>
+              </div>
+            <input class="btn btn-signin" name="commit" type="submit" value="" />
+            <a href="/sign_up" class="btn btn-signup"></a>
+          </form>    
+          <a href="/password/new">忘记密码？</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="fixed-bottom">
+        <div class="tie"></div>
+        <div class="clouds2"></div>
+        <div class="qiqiu"></div>
+      </div>
+      <div id="foot">
+        <div class="container">
+          <div class="row">
+            <a href="#">免责声明</a>&nbsp;｜&nbsp;
+            <a href="#">关于我们</a>&nbsp;｜&nbsp;
+            <a href="#">联系我们</a>&nbsp;｜&nbsp;
+            <a href="#">网站帮助</a><br />
+            <small>Copyright &copy;2002-2013 www.vqiji.com All Rights Reserved</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--div class="plane" style="background-position-x: -3024px;"></div-->
+  </div>
+</body>
+</html>
+

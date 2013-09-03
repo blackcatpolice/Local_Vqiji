@@ -1,0 +1,20 @@
+<div class="bk">
+<div class="bk_t mr_t4"></div>
+<div class="bk_c mr_c4">
+<div class="mr_rw">
+  <div class="mr_rwt"><%= link_to "+ 新建",new_todo_task_path(),:class=>"btn", 'data-skip-pjax' => 'true'%></div>
+  <% @tasks.each do |task|%>
+  <div class="mr_rwk">
+    <div class="rwk_1"><%= task.value %><span>%</span></div>
+    <div class="rwk_2">
+      <div class="rwk_2t"><%= link_to truncate_u(task.title, 12),todo_task_path(task), :title=>"#{task.title}", :'data-skip-pjax' => true %></div>
+      <div class="rwk_2d">
+      	<%= task.timeout_format%>
+        <span class="rwk_0<%= task.level%>" ></span></div>
+    </div>
+  </div>
+  <% end %>
+</div>
+</div>
+<div class="bk_t mr_t4 mr_d4"></div>
+</div>

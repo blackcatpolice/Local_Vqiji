@@ -1,0 +1,20 @@
+<% content_for :title do %>未通过审核建议<%end%>
+<div class="sz_nav f12"><b>我未通过审核的建议&nbsp;</b></div>
+<%= render '/proposal/rc/editor'%>
+<div class="list_t f16"><a class="now" href="javascript:;">未通过审核建议</a></div>
+<div class="list">
+    <% unless @suggests.empty? %>
+    <%= render :collection => @suggests, :partial => 'proposal/rc/suggest' %>
+    <% else %>
+    <div>空的～！</div>
+    <% end %>
+</div>
+
+<% unless @suggests.empty? %>
+<div class="fy"><%= will_paginate @suggests %></div>
+<% end %>
+
+<script>
+	$("#proposal_editor").suggestEditor();
+	$("div[data-type=Suggest]").suggest();
+</script>

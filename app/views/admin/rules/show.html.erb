@@ -1,0 +1,17 @@
+<% content_for :title do%>专题详细<%end%>
+<div>
+	标题：
+	<%= @rule.title %>
+</div>
+
+<div>
+	详情：
+	<%= @rule.detail.html_safe %>
+</div>
+
+<div>
+	专题显示时间
+	<%= @rule.begin_date %> --
+	<%= @rule.end_date %>
+</div>
+

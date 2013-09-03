@@ -1,0 +1,20 @@
+<!--   一周热门咨询   -->
+<% _question_types = QuestionType.enables.asc(:priority) %>
+<div class="ys_rm">
+	<div class="ys_rm_lb">
+		<% _question_types.each do |t| %>
+		<% _popular_questions = t.week_popular %>
+		<% unless _popular_questions.blank?%>
+		<div class="ys_fbk"><%= link_to t.name, "/advisory/#{t.id}" %></div>
+		<ul>
+			<% _popular_questions.each do |q|%>
+			<li>
+				<%= link_to truncate_u(q.title, 8), advisory_question_path(q) %><span style="color: #b7aaa1;">浏览数(<span style="color: #dc5f5e; float: none;"><%= q.clicks%></span>)</span>
+			</li>
+			<% end %>
+		</ul>
+		<% end %>
+		<% end %>
+	</div>
+	<div class="ys_rm_d"></div>
+</div>

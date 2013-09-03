@@ -1,0 +1,19 @@
+<div class="modal" style="width:530px;" data-receiver-id="<%= @receiver.to_param %>">
+  <div class="modal-header">
+    <a class="close" data-dismiss="modal"></a>
+    <div class="model_tabs">发私信</div>
+  </div>
+  <div class="modal-body">
+    <p style="padding-left:15px; margin:0px;">发送给：<%= @receiver.name %></p>
+    <div class="modal_form" data-role="editor">
+      <div class="w_lyk dhk1">
+        <span class="remain_counter right f12" style="margin-top: -20px; height:20px;"></span>
+        <div class="ly_time" data-type="audio-button"><a href="javascript:void(0);">30'</a></div>
+        <div class="ly_txt"><textarea class="texter"></textarea></div>
+      </div>
+      <div class="toolbar w_xz" style="display: block; padding-left:60px; width:411px;">
+        <a href="javascript:void(0);" class="submiter btn bn btn-danger">发  送</a>
+      </div>
+    </div>
+  </div>
+</div>

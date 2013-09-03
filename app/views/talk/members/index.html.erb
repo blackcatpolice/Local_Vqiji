@@ -1,0 +1,53 @@
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="tab">
+      <a class="btn bn btn-warning left" href="<%= talk_session_path(@session) %>">返回会话</a>
+      <a class="btn bn btn-danger right" href="javascript:void(0);" data-action="talk-session-add-members">添加联系人</a>
+    </div>
+    
+    <div class="members-list">
+      <%= render partial: 'talk/members/member', collection: @members %>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+
+  <div class="bk_t bk_d"></div>
+</div>
+
+<%= render 'talk/sessions/dialog.add-members' %>
+
+<script type="text/javascript">
+  var _session_add_member_form = null;
+
+  $("[data-action=talk-session-add-members]").click(function() {
+    if (_session_add_member_form) {
+      _session_add_member_form.talkSessionAddMembersDialog("open");
+      return false;
+    }
+    
+    _session_add_member_form = $("div[data-type=TalkSessionAddMembersDialog]");
+    _session_add_member_form.talkSessionAddMembersDialog({
+      submit: function(e) {
+        _session_add_member_form.talkSessionAddMembersDialog("close");
+        $.alert("添加联系人成功！", function() {
+          $.pjax.reload("[data-pjax-container]");
+        }, 1);
+      }
+    });
+  });
+
+  $("[data-type=TalkMember]").on("click", "[data-action=remove-talk-member]", function(e) {
+    var widget = $(e.delegateTarget);
+    $.confirm("确认将 TA 移除会话吗？", function(sure) {
+      if (sure) {
+        Talk.api.removeSessionMember("<%= @session.to_param %>", widget.attr("data-id"), {
+          success: function() {
+            widget.remove();
+          },
+          error: App.error.handleXHRError
+        });
+      }
+    });
+  });
+</script>

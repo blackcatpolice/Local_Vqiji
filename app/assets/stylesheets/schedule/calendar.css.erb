@@ -1,0 +1,34 @@
+/*
+ * require common
+ *= require libs/datetimepicker
+ */
+
+.schedule-calendar .head { margin-left: -1px; }
+.schedule-calendar .head .switch { width: 198px !important; }
+
+.schedule-calendar .mr_rl {margin-left:7px; width:253px; height:auto; text-align:center;}
+.schedule-calendar .mr_rl span { width:32px; height:30px; float:left; display:block;}
+.schedule-calendar .mr_rl li { width:36px; height:30px; color:#c8c8c8; line-height:30px; float:left;}
+.schedule-calendar .mr_rlk {  height:187px; border-top:1px solid #f5efe7; border-left:1px solid #f5efe7;}
+.schedule-calendar .mr_rlk li { width:35px; height:30px; position:relative; color:#545454; line-height:30px; font-weight:bold; float:left; border-bottom:1px solid #f5efe7; border-right:1px solid #f5efe7;}
+.schedule-calendar .mr_rlk li.gray { color:#c8c8c8;}
+.schedule-calendar .mr_rlk li.on { background-image:url(<%= asset_path 'images/icon.png' %>); background-position:-123px -538px; background-repeat:no-repeat;}
+.schedule-calendar .mr_rlk li:hover { background-image:url(<%= asset_path 'images/icon.png' %>); background-position:-123px -538px; background-repeat:no-repeat; cursor:pointer;}
+.schedule-calendar .mr_rlk li.data { background-image:url(<%= asset_path 'images/icon.png' %>); background-position:-123px -538px; background-repeat:no-repeat;}
+.schedule-calendar .mr_rlk li span { display:block; height:4px; width:4px; }
+.schedule-calendar .mr_rlk li span.user { background-color: #f89406; position:absolute; right:2px; bottom:2px;}
+.schedule-calendar .mr_rlk li span.sys { background-color: #da4f49; position:absolute; right:8px; bottom:2px;}
+.schedule-calendar .mr_rt { width:253px; margin-left:7px; padding-top:15px; border-bottom:1px solid #f4cfce; height:35px; line-height:35px; margin-bottom:1px;}
+.schedule-calendar .mr_rt .title { float: left; }
+.schedule-calendar .mr_rt .new-btn { width:62px; height:24px; margin-top:5px; line-height:23px; float:right; padding:0px; border:none; text-shadow:none; }
+.schedule-calendar .mr_rrz { padding-top:10px; width:253px; margin-left:7px; height:auto; border-top:1px solid #f4cfce;}
+.schedule-calendar .mr_rrz li { width:236px; padding-left:17px; height:auto; float:left; margin-bottom:5px; background-image:url(<%= asset_path 'images/mr_dot.png' %>); background-position:5px -68px; background-repeat:no-repeat;color:#c0b5ad;}
+.schedule-calendar .mr_rrz li[is-sys=true] { background-position:5px 6px; }
+.schedule-calendar .mr_rrz li .detail { width:236px; height: auto; }
+.schedule-calendar .mr_rrz li:hover .detail { color:#dc5f5e; }
+.schedule-calendar .mr_rrz li:hover a[data-action=delete-schedule-todo] { display: inline; float: right; }
+.schedule-calendar .mr_rrz li .at { width:auto; height:18px; display:block; float: left; font-size:11px;}
+
+.schedule-calendar-modal { width:450px; }
+.schedule-calendar-modal .at-picker .todo-at { width: 180px; }
+.schedule-calendar-modal .modal-footer { width:380px; }

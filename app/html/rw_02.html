@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>新建任务</title>
+<link href="../assets/stylesheets/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
+<link href="../assets/stylesheets/common.css" media="screen" rel="stylesheet" type="text/css">
+<script src="js/jquery.js"></script>
+<script src="../assets/javascripts/libs/bootstrap.js"></script>
+<script>
+   $(function() {
+	   $('.rw_xz a').click(function(){
+			$(this).parent().removeClass('rw_xz1').removeClass('rw_xz2').addClass($(this).attr('data-class'));
+		});
+    });
+
+</script>
+</head>
+
+<body>
+<div class="navbar navbar-fixed-top" id="topnav">
+  <div class="navbar-inner">
+    <a class="brand" href="/"><img alt="Logo" src="../assets/images/logo.png"></a>
+    <ul class="nav nav1">
+    	<li><a href="/" >首页</a><span class="divider">|</span></li>
+    	<li><a href="#" >弹性福利</a><span class="divider">|</span></li>
+    	<li><a href="#" >专题</a><span class="divider">|</span></li>
+    	<li><a href="/">管理员</a></li>
+    </ul>
+    <div class="nav_s ip"><form action="" method="get"><input placeholder="找人" class="search-query" name="" type="text" /><input name="" type="image" src="../assets/images/top_ser_bt.png" /></form></div>
+    <ul class="nav nav2">
+      <li><a href="/" >设置</a><span class="divider">|</span></li>
+      <li><a href="/" >退出</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="container main">
+  <div class="nav_l left">
+    <div class="bk_t"></div>
+    <div class="bk_c">
+      <div class="nav_lb">工作分享</div>
+      <div class="nav_lb"><i class="nav_icon"></i><a href="index.html">工作大厅</a></div>
+      <div class="nav_lb"><i class="nav_icon"></i><a href="gz_04.html">我的工作组</a></div>
+      <div class="nav_lb nav_bm">
+        <ul id="collapseOne" style="height:70px;">
+          <li><a href="gz_01.html">人力资源部</a></li>
+          <li><a href="gz_01.html">客舱服务部</a></li>
+          <li><a href="#">客舱服务部</a></li>
+          <li><a href="#">客舱服务部</a></li>
+        </ul>
+        <ul>
+          <li><a data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">展开</a></li>
+        </ul>
+      </div>
+      <div class="nav_lb"><i class="nav_icon"></i><a href="weibo_05.html">@提到我的</a></div>
+      <div class="nav_lb"><i class="nav_icon"></i><a href="weibo-03.html">评论</a></div>
+      <div class="nav_lb"><i class="nav_icon"></i><a href="#">私信</a></div>
+      <div class="nav_lb"><i class="nav_icon"></i><a href="weibo-04.html">收藏</a></div>
+      <div class="nav_lb">专属咨询</div>
+      <div class="nav_lb"><i class="nav_icon"></i><a href="#">提问大厅</a></div>
+      <div class="nav_lb"><i class="nav_icon"></i><a href="#">我的问题</a></div>
+      <div class="nav_lb">考试培训</div>
+      <div class="nav_lb"><i class="nav_icon"></i><a href="#">我的培训</a></div>
+      <div class="nav_lb">我的网盘</div>
+      <div class="nav_lb">文档中心</div>
+    </div>
+    <div class="bk_t bk_d"></div>
+  </div>
+  <div class="main_ct left">
+      <div class="bk">
+      	<div class="bk_t"></div>
+      	<div class="bk_c">
+      	  <div class="rw_xjt f18">新建任务<a href=""></a></div>
+      	  <div class="rw_xj">
+            <form>
+      	    <div class="rw_xjk" style="margin-bottom:10px;">上级任务：任务名字任务名字</div>
+      	    <div class="rw_xjk">
+                <label>任务名称：</label>
+                <input type="text" placeholder="请输入任务名称">
+                <span class="help-block"></span>
+            </div>
+      	    <div class="rw_xjk">
+                <label>任务描述：</label>
+                <textarea name="" cols="" rows="8"></textarea>
+            </div>
+            <div class="dhk_gn f12 toolbar">
+              <a class="tp tool" href="javascript:void(0);"></a><a class="fj tool on" href="javascript:void(0);"></a>
+            </div>
+      	    <div class="rw_xjk1">
+                <label>负责人：</label>
+                <input type="text">
+            </div>
+      	    <div class="rw_xjk1">
+                <label>优先级：</label>
+                <div class="rw_xz"><a href="javascript:void(0)" data-class=""></a><a href="javascript:void(0)" data-class="rw_xz1"></a><a href="javascript:void(0)" data-class="rw_xz2"></a></div>
+            </div>
+      	    <div class="rw_xjk1">
+                <label>开始时间：</label>
+                <div class="input-append">
+                <input readonly="readonly" class="span2" id="appendedPrependedInput" size="16" type="text"><button class="btn rw_sj" type="button"></button>
+              </div>
+            </div>
+      	    <div class="rw_xjk1">
+                <label>结束时间：</label>
+                <div class="input-append">
+                <input readonly="readonly" class="span2" id="appendedPrependedInput" size="16" type="text"><button class="btn rw_sj" type="button"></button>
+              </div>
+            </div>
+            <div class="rw_tj"><a href="rw_01.html"></a></div>
+            </form>
+			<div class="clearfix"></div>
+          </div>
+      	</div>
+      	<div class="bk_t bk_d"></div>
+      </div>
+  </div>
+  <div class="main_rt left">
+    <div class="mr_row">
+
+      <div class="bk">
+        <div class="bk_t mr_t4"></div>
+        <div class="bk_c mr_c4">
+            <div class="mr_rw">
+              <div class="mr_rwt"><a href="rw_02.html" class="btn">+ 新建</a></div>
+              <div class="mr_rwk danger">
+                <div class="rwk_1">95<span>%</span></div>
+                <div class="rwk_2">
+                  <div class="rwk_2t">对该项目所有界面进行改版！</div>
+                  <div class="rwk_2d">还有一天到期<span class="rwk_01"></span></div>
+                </div>
+              </div>
+              <div class="mr_rwk">
+                <div class="rwk_1">95<span>%</span></div>
+                <div class="rwk_2">
+                  <div class="rwk_2t">对该项目所有界面进行改版！</div>
+                  <div class="rwk_2d">还有一天到期<span class="rwk_02"></span></div>
+                </div>
+              </div>
+              <div class="mr_rwk">
+                <div class="rwk_1">95<span>%</span></div>
+                <div class="rwk_2">
+                  <div class="rwk_2t">对该项目所有界面进行改版！</div>
+                  <div class="rwk_2d">还有一天到期<span class="rwk_03"></span></div>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="bk_t mr_t4 mr_d4"></div>
+      </div>
+      
+
+    </div>
+  </div>
+  
+</div>
+<div class="foot"><a href="#">免责声明</a>　｜　<a href="#">关于我们</a>　｜　<a href="#">联系我们</a>　｜　<a href="#">网站帮助</a><br /><small>copyright &copy;2002-2013 www.vqiji.com All Rights Reserved</small></div>
+</body>
+</html>
