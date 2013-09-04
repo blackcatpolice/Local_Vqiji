@@ -8,20 +8,18 @@
     options: {
       tweetId:null,
       replayFunc: null,
-      replayModal: false
+      modalReplay: false,
+      delete_: {
+        confirm: "您确认删除这条评论吗？",
+        apiFunc: WEIBO.api.deleteComment
+      }
     },
       
     _create: function() {
       this._super();
-      
-      $.extend(true, this.options, {
-        delete_: {
-          confirm: "您确认删除这条评论吗？",
-          apiFunc: WEIBO.api.deleteComment
-        }
+      this._on({
+        "click [data-action=replay]" : this._replay
       });
-      
-      this.element.find('[data-action=replay]').click($.proxy(this._replay, this));
     },
     
     _senderName: function() {
@@ -40,7 +38,7 @@
       var tweetId = this._tweetId();
 
       /**/
-      if(this.options.replayModal){
+      if(this.options.modalReplay){
         var _replayModal = $.weibo.commentReplayModal.create({
           commentId: _messageId,
           tweetId: tweetId,
@@ -52,10 +50,10 @@
       if ($.isFunction(this.options.replayFunc)) {
         this.options.replayFunc.call(this, _messageId, _senderName);
       } else {
-          this._trigger("replay", null, {
-            commentId: _messageId,
-            senderName: _senderName
-          });
+        this._trigger("replay", null, {
+          commentId: _messageId,
+          senderName: _senderName
+        });
       }
     }
   });

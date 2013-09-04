@@ -45,7 +45,8 @@ module Weibo
       'notification/observers/advisory_question_observer', 'notification/observers/advisory_answer_observer',
       'notification/observers/elearn_training_observer', 'notification/observers/elearn_training_user_observer',
       'notification/observers/gfeed_observer', 'notification/observers/group_member_observer',
-      'notification/observers/todo_task_observer', 'notification/observers/talk_session_observer'
+      'notification/observers/todo_task_observer', 'notification/observers/talk_session_observer',
+      'notification/observers/meeting_member_observer'
     ]
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.

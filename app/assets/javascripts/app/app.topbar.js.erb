@@ -1,15 +1,11 @@
 // require _base
 
-
-// 顶部工具插件
 (function($) {
   $.widget("app.topbar", {
     _create: function() {
-      this._initSearchField();// 找人
-      this._initNotifacationsBoard();// 通知中心
+      this._initSearchField();
+      this._initNotifacationsBoard();
       this._on("[data-action=sign_out]", { click: this.signOut });
-      // jquery widget 插件机制的_on用法，给特殊的jquery元素绑定事件及处理
-      // 在这里，相当于给元素data-action属性为sign_out的元素绑定单击事件，事件处理方法signOUt
     },
     
     _destroy: function() {
@@ -19,14 +15,12 @@
     // 找人
     _initSearchField: function() {
       this.element.find(".search-query")
-        .typeahead({ // bootstrap自动完成插件
-          source: function(query, process) { // 数据源，query是查询的关键字，process是callback
+        .typeahead({
+          source: function(query, process) {
             if (this._initSearchField_queryXHR) {
               this._initSearchField_queryXHR.abort();
             }
-            //  App.api.searchUserByName是在app/app.api.js中定义的方法，这里会返回ajax请求对象
             this._initSearchField_queryXHR = App.api.searchUserByName(query, {
-            //  将success与complete的callback合并到查询的ajax请求对象中去，相当于在这里定义了这两个回调
               success: function(users) {
                 process.call(this, $.map(users, function(user, _) {
                   return user.name;
@@ -41,13 +35,12 @@
             return true;
           },
           items: 5
-        }).placeholder(); // 显示提示字符“找人”
+        }).placeholder();
     },
     
     // 通知中心
     _initNotifacationsBoard: function() {
       if (! this._notificationsBoard) {
-          //创建通知面板，就在该文件下面部分定义
          this._notificationsBoard = new NotificationBoard(this.element.find("[data-action=toggle_notifications_board]"));
       }
     },
@@ -61,7 +54,7 @@
 
     // 退出
     signOut: function(e) {
-      e.preventDefault(); // 阻止事件发生默认行为
+      e.preventDefault();
       $.confirm("确认退出？", function(ensure) {
         if (!ensure) { return };
           window.location = "/sign_out.html";
@@ -70,21 +63,17 @@
     }
   });
 
-
-  //  通知面板
   function NotificationBoard(trigger) {
-    //  将面板本身的事件触发器设置为 jquery(window)的触发器设置
     this.$trigger = $(trigger);
     this.init();
   }
 
-  //  扩展NotificationBoard
   $.extend(NotificationBoard.prototype, {
     init: function() {
       this.$trigger.popover(this._getPopoverOptions());
       this.$badge = $("<span class=\"badge\">0</span>").prependTo(this.$trigger);
-      this.$trigger //  注册鼠标出入事件，mouseenter是事件名，.nb是事件的namespace
-        .on("mouseenter.nb", $.proxy(this._onMouseEnter, this)) //jquery的proxy方法是将当前对象的注入到指定方法的this上下文
+      this.$trigger
+        .on("mouseenter.nb", $.proxy(this._onMouseEnter, this))
         .on("mouseleave.nb", $.proxy(this._onMouseLeave, this));
 
       this._$updateBadge = $.proxy(this.updateBadge, this);
@@ -157,6 +146,7 @@
     updateContent: function() {
       if (! this.$content) return;
       var self = this;
+      // console.log(this.$content);
       self.$content.spin("small");
 
       $.ajax("/notifications/nb.html", {
@@ -197,7 +187,6 @@
       
       var self = this;
       
-      //  类似上面的查找用户，notificationsCount同样定义在app/app.api.js中
       this._updateBadgeXHR = App.api.notificationsCount({
         success: function(count) {
           self.setBadgeCount(count);

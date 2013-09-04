@@ -1,0 +1,22 @@
+<% provide :title, '编辑 | %s' % @meeting.subject %>
+
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="gz_t f18"><span><%= @meeting.subject %></span>
+      <div class="right ran f12"><%= link_to "返回小组首页",meeting_meeting_path(@meeting) %></div>
+    </div>
+    <!-- <div class="gz_jj gz_ad f13 red_dc5">工作组签名：亲们，加油哟！<a href="#">编辑</a></div> -->
+    <div class="tab">
+      <%= link_to "基本信息",edit_meeting_meeting_path(@meeting),:class=>"qb on"%>
+      <%= link_to "成员管理",list_meeting_meeting_members_path(@meeting),:class=>"unstyled" %>
+      <%= link_to "添加成员",new_meeting_meeting_member_path(@meeting)%>
+    </div>
+    <div class="gz_tab">
+        <%= render "form" %>
+    </div>
+
+    <div class="clearfix"></div>
+  </div>
+    <div class="bk_t bk_d"></div>
+</div>

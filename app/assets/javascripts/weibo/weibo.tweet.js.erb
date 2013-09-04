@@ -12,105 +12,43 @@
   $.widget("weibo.tweet", $.rtext.rtextMessage, {
     options: {
       tweet: null,
-      commentType: "list" // "list" or "pop"
-    },
-    
-    _create: function(options) {
-      this._super();
-      
-      $.extend(true, this.options, {
-        delete_: {
-          confirm: "您确认删除这条微博吗？",
-          apiFunc: WEIBO.deleteTweet
-        }
-      });
-      
-      var context = this;
-      this._hello = "hello";
-      /* render reftweet */
-      this._reftweet = this.element.find("[data-role=reftweet]").tweet();
-      /* render _counter */
-      this._counter = this.element.find("[data-role=counter]");
-      
-      /*评论*/
-      this._counter.find("[data-action=comment]").click(function() {
-         if ((context.options.commentType || "list") == "list") {
-           context._toggleCommentsList(); /*列表评论*/ 
-         } else {
-           /*弹出评论*/
-           context._popCommenter(); 
-         }
-      });
-      
-      /*转发*/
-      this._counter.find("[data-action=repost]").click($.proxy(this._repost, this));
-      /*收藏*/
-      this._counter.find("[data-action=favorite]").click($.proxy(this._favorite, this));
-    },
-    //_create end
-    
-    _openAttviewer: function(attviewer) {
-      if (this._attviewer) {
-        this._attviewer.attviewer("close");
-        this._attviewer = null;
+      delete_: {
+        confirm: "您确认删除这条微博吗？",
+        apiFunc: WEIBO.deleteTweet
       }
-      this._picture.hide();
-      attviewer.attviewer("open");
-      this._attviewer = attviewer;
+    },
+    
+    _create: function() {
+      this._super();
+      this._reftweet = this.element.find("[data-role=reftweet]").tweet();
+      this._counter  = this.element.find("[data-role=counter]");
+
+      this._on(this._counter, {
+        "click [data-action=comment]" : this._toggleCommentsList,
+        "click [data-action=repost]" : this._repost,
+        "click [data-action=favorite]" : this._favorite
+      });
     },
 
-    istop:function(){
+    istop:function() {
       return (this.element.attr("data-is-top") == "true");
     },
-    
-    _tweet: function() {
-      if (!this.options.tweet) {
-        var context = this;
-        // 获取微博详细
-        WEIBO.detailTweet(this._messageId(), {
-          async: false,
-          success: function(tweet) {
-            context.options.tweet = tweet;
-          },
-          error: WEIBO.ui.errorHandler
-        });
-      }
-      return this.options.tweet;
-    }, // _tweet
-    
-    /**/
-    _repost1: function() {
-      var _popReposter = $("<div />").popReposter(
-          {
-            tweet_id: this._messageId(),
-            autoOpen: true,
-            success: function() {
-              _popReposter.popReposter("close");
-              WEIBO.ui.alert("转发微博成功！");
-            },
-            close: function() { // 关闭后清理
-              _popReposter.popReposter("destroy").remove();
-            }
-          }
-        );
-    }, // _repost
 
     /*转发*/
     _repost: function() {
       var _popReposter = $('<div  />').repostModal(
-          {
-            tweet_id: this._messageId(),
-            autoOpen: true,
-            success: function() {
-              _popReposter.repostModal("close");
-              WEIBO.ui.alert("转发微博成功！");
-            },
-            close: function() { // 关闭后清理
-              _popReposter.repostModal("destroy").remove();
-            }
+        {
+          tweet_id: this._messageId(),
+          autoOpen: true,
+          success: function() {
+            _popReposter.repostModal("close");
+            WEIBO.ui.alert("转发微博成功！");
+          },
+          close: function() { // 关闭后清理
+            _popReposter.repostModal("destroy").remove();
           }
-        );
-
+        }
+      );
     }, // _repost
     
     // 展开/收起评论列表
@@ -147,25 +85,6 @@
        }
     }, // _toggleCommentsList
     
-    _popCommenter: function() {
-       var context = this,
-         _popCommenter = $("<div />");
-       
-       _popCommenter.popCommenter({
-         tweetId: context._messageId(),
-         success: function() {
-           _popCommenter.popCommenter("close");
-           WEIBO.ui.alert("评论微博成功！");
-         },
-         close: function() {
-           _popCommenter
-             .popCommenter("destroy")
-             .remove();
-         }
-       });
-       
-    }, // _popCommenter
-    
     /* 收藏/取消收藏 */
     _favorite : function() {
       var context = this,
@@ -179,7 +98,7 @@
            error : WEIBO.ui.errorHandler
          });
        } else {
-         WEIBO.deleteFavorite(context._messageId(), {
+         WEIBO.unfavorite(context._messageId(), {
            success : function() {
             $("a[data-action=favorite]",context.element).text("收藏");
              context.element.attr("data-favorite", "false");

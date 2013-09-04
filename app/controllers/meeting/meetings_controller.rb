@@ -4,6 +4,7 @@
 class Meeting::MeetingsController < WeiboController
 
   def index
+    @meetings = Meeting::Meeting.all.paginate :page => params[:page], :per_page => 10
   end
 
   def list
@@ -54,7 +55,7 @@ class Meeting::MeetingsController < WeiboController
   end
 
   def edit
-    @group = Group.find(params[:id])
+    @meeting = Meeting::Meeting.find(params[:id])
   end
 
   def update

@@ -19,17 +19,11 @@
       inputMention: true
     },
 
-    _getCreateOptions: function() {
-      return {
-        submit: $.proxy(this._submit, this)
-      };
-    },
-
     /* 设置被回复的评论Id,txt */
     replay: function(commentId, senderName) {
       this.options.recommentId = commentId;
       this._texter.focus();
-      this.text("回复" + senderName + ":");
+      this.text("回复 " + senderName + ":");
       return this;
     },
     

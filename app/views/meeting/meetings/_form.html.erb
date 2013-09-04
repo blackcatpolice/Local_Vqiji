@@ -1,52 +1,101 @@
-<%= form_for(@meeting,:html => { :id => "meeting_form", :class => "form-horizontal" }) do |f| %>
-  <div id="error_message_box"></div>
-  <fieldset>
-    <div class="control-group">
-      <label class="control-label" for="meeting_meeting_subject"><span class="red_a_dc5">*</span>会议主题</label>
-      <div class="controls">
-        <%= f.text_field :subject, :class=>"input-xlarge", :placeholder => "名称长度不超过20字" %>
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="meeting_meeting_summary">会议摘要</label>
-      <div class="controls">
-        <%= f.text_area :summary, :class=>"input-xlarge",:size => "30x3", :placeholder => "公告长度不超过50字" %>
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="group_summary">小组简介</label>
-      <div class="controls">
-        <%= f.text_area :summary, :class=>"input-xlarge",:size => "30x3", :placeholder => "简介长度不超过50字" %>
-      </div>
-    </div>
-  </fieldset>
-  <p style="width:425px; text-align:right;">
-    <input class="btn" name="" type="submit" value="保存" />
-  </p>
+<% if false %>
+<div id="error_message_box">
+  <% if @service.msgs[:sup]%>
+  <div class="alert alert-error">
+    <div style="padding: 7px 0;" class="f12"><%= @service.msgs[:sup] %></div>
+  </div>
+  <% end %>
+  <% if @service.msgs[:date]%>
+  <div class="alert alert-error">
+    <div style="padding: 7px 0;" class="f12"><%= @service.msgs[:date] %></div>
+  </div>
+  <% end %>
+  <% if @service.msgs[:executor]%>
+  <div class="alert alert-error">
+    <div style="padding: 7px 0;" class="f12"><%= @service.msgs[:executor] %></div>
+  </div>
+  <% end %>
+</div>
 <% end %>
 
-<script>
-  $(function(){
-    $("#group_form").validate({
-      rules: {
-        'group[name]': {
-          required: true,
-            maxlength: 20
-        },
-        'group[notice]': {
-            maxlength: 50
-        },
-        'group[summary]': {
-            maxlength: 50
-        }
+<%= form_for([@meeting]) do |f| %>
+
+<div class="rw_xjk">
+    <label for="todo_task_title">会议主题:</label>
+    <%= f.text_field :subject, :placeholder => "请输入任务名称" %>
+  <span class="help-block"></span>
+</div>
+
+<div class="rw_xjk">
+    <label for="todo_task_details">会议摘要:</label>
+  <%= f.text_area :summary, :rows => 8, :class=>"texter", :required=>"required", :placeholder=>"请输入会议摘要" %>
+</div>
+
+<div class="dhk_gn f12 toolbar">
+</div>
+
+
+
+<div class="rw_xjk1">
+  <label for="todo_task_start_date">开始时间：</label>
+  <div class="input-append date form_datetime">
+    <%= f.text_field :start_date, :required=>"required", :readonly=>"", :class=>"span2", :value=>"#{l(@meeting.start_date, :format => :en_long) if @meeting.start_date}", :style=>"cursor: pointer;" %>
+    <span class="add-on"><i class="icon-calendar"></i></span>
+  </div>
+</div>
+
+<div class="rw_xjk1">
+  <label for="todo_task_end_date">结束时间：</label>
+  <div class="input-append date form_datetime">
+    <%= f.text_field :end_date, :required=>"required", :readonly=>"", :class=>"span2", :value=>"#{l(@meeting.end_date, :format => :en_long) if @meeting.end_date}", :style=>"cursor: pointer;" %>
+    <span class="add-on"><i class="icon-calendar"></i></span>
+  </div>
+</div>
+
+<div class="rw_tj"><a href="javascript:;" class="submiter"></a></div>
+<%end%>
+
+
+<script type="text/javascript">
+$(function(){
+  
+  $(".form_datetime").datetimepicker({
+        format: "yyyy-mm-dd hh:ii",
+        autoclose: true,
+        pickerPosition: "bottom-left"
+    });
+  
+  $('[data-type=todo-task-level] a').click(function(){
+    $('#todo_task_level').val($(this).attr('data-value'));
+    $(this).parent().removeClass('rw_xz1').removeClass('rw_xz2').addClass($(this).attr('data-class'));
+  });
+  
+  $('#todo_task_executor_name').typeahead({
+    source: function(query, process){
+      return $.get('/todo/tasks/executors', {name: query}, function(data){
+        return process(data);
+      });
+    },
+    matcher: function (param) {
+      return true;
+    }
+  });
+  $("#new_todo_task, #edit_todo_task_<%= @meeting.id%>").validate({
+    rules: {
+      'todo_task[title]': {
+        required: true,
+          maxlength: 25
+      }
+    },
+    messages: {
+      'todo_task[title]': {
+        required: '请输入任务标题.',
+        maxlength: '任务标题长度不超过25字.'
       },
-      messages: {
-      'group[name]': {
-        required: '请输入小组名.',
-        maxlength: '小组名长度不超过20字.'
-      },
-      'group[notice]': '公告长度不超过50字.',
-      'group[summary]': '简介长度不超过50字.'
+      'todo_task[details]': '请输入任务描述.',
+      'todo_task[executor_name]': '请输入任务负责人.',
+      'todo_task[start_date]': '请选择任务开始日期.',
+      'todo_task[end_date]': '请选择任务结束日期.'
     },
     onkeyup: false,
     onfocusout: false,
@@ -63,5 +112,5 @@
         }
     }
     });
-  });
+});
 </script>

@@ -8,11 +8,7 @@
       senderName: null,
 		  autoOpen: true
 	  },
-	
-	  _create: function(){
-      this._replaySuccess_proxy = $.proxy(this._replaySuccess, this);
-	  },
-	
+
 	  _init: function() {
 	    if(!this._modal) {
 	      this._initModal();
@@ -27,8 +23,6 @@
       if (this._modal) {
         this._off(this._modal, "hide");
         this._modal.remove();
-        this._modal = null;
-        this._editor = null;
       }
     },
 	

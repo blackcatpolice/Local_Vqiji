@@ -32,11 +32,12 @@
     (function($) {
         function toggleCCChecked(e) {
           var cc = $("#cc");
-          cc.attr("checked", !cc.attr("checked"));
+          cc.prop("checked", !cc.prop("checked"));
           $("#cc_proxy").toggleClass("checked");
         }
 
         $(document).ready(function() {
+          $(":input").placeholder();
           $('#cc_proxy').click(toggleCCChecked);
         });
     })(jQuery);

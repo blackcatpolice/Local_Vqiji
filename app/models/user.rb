@@ -266,4 +266,12 @@ class User
       user.name name
     end
   end
+
+  #============Zhou zhongwen============
+  
+  # === 会议 ===
+
+  has_many :meeting_members, class_name: 'GroupMember', inverse_of: :user, dependent: :destroy
+
+
 end

@@ -21,7 +21,8 @@ class Tweet::CommentsController < WeiboController
 
   def list
     @tweet = Tweet.find(params[:tweet_id])
-    @comments = @tweet.comments.includes(:sender).paginate(:page => params[:page], :per_page => 10)
+    @comments = @tweet.comments.includes(:sender)
+      .paginate(:page => params[:page], :per_page => 10)
     render :layout => nil
   end
   
@@ -49,11 +50,6 @@ class Tweet::CommentsController < WeiboController
     end
   end
 
-  #
-  def replay
-    
-  end
-  
   # 新建评论
   def new
     @tweet = Tweet.find(params[:tweet_id])
@@ -86,5 +82,4 @@ class Tweet::CommentsController < WeiboController
       format.json { render :json => @comment.as_json }
     end
   end
-
 end

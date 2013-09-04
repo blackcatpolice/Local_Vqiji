@@ -12,7 +12,7 @@
     options: {
       tweet: null,
       placeHolder: "请输入转发理由",
-      tmp: null,
+      _tmpl: null,
       allowBlank: true,
       textMaxLength: <%= Tweet::TEXT_MAXLEN %>,
       tools: ["emotion"],
@@ -40,7 +40,7 @@
       }
       
       WEIBO.repost(this.options.tweet.id, text, {
-      	tmpl: context.options.tmpl,
+      	_tmpl: context.options._tmpl,
         success: function(tweet) {
           context.reset();
           done();

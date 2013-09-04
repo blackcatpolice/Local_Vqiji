@@ -14,15 +14,17 @@ class Admin::ExpertsController < Admin::BaseController
     @user = User.new params[:user], :as => :admin
     @user.is_expert = true
     @user.checked = true
-    @expert = Expert.new params[:expert]
-    @expert.user_id = @user.id
-    @question_types = QuestionType.where(:status => 1).all
-    user_valid_tag = @user.valid?
-    expert_valid_tag = @expert.valid?
-    if user_valid_tag && expert_valid_tag && @user.save && @expert.save
-      redirect_to :action => 'index'
+    if @user.save
+      @expert = Expert.new params[:expert]
+      @expert.user = @user
+      @question_types = QuestionType.where(:status => 1).all
+      if @expert.save
+        redirect_to :action => 'index'
+      else
+        @user.destroy
+        render :action => 'new'
+      end
     else
-      @user.destroy 
       render :action => 'new'
     end
   end

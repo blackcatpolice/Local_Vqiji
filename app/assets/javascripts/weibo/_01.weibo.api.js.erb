@@ -29,13 +29,19 @@
         {
           type: "POST",
           dataType: "html",
-          data: { text: text }
+          data: {
+            text: text
+          }
         }
       );
-      if(_args["tmpl"]){
-      	_args["data"].tmpl = _args["tmpl"]; 
+      if(options._tmpl){
+        $.extend(true, _args, {
+          data: {
+            _tmpl: options._tmpl
+          }
+        });
+        console.log( _args )
       }
-      
       return API._request("/tweets/" + tweet_id + "/reposts.html", _args, context.repost);
     };
     
@@ -160,7 +166,7 @@
     };
     
     // 取消收藏
-    this.deleteFavorite = function(tweet_id, options) {
+    this.unfavorite = function(tweet_id, options) {
       var _args = options || {};
       _args["type"] = "DELETE";
       _args["dataType"] = "json";

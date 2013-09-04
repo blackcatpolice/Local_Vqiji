@@ -1,6 +1,5 @@
 //= require ./jquery/_base
-//= require ./spin
-//= require ./jquery.spin
+//= require ./jquery/jquery.tmpl
 //= require ./bootstrap
 //= require_self
 

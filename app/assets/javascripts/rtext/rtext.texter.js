@@ -17,7 +17,9 @@
       // 为了使ie在失去焦点后仍然保持selection状态，
       // 在input失活前(before deactivate)保存selection
       if ($.msie()) {
-        this.element.bind("beforedeactivate", $.proxy(this._saveSelection, this));
+        this._on({
+          "beforedeactivate" : this._saveSelection
+        });
       }
     },
     // 恢复 selection

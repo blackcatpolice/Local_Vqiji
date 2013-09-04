@@ -10,7 +10,6 @@
     
     // 根据名字查找用户
     this.searchUserByName = function(query, options) {
-    //  jquery的extend，true表示深克隆，把后面几个参数都合并到第一关参数中去
       var _args = $.extend(true, {}, _defaultOptions, options, {
         method: "GET",
         data: {

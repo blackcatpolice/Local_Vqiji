@@ -22,9 +22,11 @@
         	<span class="left"><%= l @tweet.created_at, format: :short %></span>
         	<span class="right">
         	  <% if @tweet.repostable? %>
-        		  <%= link_to "转发(#{@tweet.reposts_count})", tweet_reposts_path(@tweet)%> |
+        		  <%= link_to "转发(#{@tweet.reposts_count})", tweet_reposts_path(@tweet)%>
+        		  <span class="divider">|</span>
         		<% end %>
-        		<%= link_to "评论(#{@tweet.comments_count})", "javascript:void(0);"%> |
+        		<%= link_to "评论(#{@tweet.comments_count})", "javascript:void(0);"%>
+        		<span class="divider">|</span>
             <a href="javascript:void(0);" data-action="favorite"><%= fav ? "取消收藏" : "收藏"%></a>
       		</span>
         </div>

@@ -1,0 +1,25 @@
+<%
+  in_group = false
+  is_admin = current_user.id == meeting.creator.id
+%>
+<div class="gzz_list_k gzz_list_k1">
+  <div class="gzz_t">
+    <%= meeting.subject %>
+    <%= link_to '',edit_meeting_meeting_path(meeting), :class=>"gl",:title=>"管理会议" if is_admin %>
+    <p>
+      开始:<%= meeting.start_date.strftime('%Y-%m-%d %H:%M:%S') %><br/>
+      结束:<%= meeting.end_date.strftime('%Y-%m-%d %H:%M:%S') %>
+    </p>
+  </div>
+
+  <div class="gzz_t1">
+    <%= user_tag meeting.creator %>
+  </div>
+  <div class="gzz_t2" title="<%= meeting.summary%>">简介：<%= truncate(meeting.summary,:length => 18) %></div>
+
+  <div class="gzz_t2 gzz_t3">
+    确定参加会议成员数：<%= link_to meeting.members.participated.size, list_meeting_meeting_members_path(meeting, :status => Meeting::MeetingMember::PARTICIPATE) %> <br/>
+    确定缺席会议成员数：<%= link_to meeting.members.absenced.size, list_meeting_meeting_members_path(meeting, :status => Meeting::MeetingMember::ABSENCE) %> <br/>
+    待确定参加会议成员数：<%= link_to meeting.members.pending.size, list_meeting_meeting_members_path(meeting, :status => Meeting::MeetingMember::PENDING) %> <br/>    
+  </div>
+</div>

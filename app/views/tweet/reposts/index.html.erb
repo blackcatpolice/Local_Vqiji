@@ -20,8 +20,10 @@
      	<div class="lb_if f12 red_a_dc5" data-role="counter">
       	<span class="left"><%= l @tweet.created_at, format: :short %></span>
       	<span class="right">
-      		<%= link_to "转发(#{@tweet.reposts_count})", "javascript:void(0);"%> |
-      		<%= link_to "评论(#{@tweet.comments_count})", tweet_comments_path(@tweet)%> |
+      		<%= link_to "转发(#{@tweet.reposts_count})", "javascript:void(0);"%>
+      		<span class="divider">|</span>
+      		<%= link_to "评论(#{@tweet.comments_count})", tweet_comments_path(@tweet)%>
+      		<span class="divider">|</span>
           <a href="javascript:void(0);" data-action="favorite"><%= fav ? "取消收藏" : "收藏"%></a>
     		</span>
   		</div>
@@ -76,7 +78,7 @@
 	      id: "<%= @tweet.id %>"
 	    },
       preset: "<%= raw repost_preset(@tweet).gsub('"', '\"') %>",
-	    tmpl:"tweet/reposts/tweet",
+	    _tmpl:"tweet/reposts/tweet",
 	    allowBlank: false,
 	    success: function(e, tweet) {
 	      var container = $("[data-type=RepostsList]");

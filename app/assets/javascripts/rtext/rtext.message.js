@@ -31,50 +31,40 @@
 (function($){
   $.widget("rtext.rtextMessage", {
     options: {
+      /* FIX IE: delete => delete_ */
+      delete_: {
+        animate: true,
+        confirm: "删除?",
+        apiFunc: function(id, opts) {
+          $.alert("删除未实现！", 2);
+        }
+      }
     },
     
     _create: function() {
-      $.extend(true, this.options, {
-        /* FIX IE: delete => delete_ */
-        delete_: {
-          animate: true,
-          confirm: "删除?",
-          apiFunc: function(id, opts) {
-            $.alert("删除未实现！", 2);
-          }
-        }
-      });
-
       this._tokens = this.element.find(".rtext").rtextTokens();
       this._attachments = this.element.find(" > [data-role=rtext-attachments]")
         .rtextAttachments({ message: this })
         .rtextAttachments("attachVideoUrls", this._tokens.rtextTokens("videoUrlTokens"));
-      
-      if (this.options.delete_ !== false) {
-        this.delete_.proxy = $.proxy(this.delete_, this);
-        this.element.find("[data-action=delete]").bind("click", this.delete_.proxy);
-      }
+
+      this._on(this.element.find("[data-action=delete]"), {
+        "click" : this.delete_
+      });
     },
     
     // 获取消息 ID
     _messageId: function() {
       return this.element.attr("data-id");
     },
-    
-    // ------ 删除 --------
-    
+
     // 删除 Widget
     remove: function() {
-      var _remove = $.proxy(function() {
-        this.element.remove();
-        this._trigger("removed");
-        this.destroy();
-      }, this);
-    
       if (this.options.delete_.animate) {
-        this.element.slideUp("fast", _remove);
+        this.element.slideUp("fast", $.proxy(function() {
+          this.element.remove();
+        }, this));
       } else {
-        _remove();
+        this.element.remove();
       }
       return this;
     },
@@ -102,19 +92,11 @@
       });
       return this
     },
-    
-    // ------ /删除 --------
 
     // 销毁 Widget
     _destroy: function() {
-      if (this.delete_.proxy) {
-        this.element.find("[data-action=delete]").unbind("click", this.delete_.proxy)
-        this.delete_.proxy = null;
-      }
-      
       if(this._attachments) {
         this._attachments.rtextAttachments("destroy");
-        this._attachments = null;
       }
     }
   });

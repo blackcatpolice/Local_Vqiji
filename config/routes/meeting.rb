@@ -1,6 +1,6 @@
 Weibo::Application.routes.draw do
   namespace :meeting do
-    resources :meetings, :only => [:index, :show, :new, :create] do 
+    resources :meetings do 
       collection do 
         # get :mine
         # get :myexecute
@@ -18,6 +18,14 @@ Weibo::Application.routes.draw do
         # get :subs
         # get :confirm
       end
+
+    resources :members ,:controller => "meeting_members" do
+      collection do
+        get  :search
+        get  :list
+        match :save
+      end
+    end
 
     end # /tasks
   end # / namespace todo

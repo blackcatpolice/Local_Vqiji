@@ -1,1 +1,80 @@
-Hi Tony!
+<% provide :title, '我的工作组' %>
+
+<div class="main_n">
+  <div class="bk">
+    <div class="bk_td f13">
+      <div class="gzz_jj">
+        <span>
+          我的工作组
+          <a class="right btn btn-danger bn" href="/meeting/meetings/new">新建会议</a>
+        </span>
+      </div>
+      <div class="gzz_tab">
+        <%= link_to "我的工作组",mine_groups_path(),:class=>"on"%>
+        <%= link_to "所有工作组",list_groups_path()%>
+        <div class="input-append"></div>
+      </div>
+    </div>
+    
+    <div class="bk_c">
+      <div class="gzz_list">
+        <% if @meetings.any? %>
+          <%= render :collection => @meetings, :as=>"meeting", :partial => '/meeting/meetings/item' %>
+          <div class="clearfix"></div>
+          <div class="lb text-center">
+            <%= will_paginate @meetings, inner_window: 1, outer_window: 0 %>
+          </div>
+        <% else %>
+          <div class="empty"><span>暂时没有任务哦～</span></div>
+        <% end %>
+  
+
+        <div class="clearfix"></div>
+      </div>
+
+    </div>
+
+    <div class="bk_t bk_d"></div>
+  </div>
+</div>
+
+<script>
+  $(function(){
+    <% if flash['notice'] %>
+      $.alert("<%= flash['notice']%>");
+    <% end %>
+  });
+</script>
+
+
+<% if false %>
+<% provide(:title, '所有任务') %>
+<div class="rw_zx">
+  <%= render :partial =>"todo/top_nav"%>
+</div>
+
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="gz_t f18"><span>任务中心</span></div>
+    <div class="tab">
+      <%= link_to "新建任务",new_meeting_meeting_path %>
+      <%= link_to "我的任务",mine_todo_tasks_path() %>
+      <%= link_to "所有任务",todo_tasks_path(),:class=>"qb on"  %>
+    </div>
+    <div class="gz_tab">
+      <% if @meetings.any? %>
+        <%= render :collection => @meetings, :as=>"meeting", :partial => '/meeting/meetings/item' %>
+        <div class="clearfix"></div>
+        <div class="lb text-center">
+          <%= will_paginate @meetings, inner_window: 1, outer_window: 0 %>
+        </div>
+      <% else %>
+        <div class="empty"><span>暂时没有任务哦～</span></div>
+      <% end %>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="bk_t bk_d"></div>
+</div>
+<% end %>

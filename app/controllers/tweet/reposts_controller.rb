@@ -43,7 +43,7 @@ class Tweet::RepostsController < WeiboController
     respond_to do |format|
       format.json { render :json => @repost_tweet.as_json }
       format.html {
-        render :partial => params[:tmpl] || 'tweets/tweet', :object => @repost_tweet
+        render :partial => (params[:_tmpl] || 'tweets/tweet'), :object => @repost_tweet
       }
     end
   end

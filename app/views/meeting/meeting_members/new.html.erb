@@ -1,0 +1,63 @@
+<% provide :title, "添加成员 | #{ @meeting.subject }" %>
+
+<div class="bk">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="gz_t f18"><span><%= @meeting.subject %></span>
+      <div class="right ran f12"><%= link_to "返回小组首页", meeting_meeting_path(@meeting) %></div>
+    </div>
+
+    <div class="tab">
+      <%= link_to "基本信息",edit_meeting_meeting_path(@meeting) %>
+      <%= link_to "成员管理",list_meeting_meeting_members_path(@meeting),:class=>"unstyled" %>
+      <%= link_to "添加成员",new_meeting_meeting_member_path(@meeting) ,:class=>"qb on"%>
+    </div>
+
+  <div class="gz_tab">
+    <%= form_for(@meeting,:url => save_meeting_meeting_members_path,
+      :html=>{:class=>"form-horizontal",:onsubmit=>"return validate(this)", :id => 'add_group_members_form'}) do |f|  %>
+      <div data-role="users[]" class="hide"></div>
+      
+      <fieldset data-role="members-selector">
+        <div class="control-group">
+          <div class="control-tr" data-role="query-by-department">
+            <label><input name="find-by" type="radio" value="department" checked="checked">按部门查找：</label>
+            <input type="text" placeholder="请输入部门名" autocomplete="off" />&nbsp;<a href="javascript:void(0)" class="btn">查找</a>
+          </div>
+          <div class="control-tr" data-role="query-by-user-name">
+            <label><input name="find-by" type="radio" value="user-name">按姓名查找：</label>
+            <input type="text" placeholder="请输入名字" disabled="disabled" />&nbsp;<a href="javascript:void(0)" class="btn" disabled="disabled">查找</a>
+          </div>
+          <div class="control-tr">
+            <div class="left">成员列表</div>
+            <div class="left" style="margin:0px;">已选成员</div>
+            <ul data-role="found"></ul>
+            <ul style="margin:0px;" data-role="selected"></ul>
+          </div>
+        </div>
+      </fieldset>
+
+      <p>
+        <input class="btn" name="" type="submit" value="保  存">
+      </p>
+    <% end %>
+  </div>
+
+  <div class="clearfix"></div>
+  </div>
+  <div class="bk_t bk_d"></div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("[data-role=members-selector]")
+      .userMembersSelector()
+      .userMembersSelector("presetSelected", <%= raw render :template => 'group_members/index', formats: :json %>);
+  });
+
+  function validate(form) {
+    var $select = $('[data-role="users[]"]', form).empty();
+    var ids = $("[data-role=members-selector]").userMembersSelector("selectedMemberIds");
+    $.tmpl("<input type=\"checkbox\" name=\"users[]\" value=\"${$item.data}\" checked=\"checked\" />", ids).appendTo($select);
+  }
+</script>

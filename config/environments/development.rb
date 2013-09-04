@@ -36,13 +36,4 @@ Weibo::Application.configure do
 #  config.after_initialize do |app|
 #    app.assets.logger = Logger.new('/dev/null')
 #  end
-
-# => use pry insead of irb
-  silence_warnings do
-      begin
-          require 'pry'
-          IRB = Pry
-      rescue LoadError
-      end
-  end
 end
