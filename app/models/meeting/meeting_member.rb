@@ -19,12 +19,13 @@ class Meeting::MeetingMember
   field :is_creator, :type => Boolean, :default => false # 是否为创建者
   field :participate_status, :type => Integer, :default => INVITING # 与会状态
   field :remark, :type => Integer # 备注
+  field :start_date, :type => Time # 开会时间
 
   belongs_to :user, :class_name => 'User', :inverse_of => :meeting_members  # 用户
   belongs_to :meeting, :class_name => 'Meeting::Meeting', :inverse_of => :members, :counter_cache => true  # 工作组
 
   
-  validates :user, presence: true, uniqueness: { scope: :group_id }
+  validates :user, presence: true
   validates :meeting, presence: true
   validates :participate_status, inclusion: { in: PARTICIPATE_STATUS.keys }
 
@@ -35,4 +36,11 @@ class Meeting::MeetingMember
   scope :attending_meeting, ->(status){
     where(:participate_status => status)
   }
+
+  before_create :set_start_date
+  before_update :set_start_date
+
+  def set_start_date
+    self.start_date = meeting.start_date
+  end
 end

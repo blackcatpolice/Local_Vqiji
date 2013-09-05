@@ -1,5 +1,6 @@
 <%
   in_group = false
+  meeting = meeting_member.meeting
   is_admin = current_user.id == meeting.creator.id
 %>
 <div class="gzz_list_k gzz_list_k1">
@@ -17,9 +18,40 @@
   </div>
   <div class="gzz_t2" title="<%= meeting.summary%>">简介：<%= truncate(meeting.summary,:length => 18) %></div>
 
-  <div class="gzz_t2 gzz_t3">
-    确定参加会议成员数：<%= link_to meeting.members.participated.size, list_meeting_meeting_members_path(meeting, :status => Meeting::MeetingMember::PARTICIPATE) %> <br/>
-    确定缺席会议成员数：<%= link_to meeting.members.absenced.size, list_meeting_meeting_members_path(meeting, :status => Meeting::MeetingMember::ABSENCE) %> <br/>
-    待确定参加会议成员数：<%= link_to meeting.members.pending.size, list_meeting_meeting_members_path(meeting, :status => Meeting::MeetingMember::PENDING) %> <br/>    
-  </div>
+  <% if meeting.creator == current_user %>
+    <div class="gzz_t2 gzz_t3">
+      <p>
+        <% meeting.members.participated.each_with_index do |member, index| %>
+          <%= "#{member.user.name};" %>
+          <%= "<br/>".html_safe if index % 6 ==0 %>
+        <% end %>
+      </p>
+      <p>
+        <% meeting.members.absenced.each_with_index do |member, index| %>
+          <%= "#{member.user.name};" %>
+          <%= "<br/>".html_safe if index % 6 ==0 %>
+        <% end %>
+      </p>
+      <p>
+        <% meeting.members.pending.each_with_index do |member, index| %>
+          <%= "#{member.user.name};" %>
+          <%= "<br/>".html_safe if index % 6 ==0 %>
+        <% end %>
+      </p>
+    </div>
+  <% else %>
+    <% if meeting_member.participate_status == Meeting::MeetingMember::INVITING %>
+      <div id="form_<%= meeting_member.id %>">
+        <%= form_tag(change_status_meeting_meeting_members_path(meeting_member), :method => :put, :remote => true) do |f| %>
+            <%= radio_button_tag :participate_status, Meeting::MeetingMember::PARTICIPATE, true %>参与会议
+
+            <%= radio_button_tag :participate_status, Meeting::MeetingMember::ABSENCE %>缺席会议
+
+            <%= radio_button_tag :participate_status, Meeting::MeetingMember::PENDING %>待定
+          <%= submit_tag %>
+        <% end %>
+    </div>
+    <% else %>
+    <% end %>
+  <% end %>
 </div>

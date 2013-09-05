@@ -18,6 +18,10 @@ class Meeting::Meeting
 
 	validates_presence_of :subject, :creator, :start_date
 
+  after_create do |meeting|
+    Meeting::MeetingMember.create!(:meeting => self, :user_id => self.creator_id, :is_creator => true)
+  end
+
 
   # 邀请参加会议
   def invite_users(user_ids)

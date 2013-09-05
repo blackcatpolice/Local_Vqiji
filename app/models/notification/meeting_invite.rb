@@ -11,7 +11,7 @@ class Notification::MeetingInvite < Notification::Base
   
   class << self
     def notify!(meeting_member)
-      create!(:user => meeting_member.user, :meeting => meeting_member.meeting).deliver
+      create!(:user => meeting_member.user, :meeting => meeting_member.meeting).deliver unless meeting_member.is_creator
     end
     
     def for(user, meeting)
@@ -19,8 +19,7 @@ class Notification::MeetingInvite < Notification::Base
     end
     
     def view_url(user = nil)
-      # url_helpers.
-      'http://www.baidu.com'
+      url_helpers.invited_meeting_meetings_path
     end
   end
 end

@@ -2,16 +2,9 @@ Weibo::Application.routes.draw do
   namespace :meeting do
     resources :meetings do 
       collection do 
-        # get :mine
-        # get :myexecute
-        # get :mycreate
-        # get :finished 
-        # get :bycreate
-        # get :byexecute
-        # get :executors
-        # post :treeview
-        # post :progress
-        # post :my_tasks
+        get :recently
+        get :launched
+        get :invited
       end
 
       member do 
@@ -19,10 +12,11 @@ Weibo::Application.routes.draw do
         # get :confirm
       end
 
-    resources :members ,:controller => "meeting_members" do
+    resources :members , :controller => "meeting_members", :only => [:index, :show, :edit] do
       collection do
-        get  :search
-        get  :list
+        get :search
+        get :list
+        put :change_status
         match :save
       end
     end

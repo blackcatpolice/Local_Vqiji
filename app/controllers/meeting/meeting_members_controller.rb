@@ -3,7 +3,7 @@
 #
 class Meeting::MeetingMembersController < WeiboController
 
-  before_filter :set_meeting
+  before_filter :set_meeting, :except => :change_status
   # before_filter :should_be_admin, :except => :index
   
   private
@@ -20,6 +20,16 @@ class Meeting::MeetingMembersController < WeiboController
   end
   
   public
+
+  def change_status
+    @meeting_member = Meeting::MeetingMember.find(params[:meeting_id])
+    @meeting_member.update_attribute(:participate_status, params[:participate_status])
+    respond_to do |format|
+      format.html
+      format.json
+      format.js
+    end
+  end
 
   def index
     @members = @group.members.includes(:user)

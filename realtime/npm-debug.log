@@ -1,0 +1,43 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'path/to/node-mongodb-native' ]
+2 info using npm@1.2.18
+3 info using node@v0.10.5
+4 verbose read json /home/tony/opensources/Local_Vqiji/realtime/package.json
+5 verbose from cache /home/tony/opensources/Local_Vqiji/realtime/package.json
+6 verbose readDependencies using package.json deps
+7 verbose cache add [ 'path/to/node-mongodb-native', null ]
+8 verbose cache add name=undefined spec="path/to/node-mongodb-native" args=["path/to/node-mongodb-native",null]
+9 verbose parsed url { protocol: null,
+9 verbose parsed url   slashes: null,
+9 verbose parsed url   auth: null,
+9 verbose parsed url   host: null,
+9 verbose parsed url   port: null,
+9 verbose parsed url   hostname: null,
+9 verbose parsed url   hash: null,
+9 verbose parsed url   search: null,
+9 verbose parsed url   query: null,
+9 verbose parsed url   pathname: 'path/to/node-mongodb-native',
+9 verbose parsed url   path: 'path/to/node-mongodb-native',
+9 verbose parsed url   href: 'path/to/node-mongodb-native' }
+10 silly lockFile 8b1aac59-path-to-node-mongodb-native path/to/node-mongodb-native
+11 verbose lock path/to/node-mongodb-native /home/tony/.npm/8b1aac59-path-to-node-mongodb-native.lock
+12 silly lockFile 8b1aac59-path-to-node-mongodb-native path/to/node-mongodb-native
+13 silly lockFile 8b1aac59-path-to-node-mongodb-native path/to/node-mongodb-native
+14 error addLocal Could not install path/to/node-mongodb-native
+15 error Error: ENOENT, stat 'path/to/node-mongodb-native'
+16 error If you need help, you may report this log at:
+16 error     <http://github.com/isaacs/npm/issues>
+16 error or email it to:
+16 error     <npm-@googlegroups.com>
+17 error System Linux 3.5.0-39-generic
+18 error command "/usr/local/bin/node" "/usr/local/bin/npm" "install" "path/to/node-mongodb-native"
+19 error cwd /home/tony/opensources/Local_Vqiji/realtime
+20 error node -v v0.10.5
+21 error npm -v 1.2.18
+22 error path path/to/node-mongodb-native
+23 error code ENOENT
+24 error errno 34
+25 verbose exit [ 34, true ]

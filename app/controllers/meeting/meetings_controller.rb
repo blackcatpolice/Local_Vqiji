@@ -3,6 +3,25 @@
 # 工作组
 class Meeting::MeetingsController < WeiboController
 
+  def recently
+    @nav_on_recently = "on"
+    @meeting_members = Meeting::MeetingMember.where(:user => current_user).includes(:meeting).order_by(:start_date.asc).paginate(:page => params[:page], :per_page => 10)
+    render :index
+  end
+
+  def launched
+    @nav_on_launched = "on"
+    @meeting_members = Meeting::MeetingMember.where(:user => current_user, :is_creator => true).includes(:meeting).order_by(:start_date.asc).paginate(:page => params[:page], :per_page => 10)
+    render :index
+  end
+
+  def invited
+    @nav_on_invited = "on"
+    @meeting_members = Meeting::MeetingMember.where(:user => current_user, :is_creator => false).includes(:meeting).order_by(:start_date.asc).paginate(:page => params[:page], :per_page => 10)
+    current_user.notification.reset!(Notification::MeetingInvite)
+    render :index
+  end
+
   def index
     @meetings = Meeting::Meeting.all.paginate :page => params[:page], :per_page => 10
   end
