@@ -22,6 +22,19 @@ class Meeting::MeetingsController < WeiboController
     render :index
   end
 
+  def todo_meeting
+    _date = Date.current
+    _tomorrow_date = _date + 1.day
+    _after_tomorrow_date = _tomorrow_date + 1.day
+    @todo_meeings = {:today => current_user.schedule.meetings
+      .in_range(_date.beginning_of_day, _date.end_of_day).collect {|m| m.meeting},
+                     :tomorrow => current_user.schedule.meetings
+      .in_range(_tomorrow_date.beginning_of_day, _tomorrow_date.end_of_day).collect {|m| m.meeting},
+                     :after_tomorrow => current_user.schedule.meetings
+      .in_range(_after_tomorrow_date.beginning_of_day, _after_tomorrow_date.end_of_day).collect {|m| m.meeting}}
+    render :json => @todo_meeings
+  end
+
   def index
     @meetings = Meeting::Meeting.all.paginate :page => params[:page], :per_page => 10
   end
@@ -43,7 +56,11 @@ class Meeting::MeetingsController < WeiboController
     @meeting.creator = current_user
     @meeting.save
     # redirect_to group_path(@group)
-    redirect_to :action => :index
+    # redirect_to :action => :index
+    # redirect_to meeting_meeting_members_path(@meeting)
+    respond_to do |format|
+      format.js
+    end
   end
 
   def show
@@ -75,12 +92,16 @@ class Meeting::MeetingsController < WeiboController
 
   def edit
     @meeting = Meeting::Meeting.find(params[:id])
+    render :new
   end
 
   def update
     @group = Group.find(params[:id]);
     @group.update_attributes(params[:group])
-    redirect_to group_path(@group)
+    # redirect_to group_path(@group)
+    respond_to do |format|
+      format.js
+    end
   end
 
   def mine

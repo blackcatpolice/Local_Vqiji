@@ -3,25 +3,62 @@
   <div class="bk_t mr_t4"></div>
   <div class="bk_c mr_c4">
     <div class="mr_rw">
-      <div class="mr_rwt" data-type="NewTask"><%= link_to "+ 新建",new_meeting_meeting_path, :class=>"btn", 'data-skip-pjax' => 'true'%></div>
+      <div class="mr_rwt" data-type="NewTask">
+        <%= link_to "+ 新建","javascript:;", :class=>"btn", 'data-skip-pjax' => 'true', :id => 'new_meeting_btn' %>
+        <a href="javascript:;" data-action="NewMeeting" title="上传文件"></a>
+      </div>
     </div>
   </div>
-  <div class="bk_t mr_t4 mr_d4"></div>
+  <div class="bk_t mr_t4 mr_d4">
+    <p id="today_meetings">
+      今日会议:<br/>
+    </p>
+    <p id="tomorrow_meetings">
+      明日会议:<br/>
+    </p>
+    <p id="after_tomorrow_meetings">
+      后天会议:<br/>
+    </p>
+  </div>
 </div>
 
 <script type="text/javascript">
-  WEIBO.todoMyTasks({
+  WEIBO.todoMyMeetings({
     success: function(data){
-      if(data.length == 0){
-        $('<div class="mr_rwk"><div class="f12" style="margin-top: 20px; text-align:center;" >还没有任务.</div></div>').insertAfter( $('[data-type="NewTask"]', '[data-type=TaskWidget]') );
-        return;
+      console.log(data);
+      var today_meetings = data.today;
+      var tomorrow_meetings = data.tomorrow;
+      var after_tomorrow_meetings = data.after_tomorrow;
+      for(var i=0; i < today_meetings.length; i++){
+        meeting = today_meetings[i]
+        $('#today_meetings').append(meeting.subject+';  '+meeting.start_date);
       }
-      var _tmpl = '<div class="mr_rwk {{if task_danger}} danger {{/if}}"><div class="rwk_1">${value}<span>%</span></div><div class="rwk_2"><div class="rwk_2t"><a href="/todo/tasks/${id}" title="${title}" data-skip-pjax >${$.truncate(title, 24)}</a></div><div class="rwk_2d"><span class="left">${timeout_format}</span><span class="rwk_0${level}"></span></div></div></div>';
-      $.template( "taskTemplate", _tmpl );
-      var _templates = $.tmpl("taskTemplate", data);
-    _templates.insertAfter( $('[data-type="NewTask"]', '[data-type=TaskWidget]') );
+      for(var i=0; i < tomorrow_meetings.length; i++){
+        meeting = today_meetings[i]
+        $('#tomorrow_meetings').append(meeting.subject+';  '+meeting.start_date);
+      }
+      for(var i=0; i < after_tomorrow_meetings.length; i++){
+        meeting = today_meetings[i]
+        $('#after_tomorrow_meetings').append(meeting.subject+';  '+meeting.start_date);
+      }
     },
     error: WEIBO.ui.errorHandler
   });
+
+
+  $('#new_meeting_btn').click(function(){
+      var meetingNewTmpl = _meetingNewTmpl();
+      $(meetingNewTmpl).modal({
+        backdrop: 'static'
+        // remote: "/network_disks/w_swfupload.html"
+      }).on('hidden', function(){
+        $(this).remove();
+      });
+  });
+
+  function _meetingNewTmpl(){
+    return "<%=j render('meeting/meetings/demo').html_safe %>";
+  }
+
 </script>
 <% end %>

@@ -397,13 +397,22 @@
       return API._request("/todo/tasks/my_tasks.json", _args, context.todoMyTasks);
     }
 
-	  this.attachmentDisks = function(options){
-	    var _args = options || {};
+    this.attachmentDisks = function(options){
+      var _args = options || {};
         _args["type"] = "POST";
         _args["dataType"] = "json";
         _args["cache"] = false; 
         return API._request("/attachments/disks.json", _args, context.attachmentDisks);
-	  }
+    }
+
+    // ======Meeting Widget=======
+    this.todoMyMeetings = function(options){
+      var _args = options || {};
+      _args["type"] = "POST";
+      _args["dataType"] = "json";
+      _args["cache"] = false; 
+      return API._request("/meeting/meetings/todo_meeting.json", _args, context.todoMyMeetings);
+    }
   };
   
   $.extend(true, WEIBO, WEIBO.api);

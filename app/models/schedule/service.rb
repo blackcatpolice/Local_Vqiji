@@ -8,6 +8,10 @@ class Schedule::Service
   def todos
     @user.schedule_todos
   end
+
+  def meetings
+    @user.schedule_meetings
+  end
   
   # Mongoid 3.0 使用 map-reduce 重构
   #map = %Q{

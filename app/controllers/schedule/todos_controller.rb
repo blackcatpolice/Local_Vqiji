@@ -11,6 +11,9 @@ class Schedule::TodosController < Schedule::BaseController
     _date = Date.parse(params[:date])
     @todos = current_user.schedule.todos
       .in_range(_date.beginning_of_day, _date.end_of_day)
+
+    @meetings = current_user.schedule.meetings
+      .in_range(_date.beginning_of_day, _date.end_of_day)
     render :layout => false
   end
   

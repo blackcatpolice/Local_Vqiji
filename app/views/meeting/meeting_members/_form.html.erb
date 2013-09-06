@@ -4,12 +4,12 @@
   <div class="bk_t"></div>
   <div class="bk_c">
     <div class="gz_t f18"><span><%= @meeting.subject %></span>
-      <div class="right ran f12"><%= link_to "返回小组首页", meeting_meeting_path(@meeting) %></div>
+      <div class="right ran f12"><%= link_to "返回小组首页", 'www.baidu.com' %></div>
     </div>
 
 
   <div class="gz_tab">
-    <%= form_for(@meeting,:url => save_meeting_meeting_members_path,
+    <%= form_for(@meeting,:url => save_meeting_meeting_members_path(@meeting.id),
       :html=>{:class=>"form-horizontal",:onsubmit=>"return validate(this)", :id => 'add_group_members_form'}) do |f|  %>
       <div data-role="users[]" class="hide"></div>
       

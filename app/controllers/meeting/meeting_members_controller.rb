@@ -32,18 +32,11 @@ class Meeting::MeetingMembersController < WeiboController
   end
 
   def index
-    @members = @group.members.includes(:user)
-    @member = @members.where(:user_id=>current_user.id).first
-    if @member
-      @members = @members.desc([:is_admin, :created_at])
-        .paginate :page => params[:page], :per_page => 10
-      respond_to do |format|
-        format.html
-        format.json
-      end
-    else
-      redirect_to mine_groups_path
-    end
+    @members = @meeting.members.attending_meeting(params[:status]).includes(:user)
+      .desc([:is_admin, :created_at])
+      .paginate :page => params[:page], :per_page => 10
+    @members = @meeting.members
+    render :new
   end
 
   def list

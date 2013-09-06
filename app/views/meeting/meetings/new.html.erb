@@ -1,14 +1,50 @@
 <% provide(:title, '新建会议') %>
-<div class="bk">
-  <div class="bk_t"></div>
-  <div class="bk_c">
-    <div class="rw_xjt f18">新建会议<a href="javascript:window.history.back();"></a></div>
-    <div class="rw_xj" id="todo_task_editor">
-      <%= render "form" %>
-      <div class="clearfix"></div>
+
+<link href="/assets/swiper/idangerous.swiper.css?body=1" media="screen" rel="stylesheet" type="text/css">
+
+<script src="/assets/swiper/idangerous.swiper-2.1.min.js?body=1" type="text/javascript"></script>
+
+
+<div id="swiper-container" class="swiper-container">
+  <div id="back-swiper" class="swiper-wrapper">
+    <div class="swiper-slide">
+
+      <div class="bk">
+        <div class="bk_t"></div>
+        <div class="bk_c">
+          <div class="rw_xjt f18">新建会议<a href="javascript:window.history.back();"></a></div>
+          <div class="rw_xj" id="todo_task_editor">
+            <%= render "form" %>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+        <div class="bk_t bk_d"></div>
+      </div>
+    </div>
+
+    <div class="swiper-slide">
+      <div>
+        <% @meeting.members.each do |member| %>
+          <%= member.user.name %>
+        <% end %>
+      </div>
+
+      <div>
+        <%= render "meeting/meeting_members/form" %>
+      </div>
     </div>
   </div>
-  <div class="bk_t bk_d"></div>
+
 </div>
+
 <script>
+    var myBcSwiper = new Swiper('#swiper-container',{
+      loop:true,
+      grabCursor: false,
+      paginationClickable: false,
+      speed: 1500
+    });
+
+
+
 </script>

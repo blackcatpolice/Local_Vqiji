@@ -1,0 +1,6 @@
+(function(){
+  alert($('#add_group_members_form').attr('action'));
+  myBcSwiper.swipeNext();
+  $('#add_group_members_form').attr('action','<%= save_meeting_meeting_members_path(@meeting.id) %>');
+  alert($('#add_group_members_form').attr('action'));
+})();

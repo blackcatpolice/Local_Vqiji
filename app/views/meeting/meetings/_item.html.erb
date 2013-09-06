@@ -8,8 +8,9 @@
     <%= meeting.subject %>
     <%= link_to '',edit_meeting_meeting_path(meeting), :class=>"gl",:title=>"管理会议" if is_admin %>
     <p>
-      开始:<%= meeting.start_date.strftime('%Y-%m-%d %H:%M:%S') %><br/>
-      结束:<%= meeting.end_date.strftime('%Y-%m-%d %H:%M:%S') %>
+      <%= meeting.start_date.strftime('%Y-%m-%d') %><br/>
+      <%= meeting.start_date.strftime('%H:%M') %> --
+      <%= meeting.end_date.strftime('%H:%M') %>
     </p>
   </div>
 
@@ -20,19 +21,19 @@
 
   <% if meeting.creator == current_user %>
     <div class="gzz_t2 gzz_t3">
-      <p>
+      <p class="user_list_participated">
         <% meeting.members.participated.each_with_index do |member, index| %>
           <%= "#{member.user.name};" %>
           <%= "<br/>".html_safe if index % 6 ==0 %>
         <% end %>
       </p>
-      <p>
+      <p class="user_list_absenced">
         <% meeting.members.absenced.each_with_index do |member, index| %>
           <%= "#{member.user.name};" %>
           <%= "<br/>".html_safe if index % 6 ==0 %>
         <% end %>
       </p>
-      <p>
+      <p class="user_list_pending">
         <% meeting.members.pending.each_with_index do |member, index| %>
           <%= "#{member.user.name};" %>
           <%= "<br/>".html_safe if index % 6 ==0 %>

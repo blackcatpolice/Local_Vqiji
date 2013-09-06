@@ -18,17 +18,18 @@
 </div>
 <% end %>
 
-<%= form_for([@meeting]) do |f| %>
+<% @meeting ||= Meeting::Meeting.new %>
+<%= form_for([@meeting], :remote => true) do |f| %>
 
 <div class="rw_xjk">
     <label for="todo_task_title">会议主题:</label>
-    <%= f.text_field :subject, :placeholder => "请输入任务名称" %>
+    <%= f.text_field :subject, :placeholder => "请输入任务名称", :required=>"required" %>
   <span class="help-block"></span>
 </div>
 
 <div class="rw_xjk">
     <label for="todo_task_details">会议摘要:</label>
-  <%= f.text_area :summary, :rows => 8, :class=>"texter", :required=>"required", :placeholder=>"请输入会议摘要" %>
+  <%= f.text_area :summary, :rows => 8, :class=>"texter", :placeholder=>"请输入会议摘要" %>
 </div>
 
 <div class="dhk_gn f12 toolbar">
