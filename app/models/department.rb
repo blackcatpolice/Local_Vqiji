@@ -51,6 +51,10 @@ class Department
   def second_level?
     level == Department::SECOND_LEVEL
   end
+  
+  def members_with_subdepartments
+    User.where( :department_id.in => [ id, sub_ids ].flatten )
+  end
 
   def add_member(user)
     return if user.department == self

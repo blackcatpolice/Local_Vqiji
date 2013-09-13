@@ -6,7 +6,7 @@
           	<div class="ys_jj">
             	<div class="ys_tx">
             		<%= image_tag(@expert.user.avatar.url('v80x80'), :class => 'avatar_v80x80')%>
-            		<a class="btn <%= followship ? "" : "btn-warning"%>" href="javascript:;" data-action="expert-follow" data-value="<%= followship ? 1 : 0%>"><i class="<%= followship ? "icon-minus" : "icon-plus"%>"></i> <%= followship ? "取消关注" : "关注"%></a>
+            		<a class="btn <%= followship ? "" : "btn-warning"%>" href="javascript:void(0)" data-action="expert-follow" data-value="<%= followship ? 1 : 0%>"><i class="<%= followship ? "icon-minus" : "icon-plus"%>"></i> <%= followship ? "取消关注" : "关注"%></a>
             	</div>
 
             	<div class="ys_js">
@@ -16,7 +16,7 @@
             			<div style="margin-top:10px;">
             				<span data-type="less-description"><%= truncate(@expert.description, :length => 180, :omission => "...")%></span>
             				<span data-type="more-description" style="display: none;"><%= @expert.description %></span>
-            				<%= raw "&nbsp;&nbsp;<a href='javascript:;' data-action='description-action' class='f12' style='color:rgb(218, 79, 73);'>更多</a>" if (@expert.description && @expert.description.length > 180) %>
+            				<%= raw "&nbsp;&nbsp;<a href='javascript:void(0)' data-action='description-action' class='f12' style='color:rgb(218, 79, 73);'>更多</a>" if (@expert.description && @expert.description.length > 180) %>
             			</div>
             		</div>
             	</div>
@@ -50,14 +50,14 @@
           	</div>
           	<% end %>
           	<div class="ys_lyk">
-           		<div class="ly_time" data-type="audio-button"><a href="javascript:;"></a></div>
+           		<div class="ly_time" data-type="audio-button"><a href="javascript:void(0)"></a></div>
             	<div class="ly_txt"><textarea id="question_text" name="question[text]" placeholder="请输入问题内容" class="texter"></textarea></div>
           	</div>
           <!--成功上传语音-->
           	<div class="ys_xz toolbar">
           		<span><input name="question[incognito]" type="checkbox" value="0">公开问题</span>
           	</div>
-          	<div class="ys_tj"><a href="javascript:;" class="btn bn">取消</a><a href="javascript:;" class="btn bn btn-danger submiter" node-type="question-submit">提交问题</a></div>
+          	<div class="ys_tj"><a href="javascript:void(0)" class="btn bn">取消</a><a href="javascript:void(0)" class="btn bn btn-danger submiter" node-type="question-submit">提交问题</a></div>
         </div>
         <div class="bk_t bk_d"></div>
 	</div>

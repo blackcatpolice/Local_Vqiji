@@ -7,13 +7,13 @@
           '{{tmpl($value) "rtext." + $value.type}}' +
         '{{/each}}'+
         '{{if audio}}'+
-        	'<div class="audio" data-src="${audio.file_url}" data-duration="${duration}" >audio</div>'+
+        	'<div class="audio" data-src="${audio.url}" data-duration="${duration}" >audio</div>'+
 		'{{/if}}' +
 		'</div>' +	
 		'<div class="comm_list_xx f12">'+
 					'<span class="left"><abbr class="timeago" title="${created_at}">${created_at}</abbr></span>'+
 					'{{if commenter.id == $CURRENT_USER.id}}'+
-						'<span class="right"><a href="javascript:;" comment-id="${id}" data-action="del">删除</a></span>{{/if}}'+
+						'<span class="right"><a href="javascript:void(0)" comment-id="${id}" data-action="del">删除</a></span>{{/if}}'+
 								
 	      	'</div>';
 	      '</div>';
@@ -59,31 +59,29 @@
       		$.error("Parameter 'suggestId' required!");
     		}
  			self._comments(self._suggestId(),pageIndex, {
- 			success:function(comments) {
-        	if (comments.data.length != 0) {
-      		//	$(".lk", self.element).slideUp("fast",function(){
-      				$(".comm_list", self.element).remove();
-      		//	})
-	          $.each(comments.data, function(i, comment) {
-	            $(".s-comments",self.element).append(jQuery.tmpl("CommentsList", comment));
-	          });
-	          $(".timeago",self.element).timeago(); 
- 					//渲染录音　
-			  AudioPlayer.render($(".audio",$(".s-comments",self.element)));
+   			success:function(comments) {
+          	if (comments.data.length != 0) {
+        		//	$(".lk", self.element).slideUp("fast",function(){
+        				$(".comm_list", self.element).remove();
+        		//	})
+	            $.each(comments.data, function(i, comment) {
+	              $(".s-comments",self.element).append(jQuery.tmpl("CommentsList", comment));
+	            });
+	            $(".timeago",self.element).timeago(); 
+   					//渲染录音　
+			    AudioPlayer.render($(".audio",$(".s-comments",self.element)));
 				
-					self._delComment();
-					//加载分页
-					$(".pg-num", self.element).remove();
-					self._pageSelector(pageIndex, comments.ccounts);
-				} else {
-					$(".pg", self.element).remove();
-					$(".s-comments",self.element).append('<div class="blue_a_82" style="padding:10px;">赶紧发表你的评论吧~~</div>')
-				};
- 				$(".loading", self.element).hide();
- 			},
- 			error: function() {
- 				$.alert("发生未知错误！", 2);
- 			}	
+					  self._delComment();
+					  //加载分页
+					  $(".pg-num", self.element).remove();
+					  self._pageSelector(pageIndex, comments.ccounts);
+				  } else {
+					  $(".pg", self.element).remove();
+					  $(".s-comments",self.element).append('<div class="blue_a_82" style="padding:10px;">赶紧发表你的评论吧~~</div>')
+				  };
+   				$(".loading", self.element).hide();
+   			},
+   			error: App.error.XHRErrorHandler("加载评论失败！")
  			})
  		},
 
@@ -118,7 +116,7 @@
 			//	prePage = pageIndex==0 ? pageIndex+2 : pageIndex+1; 
 				//前一页
 				if(pageIndex > 1) {
-					$(".pg", that.element).append('<a href="javascript:;" page-num="'
+					$(".pg", that.element).append('<a href="javascript:void(0)" page-num="'
 															+(pageIndex-1)+'" class="pg-num">上一页</a>');
 					$(".pre-none", that.element).remove();									
 				} else if(pageIndex!=1){
@@ -127,7 +125,7 @@
 				
 //				if(pageIndex==0){
 //					$(".pg", that.element)
-//						.append('<a href="javascript:;" page-num="1" class="active first">1</a>');
+//						.append('<a href="javascript:void(0)" page-num="1" class="active first">1</a>');
 //				}
 				if(pnums >=1500){
 					perNum = pnums-5
@@ -135,24 +133,24 @@
 			    ipage = pageIndex==0 ? 1: pageIndex
 					//if(ipage !=1){
 						for(i=ipage;i<=cpage;i++) {
-							var p = '<a href="javascript:;" page-num="'+i+'"'+
+							var p = '<a href="javascript:void(0)" page-num="'+i+'"'+
 											' class="pg-num">'+i+'</a>';
 							$(".pg", that.element).append(p);
 						};
 					//}
 				if(((cpage+1)!=perNum)==true){
-				  var p = '<a href="javascript:;" class="pg-num">...</a>';
+				  var p = '<a href="javascript:void(0)" class="pg-num">...</a>';
 					$(".pg", that.element).append(p);
 				}
 					for(i=perNum;i<=pnums;i++) {
-						var p = '<a href="javascript:;" page-num="'+i+'"'+
+						var p = '<a href="javascript:void(0)" page-num="'+i+'"'+
 										' class="pg-num">'+i+'</a>';
 						$(".pg", that.element).append(p);
 					};
 					
 				} else {
 					for(i=1;i<=pnums;i++) {
-						var p = '<a href="javascript:;" page-num="'+i+'"'+
+						var p = '<a href="javascript:void(0)" page-num="'+i+'"'+
 										' class="pg-num">'+i+'</a>';
 						$(".pg", that.element).append(p);
 					};
@@ -162,7 +160,7 @@
 				//下一页
 				nextPage = pageIndex==0 ? pageIndex+2 : pageIndex+1; 
 				if(nextPage <= pnums) {
-					$(".pg", that.element).append('<a href="javascript:;" page-num="'+nextPage+'" class="pg-num">下一页</a>');
+					$(".pg", that.element).append('<a href="javascript:void(0)" page-num="'+nextPage+'" class="pg-num">下一页</a>');
 					$(".next-none", that.element).remove();
 				} else {
 					$(".pg", that.element).append('<a href="javascript:void(0);" class="next-none">下一页</a>');
@@ -281,7 +279,7 @@
 	          		self.reset();
 	          		self._trigger("success", null, {comment: comment});
 	        	},
-	        	error: WEIBO.ui.errorHandler,
+	        	error: App.error.XHRErrorHandler("提交建议失败！"),
 	       		complete: $.proxy(done, this)
 	      	});
       
@@ -308,7 +306,7 @@
           '<textarea class="texter" ></textarea>' +
         '</div>' +
         '<div class="gray_9b adv_say adv_say1 f12 toolbar">' +
-          '<a href="javascript:;" class="btn f14 submiter">评论</a>' +
+          '<a href="javascript:void(0)" class="btn f14 submiter">评论</a>' +
         '</div>' +
       '</div>';
       

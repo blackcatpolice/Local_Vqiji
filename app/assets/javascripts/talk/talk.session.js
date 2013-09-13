@@ -1,36 +1,26 @@
 (function($) {
   $.widget("talk.talkSession", {
-    options: {
-    },
-    
     _create: function() {
-      this.delete_.proxy = $.proxy(this.delete_, this);
-      this.element.on("click", "[data-action=delete]", this.delete_.proxy);
+      this._on({
+        "click [data-action=delete]": this.delete_
+      });
     },
-    
-    data_id: function() {
-      return this.element.attr("data-id");
-    },
-    
+
     delete_: function() {
-      var id = this.data_id(); if(!id) return;
-      var success = $.proxy(function() { this.element.remove(); }, this);
+      var id = this.element.attr("data-id");
       
-      WEIBO.ui.confirm("确认删除这条会话吗？", function(sure) {
+      var success = $.proxy(function() {
+        this.element.remove();
+      }, this);
+      
+      $.confirm("确认删除这条会话吗？", function(sure) {
         if(sure) {
           Talk.api.deleteSession(id, {
             success: success,
-            error: WEIBO.ui.errorHandler
+            error: App.error.XHRErrorHandler("删除会话失败！")
           });
         }
       });
-    },
-    
-    _destroy: function() {
-      if (this.delete_.proxy) {
-        this.element.off("click", "[data-action=delete]", this.delete_.proxy);
-      }
     }
   });
-  
 })(jQuery);

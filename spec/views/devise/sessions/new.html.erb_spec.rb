@@ -11,7 +11,7 @@ describe 'devise/sessions/new.html.erb' do
   }
 
   it 'should include form-signin' do
-    assert_select('form.form-signin') do
+    assert_select('form') do
       assert_select('input[name=?]', 'user[login]')
       assert_select('input[name=?]', 'user[password]')
       assert_select('input[name=?]', 'user[remember_me]')

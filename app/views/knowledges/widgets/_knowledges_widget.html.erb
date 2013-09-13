@@ -23,7 +23,7 @@
 			$.template( "knowledgeTemplate", _tmpl );
     		$.tmpl( "knowledgeTemplate", data ).appendTo( $('ul', '[node-type=KnowledgesWidget]') );
     	},
-    	error: WEIBO.ui.errorHandler
+    	error: App.error.XHRErrorHandler("初始化插件'知识库'失败！")
 	});
 })( jQuery );
 

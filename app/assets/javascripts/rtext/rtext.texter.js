@@ -21,6 +21,7 @@
           "beforedeactivate" : this._saveSelection
         });
       }
+      this._element = this.element[0];
     },
     // 恢复 selection
     _restoreSelection: function() {
@@ -36,7 +37,7 @@
     },
     
     caret: function() {
-      return this.element.caret();
+      return caret(this._element);
     },
     
     _init: function() {
@@ -84,7 +85,7 @@
      */
     select: function(start, end) {
       if (arguments.length == 1) end = start;
-      this.element.caret(start, end);
+      caret(this._element, start, end);
       // 重新保存 selection
       if ($.msie()) {
         this._saveSelection();
@@ -98,10 +99,10 @@
       if ($.msie() && (document.activeElement != this.element[0])) {
         this._restoreSelection();
       }
-      var range = this.element.caret();
+      var range = caret(this._element);
       this.element.val(range.replace(text));
       var endpos = range.start + text.length;
-      this.element.caret(endpos, endpos);
+      caret(this._element, endpos, endpos);
       if ($.msie()) {
         this._saveSelection();
       }
@@ -126,18 +127,9 @@
       return this.write(text);
     }
   });
-})(jQuery);
-
-/*
- *
- * Copyright (c) 2010 C. F., Wong (<a href="http://cloudgen.w0ng.hk">Cloudgen Examplet Store</a>)
- * Licensed under the MIT License:
- * http://www.opensource.org/licenses/mit-license.php
- *
- */
-(function($) {
-  $.fn.caret = function(options, opt2) {
-	  var start, end, t = this[0], browser = $.msie();
+  
+  function caret(t, options, opt2) {
+	  var start, end, browser = $.msie();
     if(typeof options === "object" && typeof options.start === "number" && typeof options.end === "number") {
 	    start = options.start;
 	    end = options.end;
@@ -159,22 +151,22 @@
     }
 	  if(typeof start != "undefined") {
 		  if(browser) {
-			  var selRange = this[0].createTextRange();
+			  var selRange = t.createTextRange();
 			  selRange.collapse(true);
 			  selRange.moveStart('character', start);
 			  selRange.moveEnd('character', end - start);
 			  selRange.select();
 		  } else {
-			  this[0].selectionStart = start;
-			  this[0].selectionEnd = end;
+			  t.selectionStart = start;
+			  t.selectionEnd = end;
 		  }
-		  this[0].focus();
+		  t.focus();
 		  return this;
 	  } else {
 		  // Modification as suggested by Андрей Юткин
       if(browser) {
 		    var selection=document.selection;
-        if (this[0].tagName.toLowerCase() != "textarea") {
+        if (t.tagName.toLowerCase() != "textarea") {
           var val = this.val(),
           range = selection.createRange().duplicate();
           range.moveEnd("character", val.length);
@@ -185,7 +177,7 @@
         } else {
           var range = selection.createRange(),
           stored_range = range.duplicate();
-          stored_range.moveToElementText(this[0]);
+          stored_range.moveToElementText(t);
           stored_range.setEndPoint('EndToEnd', range);
           var s = stored_range.text.length - range.text.length,
           e = s + range.text.length

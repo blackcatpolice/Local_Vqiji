@@ -1,34 +1,32 @@
 # encoding: utf-8
 
-class Emotion
-  @emotions = {}
-  module ClassMethods  
+class Emotion  
+  class << self
+    @@emotions = {}
+
     def set(emotion, url)
-      @emotions[emotion] = url
+      @@emotions[emotion] = url
     end
     
     def each(&block)
-      @emotions.each do |k, v|
+      @@emotions.each do |k, v|
         yield(k, v)
       end
     end
     
     def url(emotion)
-      @emotions[emotion]
+      @@emotions[emotion]
     end
 
     def exists?(emotion)
-      @emotions.has_key?(emotion)
+      @@emotions.has_key?(emotion)
     end
     
     def as_json(options)
-      @emotions.as_json(options)
+      @@emotions.as_json(options)
     end
   end
-  
-  self.extend ClassMethods
 end
-
 
 # loading emotions
 include Sprockets::Helpers::RailsHelper

@@ -31,6 +31,23 @@ module ApplicationHelper
     end
     return text
   end
+
+
+  def truncate_u_copy(text, length = 30, truncate_string = "...", keyword = nil)
+    l=0
+    char_array=text.unpack("U*")
+    char_array.each_with_index do |c,i|
+      l = l+ (c<127 ? 0.5 : 1)
+      if l>length
+        temp_result = char_array[0..i].pack("U*")+(i ? truncate_string : "")
+        temp_result.gsub!(keyword, "<strong>#{keyword}</strong") if keyword
+        return temp_result.html_safe
+        # return char_array[0..i].pack("U*")+(i ? truncate_string : "")
+      end
+    end
+    # return (text.gsub!(keyword, "<strong>#{keyword}</strong")).html_safe if keyword
+    return text
+  end
   
   
   def disk_file_icon(name, encrypt = false)

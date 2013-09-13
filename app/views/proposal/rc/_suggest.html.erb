@@ -10,7 +10,7 @@
 	</div>
 	<div class="list_nr">
 		<div class="nr_k">
-			<a href="javascript:;"><%= suggest.title%></a>
+			<a href="javascript:void(0)"><%= suggest.title%></a>
 			<br>
 			<div class="fw_show">
 				<%= truncate(suggest.content, :length => 80)%>
@@ -42,7 +42,7 @@
 		</div>
 		<div class="nr_k">
 			<% if suggest.check.to_i == 1%>
-			<a href="javascript:;" class="pl" data-action="comment"><%= suggest.comment_counts%></a>
+			<a href="javascript:void(0)" class="pl" data-action="comment"><%= suggest.comment_counts%></a>
 			<% end %>
 			<% if suggest.file %>
 			<a href="<%= suggest.file.file.url%>" target="_bank" class="fj"></a>

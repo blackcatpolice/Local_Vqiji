@@ -1,12 +1,12 @@
-<div class="wp_lb f13" id="fid_<%= file.id%>" data-id="<%= file.id%>" data-name="<%= file.name%>" node-type="File" data-encrypt="<%= file.encrypt || false%>">
+<div class="wp_lb f13" id="fid_<%= file.id%>" data-id="<%= file.id%>" data-name="<%= file.name%>" node-type="File" data-encrypt="<%= file.encrypt || false %>">
     <div class="w25"><input name="fid[]" data-name="fileId" type="checkbox" value="<%= file.id%>"></div>
     <div class="w60"><%= disk_file_icon file.name, file.encrypt || false%></div>
     <div class="w160">
-      <%= raw file.upload_type == Attachment::NetworkDisk::UPLOAD_TYPE_HISTORY ? "<span data-type='history'>[病历]</span>" : ""%><a href="javascript:;" data-name="fname" title="<%= file.name%>"><%= truncate_u file.name, 10 %></a><br>
-      <a href="/download/<%= file.id%>" data-skip-pjax target="_blank">下载</a>
-      <a href="javascript:;" data-action="file_share" data-id="<%= file.id%>">分享</a>
-      <a href="javascript:;" data-action="talk_message" data-id="<%= file.id%>">私信</a>
-      <a href="javascript:;" data-action="more" data-id="<%= file.id%>">更多</a>
+      <%= raw file.upload_type == Attachment::NetworkDisk::TYPE_HISTORY ? "<span data-type='history'>[病历]</span>" : ""%><a href="javascript:void(0)" data-name="fname" title="<%= file.name%>"><%= truncate_u file.name, 10 %></a><br>
+      <a href="<%= network_disk_download_path(file) %>" data-skip-pjax target="_blank">下载</a>
+      <a href="javascript:void(0)" data-action="file_share" data-id="<%= file.id%>">分享</a>
+      <a href="javascript:void(0)" data-action="talk_message" data-id="<%= file.id%>">私信</a>
+      <a href="javascript:void(0)" data-action="more" data-id="<%= file.id%>">更多</a>
   </div>
   <div class="w60"><%= number_to_human_size file.size%></div>
   <div class="w130"><%= l(file.created_at , format: :short) if file.created_at %></div>

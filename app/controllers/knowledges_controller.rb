@@ -5,72 +5,46 @@ class KnowledgesController < WeiboController
 
   #所有公开的文档
   def index
-    @knowledges = Knowledge.published.where(:public => true)
-    @knowledges = @knowledges.where('$or' => [ 
-      { title: /#{params[:keyword]}/i },
-      { pinyin_title: /#{params[:keyword]}/i }
-    ]) unless params[:keyword].blank?
-    @knowledges = @knowledges.where(:knowledge_type_id => params[:type]) unless params[:type].blank?
-    @knowledges = @knowledges.desc(:created_at).paginate :page => params[:page], :per_page => params[:size] || 10
-    @knowledge_types = KnowledgeType.all.asc(:priority)
-
-    respond_to do |format|
-      format.html 
-      format.json { 
-        knowledges = []
-        @knowledges.collect do |k|
-          knowledges << k.title
-        end
-        render :json => knowledges 
-      }
+    @query = Knowledge.search do
+      fulltext params[:keyword] do
+        highlight :title
+        highlight :text
+      end
+      with :knowledge_type_id, params[:type] if params[:type]
+      with :public, true
+      order_by :created_at, :desc
+      paginate :page => params[:page], :per_page => (params[:size] || 10)
     end
+    @knowledges = @query.results
+    @knowledge_types = KnowledgeType.all.asc(:priority)
   end
   
   ##小组文档
   def groups
     group_ids = Group.get_group_ids_by_user_id current_user.id #用户所在组id
-    @group = Group.where(_id: params[:group]).first unless params[:group].blank?
-    @knowledges = Knowledge.published.where(:public => false)
-    unless params[:group].blank?
-      @knowledges = @knowledges.where(group_id: group_ids.include?(params[:group]) ? params[:group] : nil)
-    else
-      @knowledges = @knowledges.in(group_id: group_ids) 
-      @knowledges = @knowledges.where('$or' => [ 
-        { title: /#{params[:keyword]}/i },
-        { pinyin_title: /#{params[:keyword]}/i }
-      ]) unless params[:keyword].blank?    
+    # @group = Group.where(_id: params[:group]).first unless params[:group].blank?
+
+    @query = Knowledge.search do
+      fulltext params[:keyword]
+      with :public, true
+      with :group_id, params[:group] if params[:group]
+      with :group_id, group_ids unless params[:group]
+      order_by :created_at, :desc
+      paginate :page => params[:page], :per_page => (params[:size] || 10)
     end
-    @knowledges = @knowledges.desc(:created_at).paginate :page => params[:page], :per_page => 10
-    respond_to do |format|
-      format.html
-      format.json { 
-        knowledges = []
-        @knowledges.collect do |k|
-          knowledges << k.title
-        end
-        render :json => knowledges 
-      }
-    end
+    @knowledges = @query.results
   end
   
   #我创建的文档
   def my
-    @knowledges = Knowledge.where(:creator_id => current_user.id)
-    @knowledges = @knowledges.where('$or' => [ 
-      { title: /#{params[:keyword]}/i },
-      { pinyin_title: /#{params[:keyword]}/i }
-    ]) unless params[:keyword].blank?
-    @knowledges = @knowledges.desc(:created_at).paginate :page => params[:page], :per_page => 10
-    respond_to do |format|
-      format.html 
-      format.json { 
-        knowledges = []
-        @knowledges.collect do |k|
-          knowledges << k.title
-        end
-        render :json => knowledges 
-      }
+    @query = Knowledge.search do
+      fulltext params[:keyword]
+      with :public, true
+      with :creator_id, current_user.id
+      order_by :created_at, :desc
+      paginate :page => params[:page], :per_page => (params[:size] || 10)
     end
+    @knowledges = @query.results
   end
 
   def show

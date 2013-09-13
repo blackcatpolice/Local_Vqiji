@@ -1,21 +1,15 @@
 <div class="zx_hd"><a class="tit yjj" >问题大厅</a></div>
 <div class="zx_bd">
 	<div class="zx_tabs">
-		<% 
-			i = 0
-			@question_types.each do |type|
-				i+=1
-		%>
-		 <%= link_to type.name, "/advisory/#{type.id}", :class=>"xz#{i} #{type.id == @question_type.id ? 'on' : ''}"%>
+		<% @question_types.each_with_index do |type, i| %>
+		  <%= link_to type.name, "/advisory/#{type.id}", :class=>"xz#{i + 1} #{ type == @question_type ? 'on' : '' }"%>
 		<% end %>
 	</div>
-	<% unless @questions.empty?%>
-	<%= render :collection => @questions, :partial => 'advisory/tmpl/question', :locals => { :qtype => "advisory"} %>
-	<%else %>
-	<div>还没有问题！</div>
+	<% if @questions.any? %>
+	  <%= render :collection => @questions, :partial => 'advisory/tmpl/question', :locals => { :qtype => 'advisory' } %>
+    <%= will_paginate @questions %>
+	<% else %>
+	  <div class="empty"><span>该分类还没有问题哦～</span></div>
 	<% end %>
 </div>
 <div class="zx_db"></div>
-<% unless @questions.empty?%>
-<%= will_paginate @questions %>
-<% end %>

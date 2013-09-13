@@ -10,7 +10,7 @@ class  ChecksController < ActionController::Base
 	def create
 		@check = Check.new(params[:check])
 		if @check.execute
-			redirect_to  new_user_registration_path(:cid=>@check.id.to_s)
+			redirect_to new_registration_path(:cid => @check.id)
 		else
 			render :action=>"new"
 		end

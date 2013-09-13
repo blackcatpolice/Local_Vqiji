@@ -21,7 +21,7 @@ class DepartmentsController < WeiboController
   
   def members
     @department = Department.find(params[:id])
-    @members = @department.members
+    @members = @department.members_with_subdepartments
     
     respond_to do |format|
       format.json

@@ -27,11 +27,9 @@ class Proposal::Suggest
 	
 	field :comment_counts, type: Integer, default: 0
 	
-	# 附件（文件）
-  embeds_one :file,class_name: 'Attachment::File',cascade_callbacks: true
-  #图片
+	# 附件
+  embeds_one :file,class_name: 'Attachment::File'
   embeds_one :picture,  class_name: 'Attachment::Picture'
-  #录音
   embeds_one :audio,  class_name: 'Attachment::Audio' 
   
   has_many :comments, class_name: "Proposal::Comment", dependent: :destroy  

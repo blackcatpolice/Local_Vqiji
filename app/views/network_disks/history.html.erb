@@ -19,7 +19,7 @@ var swfu = new SWFUpload({
   	post_params : {
     	"<%= key = Rails.application.config.session_options[:key] %>" : "<%= cookies[key] %>",
     	"<%= request_forgery_protection_token %>" : "<%= form_authenticity_token %>",
-    	"upload_type": "<%= Attachment::NetworkDisk::UPLOAD_TYPE_HISTORY %>"
+    	"upload_type": "<%= Attachment::NetworkDisk::TYPE_HISTORY %>"
   	},
 
   	button_image_url: "/assets/images/swfupload.png",

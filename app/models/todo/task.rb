@@ -7,6 +7,7 @@ class Todo::Task
 
   LS = { "0" => "普通", "1" => "重要", "2" => "紧急" }
   SS = { "1" => "进行到", "2" => "待确认", "3" => "已完成"}
+
   SCHEDULE_ING = 1      #任务 进行中
   SCHEDULE_CONFIRM = 2  #任务 待确认
   SCHEDULE_COMPLETED = 3 #任务 已完成
@@ -30,8 +31,8 @@ class Todo::Task
   
   field :time_out, :type => Boolean, :default => false
 
-  embeds_one :file, class_name: 'Attachment::File', cascade_callbacks: true  #文件
-  embeds_one :picture,  class_name: 'Attachment::Picture'  #图片
+  embeds_one :file, class_name: 'Attachment::File' #文件
+  embeds_one :picture, class_name: 'Attachment::Picture' #图片
   
   # relations
   belongs_to :creator, :class_name => 'User', inverse_of: :created_todo_tasks # 任务创建人
@@ -125,25 +126,27 @@ class Todo::Task
       return (minutes > 0 ? "已经超时#{minutes.to_i}分钟" : "还有#{minutes.abs.to_i}分钟到期")
     end
   end
-  
-  def set_file file_id
-    return  if file_id.blank?
-    _file = Attachment::Base.get(file_id)
-    return  if _file.blank?
-    _file.target = self
-    _file.save
+
+  def set_file(_file)
+    unless _file.is_a?(Attachment::File)
+      open(_file.path) do |file|
+        _file = Attachment::File.create!({
+          :file => file,
+          :uploader => _file.uploader,
+          :name => _file.name
+        })
+      end
+    else
+      _file.update_attributes(:target => self)
+    end
     self.file = _file
   end
 
-  def set_picture picture_id
-    return if picture_id.blank?
-     _picture = Attachment::Picture.get(picture_id)
-     return if _picture.blank?
-     _picture.target = self
-     _picture.save
-     self.picture = _picture
+  def set_picture(_picture)
+    _picture.update_attributes(:target => self)
+    self.picture = _picture
   end
-  
+
   def to_tree_node(opts = {})
     children = []
     unless self.subs.blank?
@@ -189,19 +192,5 @@ class Todo::Task
       where("#{column}" => user_id).timeout_scope.count
     end
   end
-  
-  # as_json
-  
-  AS_JSON_OPTS = {
-    :only => [
-      :title,
-      :value,
-      :level
-    ],
-    :methods => [:timeout_format, :id, :task_danger]
-  }
-  
-  def as_json(options = nil)
-    super(options || AS_JSON_OPTS)
-  end
+
 end

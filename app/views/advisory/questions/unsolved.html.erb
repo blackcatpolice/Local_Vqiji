@@ -1,16 +1,16 @@
-<div class="zx_hd"><a class="tit yjj" href="javascript:;">我的问题</a></div>
+<div class="zx_hd">
+  <a class="tit yjj" href="javascript:void(0)">我的问题</a>
+</div>
 <div class="zx_bd">
 	<div class="zx_tab">
-		<%= link_to "我未解决的问题", unsolved_advisory_questions_path, :class=>"on"%>
-		<%= link_to "我已解决的问题", solved_advisory_questions_path %>
+		<%= link_to '我未解决的问题', unsolved_advisory_questions_path, :class => 'on' %>
+		<%= link_to '我已解决的问题', solved_advisory_questions_path %>
 	</div>
-	<% unless @questions.empty?%>
-	<%= render :collection => @questions, :partial => 'advisory/tmpl/question', :locals => {:qtype=>""} %>
-	<%else %>
-	<div>还没有问题！</div>
+	<% if @questions.any? %>
+	  <%= render :collection => @questions, :partial => 'advisory/tmpl/question', :locals => { :qtype => '' } %>
+    <%= will_paginate @questions %>
+	<% else %>
+	  <div class="empty"><span>没有为解决问题哦～</span></div>
 	<% end %>
 </div>
 <div class="zx_db"></div>
-<% unless @questions.empty?%>
-<%= will_paginate @questions %>
-<% end %>

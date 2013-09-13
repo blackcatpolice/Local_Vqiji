@@ -16,7 +16,7 @@ set :deploy_to, '/var/www/vqiji.com'
 set :repository, 'git@125.64.96.70:/repo/vqiji.git'
 set :branch, 'master'
 
-set :rails_env, 'production'
+set_default :rails_env, 'production'
 
 # thin settings
 set_default :thin_cmd, 'thin'
@@ -74,6 +74,8 @@ task :deploy => :environment do
     to :launch do
       invoke :'thin:start'
       invoke :'resque:start'
+      invoke :'sunspot:start'
+      invoke :'sunspot:reindex'
       invoke :'whenever:write'
     end
     
@@ -86,6 +88,7 @@ end
 desc "Shutdown app."
 task :shutdown do
   queue %[echo "-----> Shutting down..."]
+  invoke :'sunspot:stop'
   invoke :'thin:stop'
   invoke :'resque:stop'
   invoke :'whenever:clear'
@@ -111,7 +114,7 @@ namespace :resque do
       if [ -e tmp/pids/resque.pid ]; then
         echo 'Resque workers had started!';
       else
-        PIDFILE=tmp/pids/resque.pid BACKGROUND=yes QUEUE=* RAILS_ENV=#{ rails_env } \
+        PIDFILE=tmp/pids/resque.pid BACKGROUND=yes QUEUE=* \
           #{rake} environment resque:work;
       fi
     }
@@ -138,6 +141,22 @@ namespace :resque do
         echo 'No resque workers to kill';
       fi
     }
+  end
+end
+
+namespace :sunspot do
+  [:start, :stop].each do |cmd|
+    desc "#{cmd} solr"
+    task cmd => :environment do
+      queue %[echo "-----> #{cmd} solr..."]
+      queue %[ cd #{deploy_to}/#{current_path} && #{rake} sunspot:solr:#{cmd} ]
+    end
+  end
+  
+  desc "reindex sunspot"
+  task :reindex => :environment do
+    queue %[echo "-----> reindex solr..."]
+    queue %[ cd #{deploy_to}/#{current_path} && #{rake} sunspot:mongo:reindex ]
   end
 end
 

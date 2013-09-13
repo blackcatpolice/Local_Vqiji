@@ -11,25 +11,15 @@ class My::FeedsController < WeiboController
   def index
     @feeds = current_user.feeds
       .paginate(:page => params[:page], :per_page => 20)
-      
+
     set_feeds_timeline if @feeds.current_page == 1
-    
-    respond_to do |format|
-      format.json { render :json => @feeds.as_json(Feed::AS_JSON_OPTS) }
-    end
   end
-  
+
   # 获取新收到的微博列表
   #
   def news
     @feeds = new_feeds.paginate(:page => 1, :per_page => 20 * 3) #
-    
+
     set_feeds_timeline if @feeds.current_page == 1
-    
-    respond_to do |format|
-      format.json {
-        render :json => @feeds.as_json(Feed::AS_JSON_OPTS)
-      }
-    end
   end
 end

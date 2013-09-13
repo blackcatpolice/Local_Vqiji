@@ -1,7 +1,7 @@
 // require jquery
 // require ui.alert
 
-(function() {
+(function($, App) {
   App.error = {
     parseError: function(error, defaultMsg) {
       var _error;
@@ -18,7 +18,14 @@
     },
 
     handleXHRError: function(jqXHR, httpStatus, throwErrors, defaultMsg) {
-      $.alert(App.error.XHRError(jqXHR, httpStatus, throwErrors), httpStatus, 2);
+      var errorMsg = App.error.XHRError(jqXHR, httpStatus, throwErrors, defaultMsg);
+      $.alert(errorMsg, httpStatus, 2);
+    },
+    
+    XHRErrorHandler: function(defaultMsg) {
+      return function(jqXHR, httpStatus, throwErrors) {
+        App.error.handleXHRError(jqXHR, httpStatus, throwErrors, defaultMsg);
+      };
     }
   };
 
@@ -36,4 +43,4 @@
     }
     return error;
   };
-})(jQuery);
+})(jQuery, window.App);

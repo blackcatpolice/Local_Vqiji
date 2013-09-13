@@ -12,7 +12,7 @@
 	<div class="mz">
 		<%= link_to "#{truncate_u(e.user.name, 3)} #{e.post}", user_path(e.user_id), :title => "#{e.user.name}" %>
 		<span>频道: <%= @question_type.name%></span>
-		<a class="btn <%= followship ? "" : "btn-warning"%>" href="javascript:;" data-action="expert-follow" data-value="<%= followship ? 1 : 0%>"><i class="<%= followship ? "icon-minus" : "icon-plus"%>"></i> <%= followship ? "取消关注" : "关注"%></a>
+		<a class="btn <%= followship ? "" : "btn-warning"%>" href="javascript:void(0)" data-action="expert-follow" data-value="<%= followship ? 1 : 0%>"><i class="<%= followship ? "icon-minus" : "icon-plus"%>"></i> <%= followship ? "取消关注" : "关注"%></a>
 	</div>
 	<div class="tj">
 		<a href="<%= advisory_expert_path(e)%>"></a>

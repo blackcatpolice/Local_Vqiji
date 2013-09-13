@@ -13,5 +13,7 @@ Weibo::Application.routes.draw do
       post :encrypt
       post :destroy_list
     end
+    
+    get :download
   end
 end

@@ -42,7 +42,7 @@
 <%end%>
 </li>
 <li>
-	<a href="javascript:;" data-url="<%= delete_group_member_path( :group_id=>m.group_id, :id=>m.id , :page => params[:page])%>" data-action="remove-member">请出该组</a>
+	<a href="javascript:void(0)" data-url="<%= delete_group_member_path( :group_id=>m.group_id, :id=>m.id , :page => params[:page])%>" data-action="remove-member">请出该组</a>
 </li>
 </ul>
 </div>

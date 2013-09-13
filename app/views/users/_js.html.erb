@@ -37,15 +37,15 @@ $("#user_temp a[data-action=follow]").click(function(){
       $(".a-follow-"+id).hide();
       $(".a-unfollow-"+id).show();
       $(".a-follow-"+id).parent().attr('class', 'nr_btn');
-      WEIBO.ui.alert('关注成功');
+      $.alert('关注成功', 1);
     },
-    error : WEIBO.ui.errorHandler
+    error : App.error.XHRErrorHandler("关注失败！")
   });
 });
 /*取消关注*/
 $("#user_temp a[data-action=unfollow]").click(function(){
 	var id = $(this).attr("data-id");
-	WEIBO.ui.confirm('您确认取消关注TA吗？', function(ensure) {
+	$.confirm('您确认取消关注TA吗？', function(ensure) {
      if (ensure) {
        WEIBO.unfollow(id, {
          success : function() {
@@ -53,7 +53,7 @@ $("#user_temp a[data-action=unfollow]").click(function(){
            $(".a-follow-"+id).show();
       	   $(".a-follow-"+id).parent().attr('class', 'nr_btn nr_btn1');
          },
-         error : WEIBO.ui.errorHandler
+         error : App.error.XHRErrorHandler("取消关注失败！")
        });
      }
    });
@@ -63,16 +63,16 @@ $("#more_menu a[data-action=tbfollow]").click(function(){
 	var id = $("#more_menu").attr("data-id");
 	WEIBO.follow(id,1, {
      success : function() {
-        $("#more_menu").hide();
-        $(".a-follow-"+id).hide();
-        $(".a-unfollow-"+id).show();
-        $(".a-follow-"+id).parent().attr('class', 'nr_btn');
-     	WEIBO.ui.alert('特别关注成功');
+      $("#more_menu").hide();
+      $(".a-follow-"+id).hide();
+      $(".a-unfollow-"+id).show();
+      $(".a-follow-"+id).parent().attr('class', 'nr_btn');
+     	$.alert('特别关注成功', 1);
       // _update_follow_status(true);
        // $("#wd_qgz span").text("特别关注");
        // $("#more_menu").hide();
      },
-     error : WEIBO.ui.errorHandler
+     error : App.error.XHRErrorHandler("关注失败！")
    });
 });
 /*悄悄关注*/
@@ -84,9 +84,9 @@ $("#more_menu a[data-action=qqfollow]").click(function(){
       	$(".a-follow-"+id).hide();
         $(".a-unfollow-"+id).show();
       	$(".a-follow-"+id).parent().attr('class', 'nr_btn');
-      	WEIBO.ui.alert('悄悄关注成功');
+      	$.alert('悄悄关注成功', 1);
      },
-     error : WEIBO.ui.errorHandler
+     error : App.error.XHRErrorHandler("关注失败！")
    });
 });
 

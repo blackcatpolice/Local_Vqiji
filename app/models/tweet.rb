@@ -43,7 +43,7 @@ class Tweet
   field :refchain, :type => Array # 引用链
   field :reposts_count, type: Integer, default: 0 # 转发数量
   belongs_to :reftweet, :class_name => 'Tweet', inverse_of: nil # 引用目标微博
-  
+
   # 获取转发该微博的微博
   def reposts
     Tweet.where(:refchain => id)
@@ -51,6 +51,7 @@ class Tweet
 
   # 分发策略设置
   field :is_top, :type => Boolean, :default => false # 重要微博
+  field :_to_fans, :type => Boolean, :default => true # 分发到工作大厅？
   field :group_ids, :type => Array # 推送的工作组
   
   # 只读字段
@@ -68,6 +69,9 @@ class Tweet
   # 收藏
   has_many :favorites, :inverse_of => :tweet, :dependent => :destroy
   field :favorites_count, :type => Integer, :default => 0
+  
+  # 已读
+  field :readers_count, :type => Integer, :default => 0
 
   # validations
   validates :text, :presence => true, :text_length => { :maximum => TEXT_MAXLEN }
@@ -152,7 +156,7 @@ class Tweet
   scope :mention_user, ->(user_id) { where('rtext._type' => 'Rt::Met', 'rtext.uid' => user_id) }
   
   # 粉丝可见的微博
-  scope :to_fans, where(:is_top.ne => true)
+  scope :to_fans, where(:is_top.ne => true, :_to_fans => true)
   # 可转发的微博
   scope :repostable, where(:is_top.ne => true)
   # 转发微博
@@ -163,43 +167,47 @@ class Tweet
   # 默认排序
   default_scope desc(:created_at)
 
-  def set_audio(audio_id)
-    _audio = Attachment::Audio.get(audio_id)
-    if _audio
-      _audio.update_attributes(:target => self)
-      self.audio = _audio
-    end
+  def set_audio(_audio)
+    _audio.update_attributes(:target => self)
+    self.audio = _audio
   end
 
-  def set_file(file_id)
-    _file = Attachment::Base.get(file_id)
-    if _file
+  def set_file(_file)
+    unless _file.is_a?(Attachment::File)
+      open(_file.path) do |file|
+        _file = Attachment::File.create!({
+          :file => file,
+          :uploader => _file.uploader,
+          :name => _file.name
+        })
+      end
+    else
       _file.update_attributes(:target => self)
-      self.file = _file
     end
+    self.file = _file
   end
 
-  def set_picture(picture_id)
-    _picture = Attachment::Picture.get(picture_id)
-    if _picture
-      _picture.update_attributes(:target => self)
-      self.picture = _picture
-    end
+  def set_picture(_picture)
+    _picture.update_attributes(:target => self)
+    self.picture = _picture
   end
   
-  # 粉丝可见
+  # 粉丝可见？
   def to_fans?
-    !is_top
+    !is_top && _to_fans
   end
-
+  
   # 可以转发？
-  def repostable?
-    !is_top
-  end
+  alias :repostable? :to_fans?
 
   # 判断这条微博是否是转发
   def repost?
     !!(reforigin_id || reforigin)
+  end
+
+  # 评论
+  def comment(commenter, text)
+    comments.create!(sender: commenter, text: text)
   end
 
   # 分发
@@ -238,11 +246,6 @@ class Tweet
     end
   end
 
-  # 评论
-  def comment(commenter, text)
-    comments.create!(sender: commenter, text: text)
-  end
-  
   class << self
     def find_by_sender_id(user_id)
       where(:sender_id => user_id)
@@ -262,25 +265,6 @@ class Tweet
     end
   end
 
-  AS_JSON_BASIC_OPTS = {
-    :only => [
-      :text, :rtext, :created_at,
-      :audio, :picture, :file,
-      :reposts_count, :comments_count
-    ],
-    :methods => :id
-  }
-  
-  AS_JSON_OPTS = {
-    :include => {
-      :sender => User::AS_JSON_OPTS
-    }
-  }.merge(AS_JSON_BASIC_OPTS)
-
-  def as_json(options = nil)
-    super(options || AS_JSON_OPTS)
-  end
-  
   module Rtext
     class << self
       def tokenize(text)

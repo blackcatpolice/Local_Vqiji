@@ -11,9 +11,13 @@
 		this.widget = $(DPGlobal.template)
 		  .on("click", ".prev", $.proxy(this._onPrevClick, this))
 		  .on("click", ".next", $.proxy(this._onNextClick, this))
+		  .on("click", ".to_today", $.proxy(this.toToday, this));
+
+    this.container = this.widget.find('.calendar-days')
 		  .on("click", ".day", $.proxy(this._onDayClick, this));
 
-    this.container = this.widget.find('.calendar-days');
+    this._toTodayBtn = this.widget.find('.to_today'); // ‘今天‘按钮
+
     this.format = DPGlobal.parseFormat('yyyy-mm-dd');
 		this.minViewMode = 0;
     this.viewMode = 0;
@@ -22,75 +26,12 @@
 		this.weekEnd = 6;
 		this.update();
 	};
+
+	// this.date 当前选中的日期
+	// this.viewDate 当前显示日期
 	
 	Calendar.prototype = {
 		constructor: Calendar,
-		
-		setValue: function(newDate) {
-			if (typeof newDate === 'string') {
-				this.date = DPGlobal.parseDate(newDate, this.format);
-			} else {
-				this.date = new Date(newDate);
-			}
-			this.set();
-			this.viewDate = new Date(this.date.getFullYear(), this.date.getMonth(), 1, 0, 0, 0, 0);
-			this.fill();
-		},
-		
-		update: function(newDate){
-		  if (newDate) {
-			  this.date = DPGlobal.parseDate(newDate, this.format);
-			} else {
-			  this.date = new Date();
-			  
-			  this.date.setHours(0);
-			  this.date.setMinutes(0);
-			  this.date.setSeconds(0);
-			  this.date.setMilliseconds(0);
-			}
-			this.viewDate = new Date(this.date.getFullYear(), this.date.getMonth(), 1, 0, 0, 0, 0);
-			this.fill();
-		},
-		
-		fill: function() {
-			var d = new Date(this.viewDate),
-				year = d.getFullYear(),
-				month = d.getMonth(),
-				currentDate = this.date.valueOf();
-
-			this.widget.find('.switch').text(year + '年' + DPGlobal.dates.months[month]);
-
-			var prevMonth = new Date(year, month-1, 28,0,0,0,0),
-				day = DPGlobal.getDaysInMonth(prevMonth.getFullYear(), prevMonth.getMonth());
-			prevMonth.setDate(day);
-			prevMonth.setDate(day - (prevMonth.getDay() - this.weekStart + 7)%7);
-
-			var nextMonth = new Date(prevMonth);
-			nextMonth.setDate(nextMonth.getDate() + 42);
-			nextMonth = nextMonth.valueOf();
-			
-			var html = [];
-			var clsName, prevY, prevM;
-			
-			while(prevMonth.valueOf() < nextMonth) {
-				clsName = '';
-				prevY = prevMonth.getFullYear();
-				prevM = prevMonth.getMonth();
-				if ((prevM < month &&  prevY === year) ||  prevY < year) {
-					clsName += ' old gray';
-				} else if ((prevM > month && prevY === year) || prevY > year) {
-					clsName += ' new gray';
-				}
-				if (prevMonth.valueOf() === currentDate) {
-					clsName += ' on';
-				}
-				html.push('<li class="day '+clsName+'" data-date="' + DPGlobal.formatDate(prevMonth) + '">' + prevMonth.getDate() + '</li>');
-				prevMonth.setDate(prevMonth.getDate()+1);
-			}
-
-			this.container.empty().append(html.join(''));
-			this._loadMonthCount(this.viewDate);
-		},
 		
 		_loadMonthCount: function(month) {
 			if (this._countTodosByMonthRequest) {
@@ -159,42 +100,121 @@
 		  this._loadMonthCount(this.date);
 		},
 		
+		// 转到今天
+		toToday: function() {
+		  this.update();
+		  this.widget.trigger("daychecked", [ this.date ]);
+		},
+		
 		_onPrevClick: function() {
 		  this.viewDate.setMonth(this.viewDate.getMonth(this.viewDate) + -1);
 		  this.fill();
+		  this._updateToTodayBtnVisiblity();
 		},
 		
 		_onNextClick: function() {
 		  this.viewDate.setMonth(this.viewDate.getMonth(this.viewDate) + 1);
 		  this.fill();
+		  this._updateToTodayBtnVisiblity();
 		},
 		
 		_onDayClick: function(e) {
 		  var target = $(e.target);
 		  var day = parseInt(target.text(), 10) || 1;
-			var month = this.viewDate.getMonth(), newMonth = month;
-			var year = this.viewDate.getFullYear();
+			var year = this.viewDate.getFullYear()
+			  , newMonth = this.viewDate.getMonth();
 			
 			if (target.is('.old')) {
 				newMonth -= 1;
 			} else if (target.is('.new')) {
 				newMonth += 1;
-			} else {
-			  target
-			    .closest("ul")
-			      .find(".day").removeClass("on").end()
-			    .end()
-			    .addClass("on");
 			}
 			
-		  this.date = new Date(year, newMonth, day, 0,0,0,0);
-		  this.viewDate = new Date(year, newMonth, Math.min(28, day), 0,0,0,0);
+		  var newDate = new Date(year, newMonth, day, 0,0,0,0);
+		  this.update(newDate);
+		  this.widget.trigger("daychecked", [ newDate ]);
+		},
+		
+		_updateToTodayBtnVisiblity: function() {
+		  var today = new Date();
+	    this._toTodayBtn.css("display",
+	      (sameDay( this.date, today ) && monthEqual( this.viewDate, today )) ? "none" : "block");
+		},
+		
+		// 更新当前选中的日期
+		update: function(newDate){
+		  if (newDate) {
+		    if (typeof(newDate) === "string") {
+			    this.date = DPGlobal.parseDate(newDate, this.format);		      
+		    } else {
+		      this.date = newDate;
+		    }
+			} else {
+			  this.date = new Date();
+			  this.date.setHours(0);
+			  this.date.setMinutes(0);
+			  this.date.setSeconds(0);
+			  this.date.setMilliseconds(0);
+			}
+
+      if ( !(this.viewDate && monthEqual(this.viewDate, this.date)) ) {
+			  this.viewDate = new Date(this.date.getFullYear(), this.date.getMonth(), 1, 0, 0, 0, 0);
+			  this.fill();
+			} else {
+			  this.container
+			      .find(".day.on").removeClass("on").end()
+			    .end()
+			    .find(".day[data-date=" +
+			      DPGlobal.formatDate(this.date)
+			      + "]").addClass("on");
+			}
 		  
-		  this.widget.trigger("daychecked", [this.date]);
-		  
-		  if (newMonth != month) {
-		    this.fill();
-		  }
+		  this._updateToTodayBtnVisiblity();
+		},
+		
+		fill: function() {
+			var d = new Date(this.viewDate),
+				year = d.getFullYear(),
+				month = d.getMonth(),
+				currentDate = this.date.valueOf();
+
+			this.widget.find('.switch').text(year + '年' + DPGlobal.dates.months[month]);
+
+			var prevMonth = new Date(year, month-1, 28,0,0,0,0),
+				  day = DPGlobal.getDaysInMonth(prevMonth.getFullYear(), prevMonth.getMonth());
+			prevMonth.setDate(day);
+			prevMonth.setDate(day - (prevMonth.getDay() - this.weekStart + 7)%7);
+
+			var nextMonth = new Date(prevMonth);
+			nextMonth.setDate(nextMonth.getDate() + 42);
+			nextMonth = nextMonth.valueOf();
+			
+			var html = [];
+			var clsName, prevY, prevM;
+			
+			while(prevMonth.valueOf() < nextMonth) {
+				var clsName = ''
+				  , prevY = prevMonth.getFullYear()
+				  , prevM = prevMonth.getMonth();
+				// classes
+				if ((prevM < month &&  prevY === year) ||  prevY < year) {
+					clsName += ' old gray';
+				} else if ((prevM > month && prevY === year) || prevY > year) {
+					clsName += ' new gray';
+				} else {
+				  if (prevMonth.valueOf() === currentDate) {
+					  clsName += ' on';
+				  }
+          if (sameDay(prevMonth, new Date())) {
+				    clsName += ' today';
+          }
+        }
+				html.push('<li class="day ' + clsName + '" data-date="' + DPGlobal.formatDate(prevMonth) + '">' + prevMonth.getDate() + '</li>');
+				prevMonth.setDate(prevMonth.getDate() + 1);
+			}
+
+			this.container.empty().append(html.join(''));
+			this._loadMonthCount(this.viewDate);
 		}
   };
 	
@@ -287,12 +307,13 @@
 			return date.join(format.separator);
 		},
 		
-		template: ''+
-		  '<div>'+
+		template: ('' +
+		  '<div>' +
 			  '<div class="bk_t mr_t3 head">' +
-			    '<a href="javascript:void(0)" class="prev" title="上个月">&lsaquo;</a>' +
+			    '<a href="javascript:void(0)" class="to_today" style="display:none;" title="转到今天">今天</a>' +
+			    '<a href="javascript:void(0)" class="next" title="转到下个月"></a>' +
 			    '<a href="javascript:void(0)" class="rl_date switch"></a>' +
-			    '<a href="javascript:void(0)" class="next" title="下个月">&rsaquo;</a>' +
+			    '<a href="javascript:void(0)" class="prev" title="转到上个月"></a>' +
 			  '</div>' +
         '<div class="mr_rl f13 left">' +
 		      '<ul>' +
@@ -309,7 +330,7 @@
 		      '<ul class="calendar-days">' +
           '</ul>' +
 		    '</div>' +
-		  '</div>'
+		  '</div>')
 	};
 	
 	$.widget("schedule.newScheduleTodoForm", $.rtext.rtextEditor, {
@@ -577,6 +598,16 @@
                ( date1.getFullYear() === date2.getFullYear() )
             && ( date1.getMonth() === date2.getMonth() )
             && ( date1.getDate() === date2.getDate() )
+          )
+      );
+  }
+  
+  function monthEqual(date1, date2) {
+    return (date1 === date2) || (
+        (date1 && date2) &&
+          (
+               ( date1.getFullYear() === date2.getFullYear() )
+            && ( date1.getMonth() === date2.getMonth() )
           )
       );
   }

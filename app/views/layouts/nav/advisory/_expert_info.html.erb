@@ -10,9 +10,9 @@
     <div class="ys_bk_c f13">
     	<b>详细介绍：</b><div node-type="description" data-id="<%= expert.id%>"><div><%= expert.description%></div></div>
     	<div class="ys_bk_btn">
-    		<a href="javascript:;" data-action="description-edit">修改</a>
-    		<a class="left" href="javascript:;" data-action="description-cancel" style="display:none;">取消</a>
-    		<a class="right" href="javascript:;" data-action="description-save" style="display:none;">保存</a>
+    		<a href="javascript:void(0)" data-action="description-edit">修改</a>
+    		<a class="left" href="javascript:void(0)" data-action="description-cancel" style="display:none;">取消</a>
+    		<a class="right" href="javascript:void(0)" data-action="description-save" style="display:none;">保存</a>
     	</div>
     </div>
     <div class="ys_bk_d"></div>
@@ -45,7 +45,7 @@
 					$('textarea', 'div[node-type="description"]').remove();
 					$('div[node-type="description"]').find('> div').text(_description).show();
 				},
-				error: WEIBO.ui.errorHandler
+				error: App.error.XHRErrorHandler("更新信息失败！")
 			});
 		});
 		$('a[data-action="description-cancel"]').on('click', function(){

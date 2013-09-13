@@ -1,5 +1,4 @@
 # encoding: utf-8
-# 工作组相关路由
 
 Weibo::Application.routes.draw do
   
@@ -10,10 +9,8 @@ Weibo::Application.routes.draw do
   			get :checked
   			get :refuse
   		end
-  	
   	end
-  	
+
   	resources :comments
-  end  
-  
+  end 
 end

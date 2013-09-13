@@ -27,7 +27,7 @@ class Talk::Feed
   end
   
   after_destroy do |feed|
-    feed.session.inc(:unread_count, -1) unless feed.is_read
+    feed.session.inc(:unread_count, -1) if feed.session && !feed.is_read
   end
   
   # scopes

@@ -3,9 +3,9 @@
 <div class="bk" node-type="FileListOperate">
   <div class="bk_wpt">
     <p>我的网盘</p>
-    <a class="btn_addPic btn btn-danger bn" href="javascript:;" data-action="file_upload"><span>上传文件</span></a>
-    <a class="btn_addPic btn btn-danger bn" href="javascript:;" data-action="history_upload" style="margin-left:30px;"><span>上传病历</span></a>
-    <a class="btn bn btn-warning right" href="javascript:;" data-action="delete_list">批量删除</a>
+    <a class="btn_addPic btn btn-danger bn" href="javascript:void(0)" data-action="file_upload"><span>上传文件</span></a>
+    <a class="btn_addPic btn btn-danger bn" href="javascript:void(0)" data-action="history_upload" style="margin-left:30px;"><span>上传病历</span></a>
+    <a class="btn bn btn-warning right" href="javascript:void(0)" data-action="delete_list">批量删除</a>
   </div>
   <div class="bk_c">
     <% if @files.any? %>
@@ -21,14 +21,15 @@
     <% else %>
       <div class="empty"><span>还没有文件哦～</span></div>
     <% end %>
+    <div class="clearfix"></div>
   </div>
   <div class="bk_t bk_d"></div>
 </div>
 </form>
 <div class="wp_gd f12" id="moreFileOperate" style="display:none;" fid="">
-	<a href="javascript:;" data-action="frename">重命名</a>
-	<a href="javascript:;" data-action="fencrypt">加密</a>
-	<a href="javascript:;" data-action="fdelete">删除</a>
+	<a href="javascript:void(0)" data-action="frename">重命名</a>
+	<a href="javascript:void(0)" data-action="fencrypt">加密</a>
+	<a href="javascript:void(0)" data-action="fdelete">删除</a>
 </div>
 <%= render 'encrypt'%>
 <script>
@@ -95,7 +96,7 @@
         $('[data-type=history]', '#fid_' + _fid).show();
 				_newNameInput.remove();
   		},
-  		error: WEIBO.ui.errorHandler
+  		error: App.error.XHRErrorHandler("重命名失败！")
 		});
   }
   

@@ -18,7 +18,7 @@ $(function() {
 			success: function(data){
 				$.alert("已收藏到个人网盘!", 1);
 			},
-			error: WEIBO.ui.errorHandler
+			error: App.error.XHRErrorHandler("收藏文件失败！")
 		});
 	});
 

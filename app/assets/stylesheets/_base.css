@@ -4,3 +4,7 @@
  *= require common
  *= require widgets.asynch
  */
+
+.atwho-view {
+  z-index: 2060;
+}

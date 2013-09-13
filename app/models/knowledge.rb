@@ -28,4 +28,17 @@ class Knowledge
   before_save do
     self.text = self.text.gsub(/<[^><]*script[^><]*>/i,'') if self.text_changed?
   end
+
+  include Sunspot::Mongo
+
+  searchable do
+    text :title, :stored => true
+    text :text, :stored => true
+    text :pinyin_title
+    boolean :public
+    string :group_id
+    string :creator_id
+    string :knowledge_type_id
+    time :created_at
+  end
 end

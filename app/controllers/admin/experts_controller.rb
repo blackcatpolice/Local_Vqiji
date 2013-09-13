@@ -13,7 +13,7 @@ class Admin::ExpertsController < Admin::BaseController
   def create
     @user = User.new params[:user], :as => :admin
     @user.is_expert = true
-    @user.checked = true
+    @user.check_at = Time.now.utc
     if @user.save
       @expert = Expert.new params[:expert]
       @expert.user = @user

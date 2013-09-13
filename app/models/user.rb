@@ -9,10 +9,13 @@ class User
 
   GENDER_MALE = 0
   GENDER_FEMALE = 1
+  
+  STATUS_DISABLE = 0
+  STATUS_ENABLE = 1
 
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable,
-         :authentication_keys => [:login]
+  devise :database_authenticatable, :recoverable, :rememberable,
+         :trackable, :validatable,
+         :authentication_keys => [ :login ]
   
   # Virtual attributes
   attr_accessor :login
@@ -47,12 +50,12 @@ class User
 
   field :job_no, :type => String #员工号 登录字段
   field :job, :type => String #职位
-  # FIXME: 更改 checked => actived
-  field :checked, :type => Boolean, :default => false #激活 
-  field :checked_at, :type => Time
   field :phone, :type=> String #电话
   field :id_number, :type => String #身份证号码
   field :jifen, :type=>Integer,:default => 0 #用户积分
+
+  field :check_at, :type => Time # 激活
+  field :status,     :type => Integer, :default => STATUS_ENABLE # 用户状态
 
   field :is_expert, :type => Boolean, :default => false # 专家
   has_one :expert, :class_name => 'Expert', :inverse_of => :user
@@ -68,7 +71,8 @@ class User
 
   # [ :admin ] allowed
   attr_accessible :email, :name, :job, :job_no, :id_number, :jifen, :status,
-    :department, :department_id, :checked, :is_admin, :is_expert, :release_public_knowledge, as: [:admin]
+    :department, :department_id, :check_at, :is_admin, :is_expert,
+    :release_public_knowledge, as: [:admin]
 
   scope :fuzzy_search_by_name, ->(query) {
     reg = /^#{ Regexp.escape(query) }/i
@@ -77,10 +81,16 @@ class User
       { pinyin_name: reg }
     ])
   }
-
-  def email_required?
-    checked
+  
+  # 已经验证
+  scope :checked, where(:check_at.ne => nil)
+  scope :enabled, where(:status  => STATUS_ENABLE)
+  
+  def checked?
+    !!check_at
   end
+  
+  alias :email_required? :checked?
   
   class << self
     # 根据 email 和  job_no 登录
@@ -88,12 +98,11 @@ class User
       conditions = warden_conditions.dup
       if login = conditions.delete(:login)
         login_reg = /^#{ Regexp.escape(login) }$/i
-        where(
+        checked.where(
           :'$or' => [
             { email: login_reg },
             { job_no: login_reg }
           ],
-          checked: true # 已经验证
         ).first
       else
         where(conditions).first
@@ -113,7 +122,6 @@ class User
 
   has_many :group_members, class_name: 'GroupMember', inverse_of: :user, dependent: :destroy
   field :groups_count, :type=> Integer, :default => 0 # 工作组数量
-  field :status, :type => Integer, :default => 0 # 用户状态，默认禁用  0禁用 1启用
   has_many :gfeeds, class_name: 'Gfeed', inverse_of: :_sender, dependent: :destroy
 
   def groups
@@ -159,13 +167,14 @@ class User
         raise WeiboError, '不能转发该微博！' unless opts[:reforigin].repostable?
         tweet.reforigin = opts[:reforigin]
       else
-        tweet.set_audio(opts[:audioId]) if opts[:audioId] # 音频附件
-        tweet.set_file(opts[:fileId]) if opts[:fileId] # 文件附件
-        tweet.set_picture(opts[:pictureId]) if opts[:pictureId] # 图片附件
+        tweet.set_audio attachments.audios.find(opts[:audioId]) if opts[:audioId]
+        tweet.set_picture attachments.pictures.find(opts[:pictureId]) if opts[:pictureId]
+        tweet.set_file attachments.find(opts[:fileId]) if opts[:fileId]
       end
       
       # 设置分发策略大厅
       tweet.is_top = opts[:is_top]
+      tweet._to_fans = opts[:to_fans] unless tweet.is_top
       tweet.group_ids = group_members.where(:group_id.in => opts[:group_ids]).distinct(:group_id) if opts[:group_ids] # 分发到的组
     end
 
@@ -243,35 +252,11 @@ class User
   include Todo::UserExtends
   include Schedule::UserExtends
   include Notification::UserExtends
-
-  #  as_json
-  AS_JSON_BASIC_OPTS = {
-    :only => [
-      :id, :name,
-      :followeds_count, :fans_count,
-      :tweets_count, :favorites_count,
-      :comments_count
-    ]
-  }
-  
-  AS_JSON_OPTS = AS_JSON_BASIC_OPTS
-  
-  def as_json(options = nil)
-    super(options || AS_JSON_OPTS)
-  end
+  include Attachment::UserExtends
   
   def to_builder
-    Jbuilder.new do |user|
-      user.id id
-      user.name name
+    Jbuilder.new do |json|
+      json.(self, :id, :name)
     end
   end
-
-  #============Zhou zhongwen============
-  
-  # === 会议 ===
-
-  has_many :meeting_members, class_name: 'GroupMember', inverse_of: :user, dependent: :destroy
-
-
 end

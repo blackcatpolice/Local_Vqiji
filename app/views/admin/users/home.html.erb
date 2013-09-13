@@ -1,7 +1,26 @@
-<% content_for :title do%>用户主页<%end%>
+<% provide :title, '用户主页' %>
 
 <ul class="nav nav-tabs">
   <li class="active"><%= link_to raw('<i class="icon-home"></i>用户主页'), home_admin_users_path %></li>
   <li><%= link_to raw('<i class="icon-list"></i>用户列表'), admin_users_path %></li>
   <li><%= link_to raw('<i class="icon-plus"></i>新建用户'), new_admin_user_path %></li>
 </ul>
+
+<div class="hero-unit">
+  <p class="lead">
+    欢迎来到管理员后台, <b><%= current_user.name %></b>
+  </p>
+  系统当前有：
+  <ul>
+    <li><span class="badge"><%= User.count %></span> 个用户, 其中激活用户有 <span class="badge badge-important"><%= User.checked.count %></span> 个；</li>
+    <li><span class="badge"><%= Department.count %></span> 个部门；</li>
+    <li><span class="badge"><%= Group.count %></span> 个工作组；</li>
+    <li><span class="badge badge-important"><%= Tweet.count %></span> 条微博，其中转发微博有 <span class="badge"><%= Tweet.repost.count %></span> 条，评论 <span class="badge"><%= Comment.count %></span> 条</li>
+    <li><span class="badge badge-important"><%= Attachment::Base.count %></span> 个附件，图片 <span class="badge"><%= Attachment::Picture.count %></span> 个，音频 <span class="badge"><%= Attachment::Audio.count %></span> 个，文件 <span class="badge"><%= Attachment::File.count %></span> 个，网盘文件 <span class="badge"><%= Attachment::NetworkDisk.count %></span> 个；</li>
+    <li><span class="badge"><%= Notification::Base.count %></span> 条通知；</li>
+    <li><span class="badge badge-important"><%= Todo::Task.count %></span> 个任务；</li>
+    <li><span class="badge"><%= Talk::Group.count %></span> 个私信会话，单人会话 <span class="badge"><%= Talk::Group.p2p.count %></span> 个；</li>
+    <li><span class="badge badge-important"><%= Training.count %></span> 个培训；</li>
+    <li><span class="badge badge-important"><%= Knowledge.count %></span> 篇知识库文章；</li>
+  </ul>
+</div>

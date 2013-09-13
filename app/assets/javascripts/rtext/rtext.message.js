@@ -80,7 +80,7 @@
           success: function() {
             context.remove()._trigger("deleted");
           },
-          error: WEIBO.ui.errorHandler,
+          error: App.error.XHRErrorHandler("删除失败！"),
           complete: $.proxy(context.enable, context)
         }]);
       }, this);

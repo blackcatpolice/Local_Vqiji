@@ -6,9 +6,9 @@
 		<div class="tab">
       <% if action_name == 'sends' %>
         <%= link_to '收到的评论', receives_my_comments_path %>
-        <%= link_to '发出的评论', 'javascript:;', :class=>"qb on" %>
+        <%= link_to '发出的评论', 'javascript:void(0)', :class=>"qb on" %>
       <%else%>
-        <%= link_to '收到的评论', 'javascript:;', :class=>"qb on" %>
+        <%= link_to '收到的评论', 'javascript:void(0)', :class=>"qb on" %>
         <%= link_to '发出的评论', sends_my_comments_path %>
       <% end%>
 		</div>

@@ -16,10 +16,10 @@
     				$.alert('没有选中文件！');
     				return;
     			}
-    			$.confirm('是否删所有除选中文件？', function(flag){
+    			$.confirm('是否删除所有选中文件？', function(flag){
     				if(flag){
-                        $('form[data-pjax]').submit();
-                    }
+              $('form[data-pjax]').submit();
+            }
     			});
     		});
     		

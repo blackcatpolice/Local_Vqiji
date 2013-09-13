@@ -1,54 +1,21 @@
 // require _base
+// require app.notification_board
 
 (function($) {
   $.widget("app.topbar", {
     _create: function() {
-      this._initSearchField();
-      this._initNotifacationsBoard();
+      // 找人
+      this._searchField = new SearchField(this.element.find(".search-query"))
+      // 通知中心
+      this._notificationsBoard = new App.NotificationBoard(this.element.find("[data-action=toggle_notifications_board]"));
+      
+      // 退出
       this._on("[data-action=sign_out]", { click: this.signOut });
     },
     
     _destroy: function() {
-      this._destroyNotifacationsBoard();
-    },
-    
-    // 找人
-    _initSearchField: function() {
-      this.element.find(".search-query")
-        .typeahead({
-          source: function(query, process) {
-            if (this._initSearchField_queryXHR) {
-              this._initSearchField_queryXHR.abort();
-            }
-            this._initSearchField_queryXHR = App.api.searchUserByName(query, {
-              success: function(users) {
-                process.call(this, $.map(users, function(user, _) {
-                  return user.name;
-                }));
-              },
-              complete: $(function() {
-                this._initSearchField_queryXHR = null;
-              }, this)
-            });
-          },
-          matcher: function() {
-            return true;
-          },
-          items: 5
-        }).placeholder();
-    },
-    
-    // 通知中心
-    _initNotifacationsBoard: function() {
-      if (! this._notificationsBoard) {
-         this._notificationsBoard = new NotificationBoard(this.element.find("[data-action=toggle_notifications_board]"));
-      }
-    },
-    
-    _destroyNotifacationsBoard: function() {
-      if (! this._notificationsBoard) {
+      if (this._notificationsBoard) {
         this._notificationsBoard.destory();
-        this._notificationsBoard = null;
       }
     },
 
@@ -56,184 +23,40 @@
     signOut: function(e) {
       e.preventDefault();
       $.confirm("确认退出？", function(ensure) {
-        if (!ensure) { return };
+        if (ensure) {
           window.location = "/sign_out.html";
-        });
+        }
+      });
       return false;
     }
   });
+  
+  function SearchField(elem) {
+    var _queryXHR;
+  
+    $(elem).typeahead({
+      source: function(query, process) {
+        if (_queryXHR) _queryXHR.abort();
 
-  function NotificationBoard(trigger) {
-    this.$trigger = $(trigger);
-    this.init();
-  }
-
-  $.extend(NotificationBoard.prototype, {
-    init: function() {
-      this.$trigger.popover(this._getPopoverOptions());
-      this.$badge = $("<span class=\"badge\">0</span>").prependTo(this.$trigger);
-      this.$trigger
-        .on("mouseenter.nb", $.proxy(this._onMouseEnter, this))
-        .on("mouseleave.nb", $.proxy(this._onMouseLeave, this));
-
-      this._$updateBadge = $.proxy(this.updateBadge, this);
-      setTimeout(this._$updateBadge, 3000); // 初始化页面后3秒自动更新一次
-
-      this._$onCountChanged = $.proxy(this._onCountChanged, this);
-      App.realtime.triggers.register('notificationsCountChanged', this._$onCountChanged);
-
-      // 强制更新 content
-      this._forceUpdateContent = true;
-    },
-
-    show: function() {
-      this.$trigger.popover("show");
-    },
-
-    hide: function() {
-      this.$trigger.popover("hide");
-    },
-
-    destroy: function() {
-      App.realtime.triggers.unregister('notificationsCountChanged', this._$onCountChanged);
-      
-      this.$trigger
-        .off("shown.nb").off("hidden.nb")
-        .off("mouseenter.nb").off("mouseleave.nb")
-        .popover("destroy");
-      
-      if (this.$content) {
-        this.$content.off("mouseenter.nb").off("mouseleave.nb");
-        this.$content = null;
-      }
-    },
-
-    _getPopoverOptions: function() {
-      return {
-        placement: "bottom",
-        animation: true,
-        html: true,
-        title: '通知中心',
-        content: $.proxy(this._getContent, this),
-        template: '<div class="popover ntb"><div class="arrow"></div><div class="popover-content"></div></div>',
-        container: 'body'
-      };
-    },
-    
-    _onShown: function() {
-      this.$content
-        .on("mouseenter.nb", $.proxy(this._onMouseEnter, this))
-        .on("mouseleave.nb", $.proxy(this._onMouseLeave, this));
-
-      if (this._isNeedUpdateContent()) {
-        this.updateContent();
-      }
-      this._isShown = true;
-    },
-    
-    _onHidden: function() {
-      this.$content.off("mouseenter.nb").off("mouseleave.nb");
-      if (this._isNeedUpdateContent()) {
-        this.updateContent();
-      }
-      this._isShown = false;
-    },
-    
-    _isNeedUpdateContent: function() {
-      return (this._forceUpdateContent || this._countChanged);
-    },
-    
-    updateContent: function() {
-      if (! this.$content) return;
-      var self = this;
-      // console.log(this.$content);
-      self.$content.spin("small");
-
-      $.ajax("/notifications/nb.html", {
-        dataType: "html",
-        cache: false,
-        success: function(nb) {
-          self.$content.html( nb );
-        },
-        error: function(jqXHR, httpStatus, throwErrors) {
-          var errorMsg = App.error.XHRError(jqXHR, httpStatus, throwErrors, "获取未读消息列表失败!");
-          self.$content.html( $("<div class=\"error\"></div>").text(errorMsg) );
-        },
-        complete: function() {
-          self._countChanged = self._forceUpdateContent = false;
-          self.$content.spin(false);
-        }
-      });
-    },
-    
-    _getContent: function() {
-      if (!this.$content) {
-        this.$content = $("<div data-role=\"content\"></div>");
-        this.$trigger
-          .on("shown.nb", $.proxy(this._onShown, this))
-          .on("hidden.nb", $.proxy(this._onHidden, this));
-      }
-      return this.$content;
-    },
-    
-    // 更新 badge
-    updateBadge: function(force) {
-      if (this._updateBadgeXHR) {
-        if (!force) {
-          return;
-        }
-        this._updateBadgeXHR.abort();
-      };
-      
-      var self = this;
-      
-      this._updateBadgeXHR = App.api.notificationsCount({
-        success: function(count) {
-          self.setBadgeCount(count);
-        }/*,
-        error: function(jqXHR, textStatus, errorThrown) {
-          if (textStatus == "abort") {
-            return;
+        _queryXHR = App.api.searchUserByName(query, {
+          success: function(users) {
+            process.call(this, _collectUserNames(users));
+          },
+          complete: function() {
+            _queryXHR = null;
           }
-          $.error("fetch notifications count error: " + errorThrown);
-        }*/,
-        complete: function() {
-          self._updateBadgeXHR = null;
-        }
+        });
+      },
+      matcher: function() {
+        return true;
+      },
+      items: 5
+    }).placeholder();
+    
+    function _collectUserNames(users) {
+      return $.map(users, function(user, _) {
+        return user.name;
       });
-    },
-
-    _onCountChanged: function(newCount) {
-      this.setBadgeCount(newCount);
-      this._countChanged = true;
-      if (this._isShown) {
-        this.updateContent();
-      }
-    },
-    
-    _onMouseEnter: function() {
-      if ( this._mouseLeavelHideTimer ) {
-        clearTimeout( this._mouseLeavelHideTimer );
-        this._mouseLeavelHideTimer = null;
-      }
-    },
-    
-    _onMouseLeave: function() {
-      if ( this._mouseLeavelHideTimer ) {
-        clearTimeout( this._mouseLeavelHideTimer );
-      }
-      this._mouseLeavelHideTimer = setTimeout( $.proxy(function() {
-        this._mouseLeavelHideTimer = null;
-        this.hide();
-      }, this), 5000 );
-    },
-
-    setBadgeCount: function(count) {
-      if (count > 0) {
-        this.$badge.text(count).addClass("badge-important");
-      } else {
-        this.$badge.text(0).removeClass("badge-important");
-      }
     }
-  });
+  }
 })(jQuery);

@@ -7,10 +7,10 @@ FactoryGirl.define do
     password_confirmation "12345678"
     sequence(:name) { |i| "name-#{i}"}
     sequence(:job_no) { |i| '%d' % i }
-    checked true
+    check_at Time.now.utc
 
     trait :unchecked do
-      checked false    
+      check_at nil
     end
     
     factory :unchecked_user, traits: [:unchecked]

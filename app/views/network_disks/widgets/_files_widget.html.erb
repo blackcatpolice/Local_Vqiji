@@ -2,12 +2,13 @@
 <% unless current_user.is_expert %>
 <div class="bk" node-type="FileWidget">
     <div class="bk_t mr_t1">
-    	<a href="javascript:;" data-action="SWFUpload" title="上传文件"></a>
+    	<a href="javascript:void(0)" data-action="SWFUpload" title="上传文件"></a>
    	</div>
     <div class="bk_c">
         <div class="mr_lb f12">
             <ul></ul>
-        </div><div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
     </div>
     <div class="bk_t bk_d"></div>
 </div>
@@ -24,14 +25,14 @@
 	
 	WEIBO.filesWidget({
 		size: 4,
-		success: function(data){
+		success: function(data) {
 			if(data.length == 0){
 				$('ul', '[node-type=FileWidget]').html('<li data-type="message">您的网盘还没有上传文件.</li>');
 				return false;
 			}
 			var _tmpl = '<li>' + 
-				'<a href="/download/${id}" data-skip-pjax title="${name}">${ $.truncate(name, 24) }</a>' + 
-				'<span><a href="javascript:;" data-action="file-share" data-id="${id}">分享</a> | <a href="javascript:;" data-action="file-talk-message" data-id="${id}">私信</a></span>' +
+				'<a href="/network_disks/${id}/download" data-skip-pjax title="${name}">${ $.truncate(name, 24) }</a>' + 
+				'<span><a href="javascript:void(0)" data-action="file-share" data-id="${id}">分享</a> | <a href="javascript:void(0)" data-action="file-talk-message" data-id="${id}">私信</a></span>' +
 				'</li>';
 			$.template( "fileTemplate", _tmpl );
 
@@ -58,7 +59,7 @@
     			});
 			});
 		},
-		error: WEIBO.ui.errorHandler
+		error: App.error.XHRErrorHandler("初始化'我的网盘'失败！")
 	});
 	
 	function _swfuploadHtml(){

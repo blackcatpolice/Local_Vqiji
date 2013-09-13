@@ -26,24 +26,6 @@
       </li>
     <% end %>
   </ul>
-
-<hr/>
-
-  <ul>
-    <% @meetings.each do |meeting| %>
-      <li data-id="<%= meeting.to_param %>" is-sys="false">
-        <div class="detail">
-          <%= meeting.meeting.subject %>
-        </div>
-<!--         <div>
-            <span class="at"><%= l meeting.at, format: '%H:%M' %></span>
-            <a class="hide" href="javascript:void(0)" data-action="delete-schedule-todo">删除</a>
-        </div> -->
-      </li>
-    <% end %>
-  </ul>
-
-
 <% else %>
   <div style="height: 25px; padding-top: 10px; text-align: center;">没有待办事项</div>
 <% end %>

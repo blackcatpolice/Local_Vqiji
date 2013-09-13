@@ -204,6 +204,6 @@ Weibo::Application.routes.draw do
 
     resources :knowledge_types
 
-    root :to => 'users#index'
+    root :to => 'users#home'
   end
 end

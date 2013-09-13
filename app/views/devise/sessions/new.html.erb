@@ -6,11 +6,11 @@
       :html=>{ :class=>'form-horizontal form-signin' }) do |f| %>
       <div class="notice"><%= alert || notice %></div>
       <div class="ipt">
-        <%= f.text_field :login, :autofocus => true, :placeholder=>'邮箱，员工号' %>
+        <%= f.text_field :login, :autofocus => true, :placeholder=>' 邮箱，员工号 ' %>
       </div>
 
       <div class="ipt ipt1" style="margin-bottom:11px;">
-        <%= f.password_field :password, :placeholder => '密码' %>
+        <%= f.password_field :password, :placeholder => ' 密码 ' %>
       </div>
 
       <% if devise_mapping.rememberable? %>
@@ -21,8 +21,7 @@
         </div>
       <% end %>
       <%= f.submit '', class: 'btn btn-signin' %>
-      <%= link_to '', new_user_registration_path, class: 'btn btn-signup' %>
-      <div>
+      <%= link_to '', sign_up_path, class: 'btn btn-signup' %>
     <% end %>
     <div class="links">
       <%= link_to '忘记密码？', new_user_password_path, class: 'forgot-pass' %>

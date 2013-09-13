@@ -5,6 +5,8 @@ class Favorite
   include Mongoid::Document
   include Mongoid::Timestamps::Created
 
+  field :tag
+
   belongs_to :user,  class_name: 'User', inverse_of: :favorites, counter_cache: true
   belongs_to :tweet, class_name: 'Tweet', inverse_of: :favorites, counter_cache: true
   
@@ -29,15 +31,19 @@ class Favorite
     end
     
     # 收藏微博
-    def favorite(tweet)
+    def favorite(tweet, tag = nil)
       if !favorite?(tweet)
-        @user.favorites.create!(tweet: tweet)
+        @user.favorites.create!(tweet: tweet, tag: tag)
       end
     end
     
     # 取消收藏
     def unfavorite!(tweet)
       @user.favorites.where(tweet_id: tweet.to_param).destroy
+    end
+    
+    def of(tweet)
+      @user.favorites.where(tweet_id: tweet.to_param).first
     end
   end # /Service
   

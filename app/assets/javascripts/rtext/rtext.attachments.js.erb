@@ -2,11 +2,13 @@
 // require jQuery.ui.widget
 
 (function($) {
+
+  var VIDEO_PLAYER_TMPL = ''
+    + '<div style="margin-bottom: 10px;">'
+      + '<embed src="${url}" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" wmode="opaque" width="400" height="400" withSearchBar="false" autoPlay="true" pluginspage="http://get.adobe.com/cn/flashplayer/"  flashvars="playMovie=true&amp;auto=1" wmode="transparent"></embed>'
+    + '</div>';
+
   $.widget("rtext.rtextAttachments", {
-    options: {
-      message: null // required
-    },
-    
     _create: function() {
       var context = this;
       this._children = this.element.children();
@@ -65,36 +67,31 @@
       if(videoUrl.data("isPlaying")) {
         return false;
       }
-
       var context = this;
-
-      var _viewer = $(''
-        + '<div style="margin-bottom: 10px;">'
-          + '<embed src="' 
-            + videoUrl.attr("data-play-url") 
-            + '" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" wmode="opaque" width="400" height="400" withSearchBar="false" autoPlay="true" pluginspage="http://get.adobe.com/cn/flashplayer/"  flashvars="playMovie=true&amp;auto=1" wmode="transparent"></embed>'
-        + '</div>')
+      
+      var _viewer = $.tmpl(VIDEO_PLAYER_TMPL, {
+          url: videoUrl.attr("data-play-url")
+        })
         .appendTo(context.element)
         .rtextAttachmentViewer({
-         open: function() {
-           context._children.hide();
-           videoUrl.data("isPlaying", true);
-         },
-         close: function() {
-           context._children.show();
-           _viewer.remove(); // 删除
-           videoUrl.data("isPlaying", false);
-         },
-         buttons: {
-           "在新窗口中打开": {// 在单独窗口中打开图片
-              class_: "",
-              click: function() {
-                window.open(videoUrl.attr("href"));
-              }
+           open: function() {
+             context._children.hide();
+             videoUrl.data("isPlaying", true);
+           },
+           close: function() {
+             context._children.show();
+             _viewer.remove(); // 删除
+             videoUrl.data("isPlaying", false);
+           },
+           buttons: {
+             "在新窗口中打开": {// 在单独窗口中打开图片
+                class_: "",
+                click: function() {
+                  window.open(videoUrl.attr("href"));
+                }
+             }
            }
-         }
-       });
-      
+         });
       this._openViewer(_viewer);
       return false;
     },

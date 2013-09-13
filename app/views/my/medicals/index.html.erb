@@ -12,7 +12,7 @@
       <div class="med_dhk mb10" id="show<%=mr.id%>">
       	<div class="chk"><input name="files" type="checkbox" value="<%=mr.id%>" /></div>
       	<div class="con">
-      		<div ><%= link_to mr.title, mr.record_url, :target => "_blank", :id=>"title#{mr.id}"%><a href="javascript:;" id="<%=mr.id%>" class="changeName f12" >重命名</a></div>
+      		<div ><%= link_to mr.title, mr.record_url, :target => "_blank", :id=>"title#{mr.id}"%><a href="javascript:void(0)" id="<%=mr.id%>" class="changeName f12" >重命名</a></div>
       		<div class="mt5 f12">
       			<%= format_time(mr.created_at,"%Y-%m-%d") %>
       			<a href="/my/medicals/<%=mr.id%>/destroy" onclick="return confirm('您确定要删除吗？');" style="float:right;" class="del"></a>
@@ -148,8 +148,8 @@
 		}).get();
  	  					
 	  if (txt.length == 0) {
-			  $.alert("请勾选需要批量删除的病历");
-			  return false;
+		  $.alert("请勾选需要批量删除的病历");
+		  return false;
    	};
    	
 		if(!confirm("您确定要删除所选病历吗?")) {
@@ -168,11 +168,9 @@
 			    _id = "#show" + msg[i];
 		      $(_id).hide(1000);
 			  };
-			  $.dialog("删除成功！");
+			  $.alert("删除成功！", 1);
 		  },
-	    error: function(){
-	      $.alert("发生未知错误");
-	    }
+	    error: App.error.XHRErrorHandler("删除失败！")
    	});
 	});
 </script>

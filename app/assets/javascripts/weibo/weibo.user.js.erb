@@ -45,14 +45,14 @@
        	//alert(isFollowedBy());
          self._setFollowed(true,true);
        },
-       error : WEIBO.ui.errorHandler
+       error : App.error.XHRErrorHandler("关注失败！")
       });
     },
     
     _unfollow: function() {
       var self = this;
     
-      WEIBO.ui.confirm('您确认取消关注TA吗？', function(ensure) {
+      $.confirm('您确认取消关注TA吗？', function(ensure) {
         if (!ensure) { return; }
        
         WEIBO.unfollow(self._userId(), {
@@ -60,7 +60,7 @@
          success : function() {
            self._setFollowed(false);
          },
-         error : WEIBO.ui.errorHandler
+         error : App.error.XHRErrorHandler("取消关注失败！")
         });
       })
     },

@@ -42,7 +42,7 @@
           autoOpen: true,
           success: function() {
             _popReposter.repostModal("close");
-            WEIBO.ui.alert("转发微博成功！");
+            $.alert("转发微博成功！", 1);
           },
           close: function() { // 关闭后清理
             _popReposter.repostModal("destroy").remove();
@@ -69,7 +69,7 @@
               .insertAfter(context._counter);
             context._commentEmbedList = _commentEmbedList;
           },
-          error: WEIBO.ui.errorHandler,
+          error: App.error.XHRErrorHandler("获取评论失败！"),
           complete: function() {
             context._toggleCommentsList._locked = false;
           }
@@ -95,7 +95,7 @@
              $("a[data-action=favorite]",context.element).text("取消收藏");
              context.element.attr("data-favorite", "true");
            },
-           error : WEIBO.ui.errorHandler
+           error : App.error.XHRErrorHandler("取消收藏失败！")
          });
        } else {
          WEIBO.unfavorite(context._messageId(), {
@@ -103,7 +103,7 @@
             $("a[data-action=favorite]",context.element).text("收藏");
              context.element.attr("data-favorite", "false");
            },
-           error : WEIBO.ui.errorHandler
+           error : App.error.XHRErrorHandler("收藏失败！")
         });
        }
     } // _toggleFavorite

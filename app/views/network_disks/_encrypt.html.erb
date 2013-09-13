@@ -1,5 +1,5 @@
 <div id="fileEncryptModal" class="modal" role="dialog" style="width: 400px; display:none;">
-	<div class="modal-header"><a class="close" data-dismiss="modal"></a><div class="model_tabs"><a href="javascript:;" class="tabs_rw">加密</a></div></div>
+	<div class="modal-header"><a class="close" data-dismiss="modal"></a><div class="model_tabs"><a href="javascript:void(0)" class="tabs_rw">加密</a></div></div>
 	<div class="modal-body">
 		<div class="modal_form">
 			<div class="wd_zf">
@@ -31,13 +31,13 @@
   		WEIBO.fileEncrypt(_fid, {
   			encrypt: $(':password[name=encrypt]', '#fileEncryptModal').val(),
   			success: function(data) {
-  				$.alert('文件『' + $(data).attr('data-name') + '』加密成功.', '加密成功',1);
+  				$.alert('文件『' + $(data).attr('data-name') + '』加密成功.', '加密成功', 1);
   				$('<div id="appendFile" />').insertAfter($('#fid_' + _fid));
   				$('#fid_' + _fid).remove();
   				$(data).fileOperate().insertAfter('#appendFile');
   				$('#appendFile').remove();
     		},
-    		error: WEIBO.ui.errorHandler
+    		error: App.error.XHRErrorHandler("加密失败！")
   		});
   	});
   	

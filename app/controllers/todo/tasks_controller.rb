@@ -73,7 +73,6 @@ class Todo::TasksController < Todo::BaseController
           render :action => "new"
         end
      end
-  	 
   end
 
   def confirm

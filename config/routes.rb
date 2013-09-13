@@ -1,16 +1,14 @@
 Weibo::Application.routes.draw do
-  devise_for :users, :path => '/', :controllers => {
-    :registrations => :registrations
-  }
+  devise_for :users, :path => '/'
 
   # 注册/登录/登出
   get 'sign_in'  => 'devise/sessions#new'
   get 'sign_out' => 'devise/sessions#destroy'
-  # get 'sign_up'  => 'registration#new'
+  get 'sign_up' => 'checks#new'
 
   devise_scope :users do
-    get  "sign_up_check" => "checks#new"
-    resources :checks , :only => [:create]
+    resources :checks , :only => [ :new, :create ]
+    resources :registrations, :only => [ :new, :create ]
   end
 
   # 我的微博

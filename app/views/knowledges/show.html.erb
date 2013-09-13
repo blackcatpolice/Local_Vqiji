@@ -10,7 +10,7 @@
 		<div class="zsk_nr">
 			<div class="zsk_gn">
 				<% if current_user == @knowledge.creator %>
-				<%= link_to "删除", "javascript:;", :class=>"zsk_sc", :data=>{action:'delete'}%><%= link_to "编辑", edit_knowledge_path, :class=>"zsk_bj", :'data-skip-pjax'=>true%>
+				<%= link_to "删除", "javascript:void(0)", :class=>"zsk_sc", :data=>{action:'delete'}%><%= link_to "编辑", edit_knowledge_path, :class=>"zsk_bj", :'data-skip-pjax'=>true%>
 				<% end %>
 			</div>
 			<h1><%= @knowledge.title%></h1>

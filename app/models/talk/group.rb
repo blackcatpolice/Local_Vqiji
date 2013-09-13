@@ -63,13 +63,13 @@ class Talk::Group
   
   def remove_member!(user)
     if (session = session_for(user))
-      p2p ? session.delete : session.destroy
+      p2p ? session.delete : session.destroy!
     end
   end
   
   def remove_session!(session)
     if (session.group == self)
-      p2p ? session.delete : session.destroy
+      p2p ? session.delete : session.destroy!
     end
   end
   
@@ -79,13 +79,13 @@ class Talk::Group
       session.restore # 恢复删除的会话
     end if deleted_sessions.any?
   end
-  
+
   # 发送消息
   def send_message(sender, text, opts={})
     _message = Talk::Message::User.new(group: self, sender: sender, text: text) do |message|
-      message.set_picture(opts[:pictureId]) if opts[:pictureId]
-      message.set_audio(opts[:audioId]) if opts[:audioId]
-      message.set_file(opts[:fileId]) if opts[:fileId]
+      message.set_audio sender.attachments.audios.find(opts[:audioId]) if opts[:audioId]
+      message.set_picture sender.attachments.pictures.find(opts[:pictureId]) if opts[:pictureId]
+      message.set_file sender.attachments.find(opts[:fileId]) if opts[:fileId]
     end
     
     if _message.save!

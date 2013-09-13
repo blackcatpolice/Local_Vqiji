@@ -4,17 +4,29 @@
  */
 
 .schedule-calendar .head { margin-left: -1px; }
-.schedule-calendar .head .switch { width: 198px !important; }
+.schedule-calendar .head .switch { width: 90px !important; background:none; }
 
 .schedule-calendar .mr_rl {margin-left:7px; width:253px; height:auto; text-align:center;}
 .schedule-calendar .mr_rl span { width:32px; height:30px; float:left; display:block;}
 .schedule-calendar .mr_rl li { width:36px; height:30px; color:#c8c8c8; line-height:30px; float:left;}
 .schedule-calendar .mr_rlk {  height:187px; border-top:1px solid #f5efe7; border-left:1px solid #f5efe7;}
 .schedule-calendar .mr_rlk li { width:35px; height:30px; position:relative; color:#545454; line-height:30px; font-weight:bold; float:left; border-bottom:1px solid #f5efe7; border-right:1px solid #f5efe7;}
-.schedule-calendar .mr_rlk li.gray { color:#c8c8c8;}
-.schedule-calendar .mr_rlk li.on { background-image:url(<%= asset_path 'images/icon.png' %>); background-position:-123px -538px; background-repeat:no-repeat;}
-.schedule-calendar .mr_rlk li:hover { background-image:url(<%= asset_path 'images/icon.png' %>); background-position:-123px -538px; background-repeat:no-repeat; cursor:pointer;}
-.schedule-calendar .mr_rlk li.data { background-image:url(<%= asset_path 'images/icon.png' %>); background-position:-123px -538px; background-repeat:no-repeat;}
+.schedule-calendar .mr_rlk li.gray { color:#c8c8c8; }
+.schedule-calendar .mr_rlk li.today,
+.schedule-calendar .mr_rlk li.today:hover {
+  color:#ce293b;
+}
+.schedule-calendar .mr_rlk li.today.on,
+.schedule-calendar .mr_rlk li.today.on:hover {
+  color:#fff;
+}
+.schedule-calendar .mr_rlk li.on,
+.schedule-calendar .mr_rlk li.on:hover {
+  background-image:url(<%= asset_path 'images/icon.png' %>);
+  background-position:-168px -538px;
+}
+.schedule-calendar .mr_rlk li:hover { background-image:url(<%= asset_path 'images/icon.png' %>); background-position:-123px -538px; cursor:pointer; color:#545454; }
+.schedule-calendar .mr_rlk li.data { background-image:url(<%= asset_path 'images/icon.png' %>); background-position:-123px -538px; background-repeat:no-repeat; }
 .schedule-calendar .mr_rlk li span { display:block; height:4px; width:4px; }
 .schedule-calendar .mr_rlk li span.user { background-color: #f89406; position:absolute; right:2px; bottom:2px;}
 .schedule-calendar .mr_rlk li span.sys { background-color: #da4f49; position:absolute; right:8px; bottom:2px;}

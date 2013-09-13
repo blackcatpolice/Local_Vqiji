@@ -1,17 +1,10 @@
 require File.expand_path('../boot', __FILE__)
-require "rails"
 
-%w(
-  action_controller
-  action_mailer
-  active_resource
-  sprockets
-).each do |framework|
-  begin
-    require "#{framework}/railtie"
-  rescue LoadError
-  end
-end
+require "rails"
+require "action_controller/railtie"
+require "action_mailer/railtie"
+require "active_resource/railtie"
+require "sprockets/railtie"
 
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
@@ -45,8 +38,7 @@ module Weibo
       'notification/observers/advisory_question_observer', 'notification/observers/advisory_answer_observer',
       'notification/observers/elearn_training_observer', 'notification/observers/elearn_training_user_observer',
       'notification/observers/gfeed_observer', 'notification/observers/group_member_observer',
-      'notification/observers/todo_task_observer', 'notification/observers/talk_session_observer',
-      'notification/observers/meeting_member_observer'
+      'notification/observers/todo_task_observer', 'notification/observers/talk_session_observer'
     ]
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.

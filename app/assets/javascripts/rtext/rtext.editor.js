@@ -41,7 +41,6 @@
       textMaxLength: 140,
       tools: ["emotion"],  /* 使用的工具 */
       inputMention: false, /* 可否输入 mention */
-      selectFile: false, /*是否可选网盘文件*/
       preset: null,
       placeHolder: null,
       submit: null,
@@ -245,38 +244,48 @@
     },
     
     _enableMention: function() {
-      this._texter.atwho("@", {
+      this._texter.atwho({
+        at: "@",
         limit: 7,
         callbacks: {
-          filter: function(query, data, search_key) {
-            // 查询所有好友
+          remote_filter: function(query, callback) {
             WEIBO.api.queryFolloweds({
               async: false,
               page: 1,
               psize: 7,
               query: query,
               cache: true,
-              success: function(resp) { data = resp; }
+              success: function(data) {
+                callback(data);
+              }
             });
-            return data;
           }
-        }
+        },
+        tpl: '<li data-value="${name}">${name}</li>',
+        start_with_space: false
       });
     },
     
     _enableGroupMention: function() {
-      this._texter.atWho("@", {
-        tpl: "<li id='${id}' data-value='${nickname}'>${nickname}</li>",
+      this._texter.atwho({
+        at: "@",
         limit: 7,
-        callback: function(query, done) {
-          // 查询所有好友
-          WEIBO.api.queryGroups({
-            page: 1, psize: 7,
-            query: query,
-            cache: true,
-            success: done
-          });
-        }
+        callbacks: {
+          remote_filter: function(query, callback) {
+            WEIBO.api.queryGroups({
+              async: false,
+              page: 1,
+              psize: 7,
+              query: query,
+              cache: true,
+              success: function(data) {
+                callback(data);
+              }
+            });
+          }
+        },
+        tpl: "<li id='${id}' data-value='${nickname}'>${nickname}</li>",
+        start_with_space: false
       });
     },
 
@@ -457,7 +466,7 @@
         $('<div class="bs-docs-example">' +
             '<ul class="nav nav-tabs">'   +
               '<li class="active"><a href="javascript:void(0)" data-role="role-upload">附件</a></li>'  +
-              '<li><a href="javascript:;" data-role="role-disk">网盘</a></li>' +
+              '<li><a href="javascript:void(0)" data-role="role-disk">网盘</a></li>' +
               '<li><a data-role="selected-file" style="display:none;cursor: text;"></a></li>' + 
             '</ul>' +
           '</div>').appendTo(_tip);
@@ -504,7 +513,7 @@
           uploaded: function(event, file) {
             context._file = file;
             if(context._selecedFileText){
-            	context._selecedFileText.text("已选附件: " + _subString(file.name, 10)).show();
+            	context._selecedFileText.text("已选附件: " + $.truncate(file.name, 10)).show();
             }
             fileBtn.addClass("on");
           },

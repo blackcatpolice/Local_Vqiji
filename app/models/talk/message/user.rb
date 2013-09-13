@@ -30,28 +30,29 @@ class Talk::Message::User < Talk::Message
     message.rtext = Talk::Rtext.tokenize(message.text)
   end
 
-  def set_picture(picture_id)
-    _picture = Attachment::Picture.get(picture_id)
-    if _picture
-      _picture.update_attributes(:target => self)
-      self.picture = _picture
-    end
+  def set_audio(_audio)
+    _audio.update_attributes(:target => self)
+    self.audio = _audio
   end
 
-  def set_audio(audio_id)
-    _audio = Attachment::Audio.get(audio_id)
-    if _audio
-      _audio.update_attributes(:target => self)
-      self.audio = _audio
+  def set_file(_file)
+    unless _file.is_a?(Attachment::File)
+      open(_file.path) do |file|
+        _file = Attachment::File.create!({
+          :file => file,
+          :uploader => _file.uploader,
+          :name => _file.name
+        })
+      end
+    else
+      _file.update_attributes(:target => self)
     end
+    self.file = _file
   end
 
-  def set_file(file_id)
-    _file = Attachment::Base.get(file_id)
-    if _file
-      _file.update_attributes(:target => self) if _file.is_a?(Attachment::File)
-      self.file = _file
-    end
+  def set_picture(_picture)
+    _picture.update_attributes(:target => self)
+    self.picture = _picture
   end
   
   def rtext_html

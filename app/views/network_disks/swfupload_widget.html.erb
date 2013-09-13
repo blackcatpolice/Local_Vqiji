@@ -49,7 +49,7 @@ var swfu = new SWFUpload({
 			progress.toggleCancel(false);
 			var _tmpl = '<li>' + 
 				'<a href="/download/${id}" data-skip-pjax title="${name}">${name}</a>' + 
-				'<span><a href="javascript:;" data-action="file-share" data-id="${id}">分享</a> | <a href="/download/${id}" data-skip-pjax>下载</a></span>' +
+				'<span><a href="javascript:void(0)" data-action="file-share" data-id="${id}">分享</a> | <a href="/download/${id}" data-skip-pjax>下载</a></span>' +
 				'</li>';
 			var _tmplHtml = $.tmpl( _tmpl, eval('(' + serverData +')') );
 			$('[data-action=file-share]', _tmplHtml).click(function(){

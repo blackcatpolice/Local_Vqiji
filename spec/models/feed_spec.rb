@@ -3,10 +3,41 @@
 require 'spec_helper'
 
 describe Feed do
-  #it "should fail when recever exists scope by tweet" do
-  #  feed = create :feed
-  #  new_feed = feed.clone
-  #  new_feed.save.should be_false
-  #  new_feed.should have(1).errors_on(:receiver_id)
-  #end
+
+  describe '#read!' do
+    it 'should set read_at' do
+      feed = create :feed
+      feed.read!
+      feed.read_at.should_not be_nil
+      feed.readed?.should be_true
+    end
+  
+    it 'should increment tweet\'readers count' do
+      feed = create :feed
+      feed.tweet.readers_count.should == 0
+      feed.read!
+      feed.tweet.reload.readers_count.should == 1
+    end
+  end
+
+  describe '#unread!' do
+    it 'should set read_at = nil' do
+      feed = create :feed
+      feed.read!
+      
+      feed.unread!
+      feed.read_at.should be_nil
+      feed.readed?.should be_false
+    end
+  
+    it 'should decrement tweet\'readers count' do
+      feed = create :feed
+      feed.read!
+      
+      feed.tweet.reload.readers_count.should == 1
+      feed.unread!
+      feed.tweet.reload.readers_count.should == 0
+    end
+  end
+
 end

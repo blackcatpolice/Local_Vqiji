@@ -44,6 +44,4 @@ zh-CN:
           unit: '个新任务'
         notification/talk_group_join:
           unit: '个新加入讨论组'
-        notification/meeting_invite:
-          unit: '个会议邀请'  
 

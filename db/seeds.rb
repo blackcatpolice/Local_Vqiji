@@ -11,5 +11,5 @@
 Dir[File.join(Rails.root, 'db', 'seeds', '**', '*.rb')].each { |seed| load seed }
 
 if Rails.env != 'production'
-  User.create({ :password => '12345678', :password_confirmation => '12345678', :email => "admin@vqiji.com", :name => "管理员", :checked=>true, :is_admin => true }, as: :admin)
+  User.create({ :password => '12345678', :password_confirmation => '12345678', :email => "admin@vqiji.com", :name => "管理员", :checked => true, :is_admin => true, job_no: '-000000', id_number: '0' }, as: :admin)
 end

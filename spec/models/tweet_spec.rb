@@ -56,6 +56,26 @@ describe Tweet do
     comment.text.should == "第一条评论"
     comment.sender.should == user
   end
+
+  it '重要微博不分发给粉丝' do
+    tweet = create :tweet, :is_top => true
+    tweet.to_fans?.should be_false
+  end
+
+  it '_to_fans != true 的微博不能分发给粉丝' do
+    tweet = create :tweet, :_to_fans => false
+    tweet.to_fans?.should be_false
+  end
+    
+  it '重要微博不能转发' do
+    tweet = create :tweet, :is_top => true
+    tweet.repostable?.should be_false
+  end
+    
+  it '_to_fans != true 的微博不能转发' do
+    tweet = create :tweet, :_to_fans => false
+    tweet.repostable?.should be_false
+  end
   
   describe "#dispatch" do
     it "should dispatch to fans." do

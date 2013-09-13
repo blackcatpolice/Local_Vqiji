@@ -1,7 +1,9 @@
+<% keyword = params[:keyword] %>
+
 <div class="zsk_k" node-type="Knowledge" data-id="<%= knowledge.id %>" data-title="<%= knowledge.title%>">
     <div class="zsk_kt">
     	<%= knowledge_type_image_tag knowledge.knowledge_type.image %>
-    	<%= link_to truncate_u(knowledge.title, 7), knowledge_path(knowledge), :class=> "f16", :title=>knowledge.title%>
+      <%= link_to truncate_u_copy(knowledge.title, 7, '...', keyword), knowledge_path(knowledge), :class=> "f16", :title=>knowledge.title%>
     	<span>
     	  <% if knowledge.creator %>
       	  创建人：<%= knowledge.creator.name %>
@@ -10,6 +12,16 @@
     	  <%= l knowledge.created_at, :format => :long%>
     	</span>
   	</div>
+  <div>
+    <% if keyword %>
+    <%= @query.hits[knowledge_counter].highlights(:text).size %>
+        <% @query.hits[knowledge_counter].highlights(:text).each do |highlight| %>
+        <p>
+          <%= highlight.format {|word| "<font color='red'>#{word}</font>"}.html_safe %>
+        </p>
+        <% end %>  
+    <% end %>
+  </div>
 	<div class="zsk_d">
 		<% if knowledge.creator == current_user %>
 		  <%= link_to "", edit_knowledge_path(knowledge), :'data-skip-pjax'=>true, :class => "bj", :title => '编辑' %>

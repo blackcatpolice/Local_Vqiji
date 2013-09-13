@@ -52,8 +52,10 @@ class Todo::Service
 			self.msgs[:executor] = "任务处理人不存在"
 			return task 
 		end
-		task.set_file file_id
-		task.set_picture picture_id
+
+    task.set_file @user.attachments.find(file_id) unless file_id.blank?
+    task.set_picture @user.attachments.pictures.find(picture_id) unless picture_id.blank?
+		
 		task.creator = self.user
 		#task.logs.build(:user => self.user,:task => task,:msg => "新建任务")
 		self.pass = task.save
@@ -116,9 +118,16 @@ class Todo::Service
 	
 	#= log =
 	def create_log(task, opts, todo_task = nil, file_id = nil, picture_id = nil)
-	  log = task.logs.build(:user => self.user,:task=>task,:msg=>opts[:msg], :value=>opts[:value], :old_value => task.value, :old_task_schedule=>task.schedule)
-	  log.set_file(file_id)
-	  log.set_picture(picture_id)
+	  log = task.logs.build({
+	    :user => @user,
+	    :task => task,
+	    :msg => opts[:msg],
+	    :value => opts[:value],
+	    :old_value => task.value,
+	    :old_task_schedule => task.schedule
+	  })
+	  log.set_file @user.attachments.find(file_id) unless file_id.blank?
+	  log.set_picture @user.attachments.pictures.find(picture_id) unless picture_id.blank?
     task.value = log.value
     
 	  if task.creator == self.user

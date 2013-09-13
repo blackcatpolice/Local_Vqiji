@@ -4,7 +4,7 @@
 # 录音，图片，文件
 class AttachmentsController < WeiboController
 
-  #上传音频附件
+  # 上传音频附件
   def audio
     begin
       # 如果使用 form data 上传
@@ -55,13 +55,13 @@ class AttachmentsController < WeiboController
   #上传病历
   def history
     _file = params[:tmp_file][:file];
-    _tmp = Attachment::NetworkDisk.create!(:file => _file,
+    @tmp = Attachment::NetworkDisk.create!(:file => _file,
       :name => _file.original_filename,
       :uploader_id => current_user.id,
-      :upload_type => Attachment::NetworkDisk::UPLOAD_TYPE_HISTORY
+      :upload_type => Attachment::NetworkDisk::TYPE_HISTORY
     )
     respond_to do |format|
-      format.json { render_inline_json _tmp.to_json }
+      format.json { render_inline_json @tmp.to_json }
     end
   end
 
@@ -102,50 +102,44 @@ class AttachmentsController < WeiboController
       render :json => data
     end
   end
+  
+  DOWNLOAD_ABLE_TYPES = [
+    Attachment::Audio,
+    Attachment::File,
+    Attachment::Picture
+  ].collect { |model|
+      model._types
+    }.flatten!.freeze
 
-
-  #下载附件
+  # 下载附件
   def download
-    att = Attachment::Base.get(params[:id])
-
-    if att
-      filename = att.name || att.filename
-      url = "#{att.file.path}"
-      if att.encrypt
-        chdir, tardir = File.split(url)
-        url = chdir + '/' + Attachment::Base::ENCRYPT_FILE_NAME
-        filename = File.basename(filename, File.extname(filename)) + '.zip'
-      end
-      send_file(url, :filename => filename)
-    else
-      render :text => "没有相应的文档"
-    end
+    @file = Attachment::Base.where(:_type.in => DOWNLOAD_ABLE_TYPES).find(params[:id])
+    send_file @file.path, :filename => (@file.name || @file.filename), :x_sendfile => true
   end
 
   def destroy
-    att = Attachment::Base.find(params[:id])
+    @file = Attachment::Base.find(params[:id])
 
-    if att.uploader == current_user
-      att.destroy
+    if @file.uploader == current_user
+      @file.destroy
       respond_to do |format|
-        format.json { render :json => att }
+        format.json { render :json => @file }
       end
     else
       raise WeiboError, '滚粗！'
     end
   end
-  
-  
+
   def case_history
-    histories = Attachment::Base.where(:uploader_id => current_user.id, :upload_type => Attachment::NetworkDisk::UPLOAD_TYPE_HISTORY,:status => Attachment::NetworkDisk::FILE_STATUS)
+    @histories = Attachment::Base.where(:uploader_id => current_user.id, :upload_type => Attachment::NetworkDisk::TYPE_HISTORY,:status => Attachment::NetworkDisk::FILE_STATUS)
     respond_to do |format|
-      format.json { render :json => histories }
+      format.json { render :json => @histories }
     end
   end
   
   def disks
-    files = Attachment::NetworkDisk.where(:uploader_id => current_user.id, :upload_type => Attachment::NetworkDisk::UPLOAD_TYPE_NETWORK_DISK, :status => Attachment::NetworkDisk::FILE_STATUS).desc(:created_at)
-    render :json => files
+    @files = Attachment::NetworkDisk.where(:uploader_id => current_user.id, :upload_type => Attachment::NetworkDisk::TYPE_NETWORK_DISK, :status => Attachment::NetworkDisk::FILE_STATUS).desc(:created_at)
+    render :json => @files
   end
-  
+
 end

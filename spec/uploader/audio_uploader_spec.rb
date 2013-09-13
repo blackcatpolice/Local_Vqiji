@@ -20,7 +20,7 @@ describe AudioUploader do
     @uploader.duration.should == 2.81
   end
 
-  it "should make the image readable only to the owner and not executable" do
+  it "should make the audio readable only to the owner and not executable" do
     @uploader.should have_permissions(0666)
   end
 end

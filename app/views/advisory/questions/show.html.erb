@@ -134,7 +134,7 @@ $(function(){
 					success: function(data) {
 						window.location.href="<%= unsolved_advisory_questions_path%>";
     				},
-					error: WEIBO.ui.errorHandler
+					error: App.error.XHRErrorHandler("删除问题失败！")
 				});
 			}
 		});
@@ -148,7 +148,7 @@ $(function(){
 			success: function() {
 				window.location.href="<%= solved_advisory_questions_path%>";
 			},
-			error: WEIBO.ui.errorHandler
+			error: App.error.XHRErrorHandler("操作失败！")
 		});
 	});
 });

@@ -6,13 +6,8 @@ class Rt::Url
     HOST = 'v.youku.com'
     
     CONFIG = YAML.load_file("#{Rails.root}/config/youku_video.yml")
-    PID = CONFIG['pid']
+    CLIENT_ID = CONFIG['pid']
 
-    OPTIONS = {
-      :rt => :JSON,
-      :pid => PID
-    }.freeze
-    
     def to_token(options = nil)
       _get_token
     end
@@ -24,38 +19,35 @@ class Rt::Url
     private
 
     # 根据视频ID得到视频的详细信息。
-    # url: GET http://api.youku.com/api_ptvideoinfo
-    #  pid	YOUKU合作ID
-    #  id	视频ID	兼容优酷播放URL
-    #  rt	返回数据类型	2.XML 3.JSON
+    # http://open.youku.com/docs/api/videos/show_basic
     #
-    def _get_videoinfo
-      _query = OPTIONS.merge({
-        :id => long_url
-      });
+    def _get_video_info
+      _query = {
+        :client_id => CLIENT_ID,
+        :video_url => long_url
+      }
       
       _querystr = URI.encode_www_form(_query)
-      _youku_url = 'http://api.youku.com/api_ptvideoinfo?%s' % _querystr
+      _youku_url = 'https://openapi.youku.com/v2/videos/show_basic.json?%s' % _querystr
       request!(_youku_url)
     end
     
     def _create_token(json)
-      _json = JSON.parse(json)
-      return nil unless _json
+      _videoinfo = JSON.parse(json)
+      return nil unless _videoinfo
       
-      _videoinfo = _json
-      Tweet::Token::VideoUrl.new(
+      Rt::Vurl.new(
         :source => 'Youku',
         :url  => short_url,
-        :name => _videoinfo['title'],
-        :cover_url => _videoinfo['imagelink'],
-        :description => _videoinfo['comment'],
-        :play_url => _videoinfo['shareswf']
+        :title => _videoinfo['title'],
+        :cvurl => _videoinfo['thumbnail'],
+        :desc => _videoinfo['description'],
+        :plurl => _videoinfo['player']
       )
     end
     
     def _get_token
-      @_retext ||= _create_token(_get_repaste_info)
+      @_retext ||= _create_token(_get_video_info)
     end
     
     def request!(url)

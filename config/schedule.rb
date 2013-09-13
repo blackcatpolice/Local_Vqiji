@@ -18,3 +18,7 @@
 # end
 
 # Learn more: http://github.com/javan/whenever
+
+every :day, :at => '4:00 am' do
+ rake "sunspot:mongo:reindex"
+end
