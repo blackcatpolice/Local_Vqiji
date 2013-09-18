@@ -29,11 +29,13 @@ class Todo::Log
       creator_count = Todo::Count.find_by_user_id(task.creator_id)
       executor_count = Todo::Count.find_by_user_id(task.executor_id)
       
+      Rails.logger.info("!!!!!!cc:#{creator_count}-------!!!!!!!ec:#{executor_count}")
+
       case self.task_schedule
         when Todo::Task::SCHEDULE_ING
           if self.old_task_schedule == Todo::Task::SCHEDULE_CONFIRM
-            creator_count.inc(:create_confirm, -1) if creator_count.create_confirm > 0
-            executor_count.inc(:execute_confirm, -1) if executor_count.execute_confirm > 0
+            creator_count.inc(:create_completed_checking, -1) if creator_count.create_completed_checking > 0
+            executor_count.inc(:execute_completed_checking, -1) if executor_count.execute_completed_checking > 0
           end
           
           creator_count.inc(:create_now, 1)
@@ -44,21 +46,22 @@ class Todo::Log
           creator_count.inc(:create_now, -1) if creator_count.create_now > 0
           executor_count.inc(:execute_now, -1) if executor_count.execute_now > 0
           
-          creator_count.inc(:create_confirm, 1)
-          executor_count.inc(:execute_confirm, 1)
+          creator_count.inc(:create_completed_checking, 1)
+          executor_count.inc(:execute_completed_checking, 1)
           
         when Todo::Task::SCHEDULE_COMPLETED
           if self.old_task_schedule == Todo::Task::SCHEDULE_ING
             creator_count.inc(:create_now, -1) if creator_count.create_now > 0
             executor_count.inc(:execute_now, -1) if executor_count.execute_now > 0
           elsif self.old_task_schedule == Todo::Task::SCHEDULE_CONFIRM
-            creator_count.inc(:create_confirm, -1) if creator_count.create_confirm > 0
-            executor_count.inc(:execute_confirm, -1) if executor_count.execute_confirm > 0  
+            creator_count.inc(:create_completed_checking, -1) if creator_count.create_completed_checking > 0
+            executor_count.inc(:execute_completed_checking, -1) if executor_count.execute_completed_checking > 0  
           end
           
           task.time_out ? creator_count.inc(:create_completed_timeout, 1) : creator_count.inc(:create_completed_ontime, 1)
           task.time_out ? executor_count.inc(:execute_completed_timeout, 1) : executor_count.inc(:execute_completed_ontime, 1)
       end
+      Rails.logger.info("!!!!!!cc:#{creator_count}-------!!!!!!!ec:#{executor_count}")
     end
   end
   

@@ -36,12 +36,6 @@
 			<%= link_to kt.name, "#{knowledges_path}?type=#{kt.id}", :class => "#{params[:type] == kt.id.to_s ? 'on' : ''}"%>
 			<% end %>
 		</div>
-
-		<% if params[:keyword] %>
-			<div>
-				<%= "关键字“#{params[:keyword]}”" %>
-			</div>
-		<% end %>
 		<div class="zsk_lb f12">
 			<% unless @knowledges.blank?%>
 			  <%= render :collection => @knowledges, :partial => 'knowledges/knowledge' %>

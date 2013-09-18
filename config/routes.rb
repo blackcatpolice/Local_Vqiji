@@ -30,11 +30,19 @@ Weibo::Application.routes.draw do
     
     # 关注
     resources :followeds, :only => [:create, :destroy] do
-      get :query,:on => :collection
+      get :query, :on => :collection
     end
     
     # 收藏
-    resources :favorites, :only => [:index, :create, :destroy]
+    resources :favorites, :only => [:index, :create] do
+      collection do
+        get 'untagged' => :index_untagged
+        get 'tagged' => :index_tagged
+        delete ':tweet_id' => :destroy
+        put ':tweet_id/tags' => :set_tags
+        get ':tweet_id/tags_tip' => :set_tags_tip
+      end
+    end
     
     # 收到的微博
     resources :feeds, :only => [:index] do
@@ -57,7 +65,7 @@ Weibo::Application.routes.draw do
   
   resources :notifications, :only => [:index] do
     get :count, :on => :collection
-    get :nb, :on => :collection
+    get :board, :on => :collection
   end
   
   # 用户相关

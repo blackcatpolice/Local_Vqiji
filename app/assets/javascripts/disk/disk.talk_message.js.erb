@@ -74,8 +74,8 @@
             $(self.element).modal('hide');
             $(self.element).remove();
           },
-          error: function() {
-            App.error.handleXHRError.apply(this, arguments);
+          error: function(jqXHR, httpStatus, throwErrors) {
+            App.error.handleXHRError(jqXHR, httpStatus, throwErrors, "发送私信失败！");
             done();
           }
         }

@@ -5,8 +5,8 @@ describe NotificationsController do
     get('/notifications').should route_to('notifications#index')
   end
   
-  it 'should route to #nb' do
-    get('/notifications/nb').should route_to('notifications#nb')
+  it 'should route to #board' do
+    get('/notifications/board').should route_to('notifications#board')
   end
   
   it 'should route to #count' do

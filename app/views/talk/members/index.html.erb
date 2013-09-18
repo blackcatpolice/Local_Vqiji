@@ -45,7 +45,7 @@
           success: function() {
             widget.remove();
           },
-          error: App.error.handleXHRError
+          error: App.error.XHRErrorHandler("移除成员失败！")
         });
       }
     });

@@ -7,7 +7,7 @@ class NotificationsController < WeiboController
     render :json => current_user.notification.count
   end
 
-  def nb
+  def board
     @map = current_user.notification.map
     render :layout => false
   end

@@ -22,6 +22,8 @@ class Tweet::RepostsController < WeiboController
   
   # 新建转发
   def new
+    # NOTE: 为啥不用 find？ 因为出现微博被删除而未及时更新已经显示该微博的页面的情况几率较高，
+    # 所以不应该直接报错，而应该给予友好的错误提示
     @tweet = Tweet.find_by_id(params[:tweet_id])
     raise WeiboError, '微博不存在' unless @tweet
     raise WeiboError, '该微博不能转发' unless @tweet.repostable? 

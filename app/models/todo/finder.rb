@@ -36,7 +36,9 @@ module Todo::Finder
 	end
 
 	def will_finish_tasks creator
-		 Todo::Task.find_by_creator_id(creator.id).where(:value=>100).confirm_scope.desc(:confirm_at)
+		 Todo::Task.find_by_creator_id(creator.id)
+     .where(:value=>100)
+     .confirm_scope.desc(:confirm_at)
 	end
 
 	## query methods => about log

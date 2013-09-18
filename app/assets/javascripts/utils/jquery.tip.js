@@ -24,13 +24,14 @@
 // require jquery.ui.position
 //
 
-(function($) {
+(function($, document) {
   $.widget("ui.tip", {
     options: {
       tipClass: null,
       within: window,
       trigger: null,          // require
       triggerEvents: "click", // require
+      autoCloseWhenClickOutside: true,
       closeable: true,        // 是否显示关闭按钮
       autoOpen: false,
       csses: {
@@ -64,17 +65,30 @@
         .append( [ _arrow, _close, _content ] )
         .appendTo(document.body);
 
-      this._on({
+      this._on(this._widget, {
         "click .tp_close": this.close,
         "resize": this._delayResetPosition
       });
+      
+      if (this.options.autoCloseWhenClickOutside) {
+        this._on(this._widget, {
+          "mouseenter": this._onMouseEnter,
+          "mouseleave": this._onMouseLeave
+        });
+        if (this.options.trigger) {
+          this._on(this.options.trigger, {
+            "mouseenter": this._onMouseEnter,
+            "mouseleave": this._onMouseLeave
+          });
+        }
+      }
 
       this._on(this.options.within, { resize: this._delayResetPosition });
       
       if (this.options.trigger) {
         if (this.options.triggerEvents) {
           var events = {};
-          events[this.options.triggerEvents] = this.open;
+          events[ this.options.triggerEvents ] = this.open;
           this._on(this.options.trigger, events);
         }
       }
@@ -100,6 +114,7 @@
     }, // _setOption
     
     _destroy: function() {
+      this._offClickOutsideEvent();
       this._widget.remove();
     }, // _destroy
     
@@ -126,6 +141,28 @@
       }, this), timeout || 20);
     },
     
+    _onMouseEnter: function() {
+      this._offClickOutsideEvent();
+    },
+    
+    _onMouseLeave: function() {
+      this._bindClickOutsideEvent();
+    },
+    
+    _bindClickOutsideEvent: function() {
+      this._on(document, {
+        "click": this._clickOutside
+      });
+    },
+    
+    _offClickOutsideEvent: function() {
+      this._off( $(document), "click" );
+    },
+    
+    _clickOutside: function() {
+      this.close();
+    },
+    
     open: function() {
       if (!this._isOpen) {
         this._isOpen = true;
@@ -141,6 +178,7 @@
         this._widget.hide();
         this._isOpen = false;
         this._trigger("close");
+        this._offClickOutsideEvent();
       }
       return this;
     }, // close
@@ -180,4 +218,4 @@
       }
     }
   };
-})(jQuery);
+})(jQuery, window.document);

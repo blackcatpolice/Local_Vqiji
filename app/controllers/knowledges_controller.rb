@@ -5,17 +5,14 @@ class KnowledgesController < WeiboController
 
   #所有公开的文档
   def index
-    @query = Knowledge.search do
-      fulltext params[:keyword] do
-        highlight :title
-        highlight :text
-      end
+    query = Knowledge.search do
+      fulltext params[:keyword]
       with :knowledge_type_id, params[:type] if params[:type]
       with :public, true
       order_by :created_at, :desc
       paginate :page => params[:page], :per_page => (params[:size] || 10)
     end
-    @knowledges = @query.results
+    @knowledges = query.results
     @knowledge_types = KnowledgeType.all.asc(:priority)
   end
   
@@ -24,7 +21,7 @@ class KnowledgesController < WeiboController
     group_ids = Group.get_group_ids_by_user_id current_user.id #用户所在组id
     # @group = Group.where(_id: params[:group]).first unless params[:group].blank?
 
-    @query = Knowledge.search do
+    query = Knowledge.search do
       fulltext params[:keyword]
       with :public, true
       with :group_id, params[:group] if params[:group]
@@ -32,19 +29,19 @@ class KnowledgesController < WeiboController
       order_by :created_at, :desc
       paginate :page => params[:page], :per_page => (params[:size] || 10)
     end
-    @knowledges = @query.results
+    @knowledges = query.results
   end
   
   #我创建的文档
   def my
-    @query = Knowledge.search do
+    query = Knowledge.search do
       fulltext params[:keyword]
       with :public, true
       with :creator_id, current_user.id
       order_by :created_at, :desc
       paginate :page => params[:page], :per_page => (params[:size] || 10)
     end
-    @knowledges = @query.results
+    @knowledges = query.results
   end
 
   def show

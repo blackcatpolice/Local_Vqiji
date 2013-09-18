@@ -53,6 +53,6 @@ class User::AvatarsController < ActionController::Base
   
   # 发送 png 图片文件
   def _serve_png(path)
-    send_file path, :type => 'image/png', :disposition => 'inline'    
+    send_file path, :type => 'image/png', :disposition => 'inline'
   end
 end

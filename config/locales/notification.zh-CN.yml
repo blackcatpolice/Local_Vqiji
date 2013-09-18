@@ -9,7 +9,7 @@ zh-CN:
 
   views:
     notifications:
-      nb:
+      board:
         notification/base:
           unit: '条新通知'
         notification/fan:

@@ -61,9 +61,9 @@
           done();
           context._trigger("success", null, comment);
         },
-        error: function() {
+        error: function(jqXHR, httpStatus, throwErrors) {
           done();
-          App.error.handleXHRError.apply(this, arguments);
+          App.error.handleXHRError(jqXHR, httpStatus, throwErrors, "发送评论失败！");
         }
       });
     }

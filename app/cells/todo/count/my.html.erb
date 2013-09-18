@@ -1,26 +1,31 @@
 <div class="bk">
-<div class="bk_t mr_t6"></div>
-<div class="bk_c mr_c6">
-  <div class="mr_c6k">
-    <div class="c61">进行中</div>
-    <div class="c62"><%= @count.execute_now %></div>
-    <div class="c62"><%= @count.create_now %></div>
+  <div class="bk_t mr_t6"></div>
+  <div class="bk_c mr_c6">
+    <div class="mr_c6k">
+      <div class="c61">进行中</div>
+      <div class="c62"><%= @count.execute_now %></div>
+      <div class="c62"><%= @count.create_now %></div>
+    </div>
+    <div class="mr_c6k">
+      <div class="c61">待确认</div>
+      <div class="c62"><%= @count.execute_completed_checking %></div>
+      <div class="c62"><%= @count.create_completed_checking %></div>
+    </div>
+    <div class="mr_c6k">
+      <div class="c61">超时完成</div>
+      <div class="c62 c62_yel"><%= @count.execute_completed_timeout %></div>
+      <div class="c62 c62_yel"><%= @count.create_completed_timeout %></div>
+    </div>
+    <div class="mr_c6k">
+      <div class="c61">按时完成</div>
+      <div class="c62"><%= @count.execute_completed_ontime %></div>
+      <div class="c62"><%= @count.create_completed_ontime %></div>
+    </div>
+    <div class="mr_c6k">
+      <div class="c61">合计</div>
+      <div class="c62"><%= link_to @count.execute, myexecute_todo_tasks_path %></div>
+      <div class="c62"><%= link_to @count.create, mycreate_todo_tasks_path %></div>
+    </div>
   </div>
-  <div class="mr_c6k">
-    <div class="c61">超时完成</div>
-    <div class="c62 c62_yel"><%= @count.execute_completed_timeout %></div>
-    <div class="c62 c62_yel"><%= @count.create_completed_timeout %></div>
-  </div>
-  <div class="mr_c6k">
-    <div class="c61">按时完成</div>
-    <div class="c62"><%= @count.execute_completed_ontime %></div>
-    <div class="c62"><%= @count.create_completed_ontime %></div>
-  </div>
-  <div class="mr_c6k">
-    <div class="c61">合计</div>
-    <div class="c62"><%= @count.execute %></div>
-    <div class="c62"><%= @count.create %></div>
-  </div>
-</div>
-<div class="bk_t mr_d6"></div>
+  <div class="bk_t mr_d6"></div>
 </div>

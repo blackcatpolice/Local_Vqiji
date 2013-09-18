@@ -173,9 +173,9 @@ class User
       end
       
       # 设置分发策略大厅
-      tweet.is_top = opts[:is_top]
-      tweet._to_fans = opts[:to_fans] unless tweet.is_top
-      tweet.group_ids = group_members.where(:group_id.in => opts[:group_ids]).distinct(:group_id) if opts[:group_ids] # 分发到的组
+      tweet.is_top = opts[:is_top] if opts.key?(:is_top) # 重要微博？
+      tweet._to_fans = opts[:to_fans] if tweet.is_top && opts.key?(:to_fans) # 分发给粉丝（工作大厅）？
+      tweet.group_ids = group_members.where(:group_id.in => opts[:group_ids]).distinct(:group_id) if !opts[:group_ids].blank? # 分发到的组
     end
 
     # 分发到我的微博 feed 列表中

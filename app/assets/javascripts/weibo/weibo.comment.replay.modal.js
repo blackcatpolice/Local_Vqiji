@@ -69,7 +69,7 @@
 
             self._modal.modal({ show: self.options.autoOpen });
           },
-          error: App.error.handleXHRError
+          error: App.error.XHRErrorHandler("回复评论失败！")
       });
 	  },
     

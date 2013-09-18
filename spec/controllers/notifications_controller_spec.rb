@@ -11,14 +11,14 @@ describe NotificationsController do
     end
   end
 
-  describe "GET 'nb'" do
+  describe "GET 'board'" do
     it "returns http success" do
-      get 'nb'
+      get 'board'
       response.should be_success
     end
     
     it "should assign @map" do
-      get 'nb'
+      get 'board'
       assigns[:map].should_not be_nil
     end
   end

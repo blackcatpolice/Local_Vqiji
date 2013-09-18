@@ -11,8 +11,8 @@
       this.$trigger.popover(this._getPopoverOptions());
       this.$badge = $("<span class=\"badge\">0</span>").prependTo(this.$trigger);
       this.$trigger
-        .on("mouseenter.nb", $.proxy(this._onMouseEnter, this))
-        .on("mouseleave.nb", $.proxy(this._onMouseLeave, this));
+        .on("mouseenter.notify-board", $.proxy(this._onMouseEnter, this))
+        .on("mouseleave.notify-board", $.proxy(this._onMouseLeave, this));
 
       this._$updateBadge = $.proxy(this.updateBadge, this);
       setTimeout(this._$updateBadge, 3000); // 初始化页面后3秒自动更新一次
@@ -36,12 +36,11 @@
       App.realtime.triggers.unregister('notificationsCountChanged', this._$onCountChanged);
       
       this.$trigger
-        .off("shown.nb").off("hidden.nb")
-        .off("mouseenter.nb").off("mouseleave.nb")
+        .off(".notify-board")
         .popover("destroy");
       
       if (this.$content) {
-        this.$content.off("mouseenter.nb").off("mouseleave.nb");
+        this.$content.off(".notify-board");
         this.$content = null;
       }
     },
@@ -53,15 +52,15 @@
         html: true,
         title: '通知中心',
         content: $.proxy(this._getContent, this),
-        template: '<div class="popover ntb"><div class="arrow"></div><div class="popover-content"></div></div>',
+        template: '<div class="popover notify-board"><div class="arrow"></div><div class="popover-content"></div></div>',
         container: 'body'
       };
     },
     
     _onShown: function() {
       this.$content
-        .on("mouseenter.nb", $.proxy(this._onMouseEnter, this))
-        .on("mouseleave.nb", $.proxy(this._onMouseLeave, this));
+        .on("mouseenter.notify-board", $.proxy(this._onMouseEnter, this))
+        .on("mouseleave.notify-board", $.proxy(this._onMouseLeave, this));
 
       if (this._isNeedUpdateContent()) {
         this.updateContent();
@@ -70,7 +69,7 @@
     },
     
     _onHidden: function() {
-      this.$content.off("mouseenter.nb").off("mouseleave.nb");
+      this.$content.off("mouseenter.notify-board").off("mouseleave.notify-board");
       if (this._isNeedUpdateContent()) {
         this.updateContent();
       }
@@ -87,11 +86,11 @@
       // console.log(this.$content);
       self.$content.spin("small");
 
-      $.ajax("/notifications/nb.html", {
+      $.ajax("/notifications/board.html", {
         dataType: "html",
         cache: false,
-        success: function(nb) {
-          self.$content.html( nb );
+        success: function(notify_board) {
+          self.$content.html( notify_board );
         },
         error: function(jqXHR, httpStatus, throwErrors) {
           var errorMsg = App.error.XHRError(jqXHR, httpStatus, throwErrors, "获取未读消息列表失败!");
@@ -108,8 +107,8 @@
       if (!this.$content) {
         this.$content = $("<div data-role=\"content\"></div>");
         this.$trigger
-          .on("shown.nb", $.proxy(this._onShown, this))
-          .on("hidden.nb", $.proxy(this._onHidden, this));
+          .on("shown.notify-board", $.proxy(this._onShown, this))
+          .on("hidden.notify-board", $.proxy(this._onHidden, this));
       }
       return this.$content;
     },

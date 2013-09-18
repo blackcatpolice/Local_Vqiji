@@ -1,0 +1,19 @@
+require 'spec_helper'
+
+describe Meeting::MeetingsController do
+  describe "会议中心" do
+    it "首页" do
+      get 'index', format: :html
+      response.should be_success
+    end
+    
+    pending "新建会议页面" do
+    end
+    
+    describe "创建会议" do
+      pending "会议主题为空，不能创建该会议" do
+      end
+      
+    end
+  end
+end

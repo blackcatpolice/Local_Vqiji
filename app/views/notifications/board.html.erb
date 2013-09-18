@@ -1,0 +1,11 @@
+<% if @map.blank? %>
+  <div class="empty">暂时没有通知 :)</div>
+<% else %>
+  <ul class="list">
+    <% @map.each do |type, items| %>
+      <li>
+        <span><%= items.count %></span><%= t "views.notifications.board.#{ type.model_name.i18n_key }.unit" %>，<a href="<%= type.view_url(current_user) %>" data-skip-pjax>查看</a>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

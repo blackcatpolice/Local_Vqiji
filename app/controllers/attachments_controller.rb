@@ -114,7 +114,7 @@ class AttachmentsController < WeiboController
   # 下载附件
   def download
     @file = Attachment::Base.where(:_type.in => DOWNLOAD_ABLE_TYPES).find(params[:id])
-    send_file @file.path, :filename => (@file.name || @file.filename), :x_sendfile => true
+    x_send_file @file.path, :filename => (@file.name || @file.filename)
   end
 
   def destroy

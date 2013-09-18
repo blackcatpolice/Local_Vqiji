@@ -15,26 +15,39 @@ describe User do
     admin.pinyin_index.should == 'x'
   end
   
-  it "should send/destroy tweet" do
+  it "should #send" do
     other = FactoryGirl.create(:user)
-    tweet = admin.tweet(text: "测试微博")
+    tweet = nil
+    
+    lambda {
+      tweet = admin.tweet(text: "测试微博")
+    }.should change(Tweet, :count).by(1)
+    
     tweet.should be_an_instance_of(Tweet)
     tweet.sender.should == admin
     tweet.text.should == "测试微博"
-    
-    admin.delete_tweet!(tweet).should be_true
   end
   
-  it "should repost/destroy" do
+  it "should #repost" do
     other = FactoryGirl.create(:user)
     tweet = admin.tweet(text: "测试微博")
-    repost = other.repost(tweet, "转发")
+    repost = nil
+
+    lambda {
+      repost = other.repost(tweet, "转发")
+    }.should change(Tweet, :count).by(1)
     
     repost.should be_an_instance_of(Tweet)
     repost.text.should == "转发"
     repost.reforigin.should == tweet
-    
-    other.delete_tweet!(repost).should be_true
+  end
+  
+  it "should #destroy" do
+    other = FactoryGirl.create(:user)
+    tweet = create(:tweet, :sender => other)
+    lambda {
+      other.delete_tweet!(tweet)
+    }.should change(Tweet, :count).by(-1)
   end
 
   it "should fuzzy search" do

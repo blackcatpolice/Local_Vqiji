@@ -9,6 +9,7 @@ class Todo::Count
 	field :create_now, :type => Integer ,:default => 0         # 进行中任务数
 	field :create_completed_ontime,:type => Integer ,:default => 0     # 按时完成任务
 	field :create_completed_timeout, :type => Integer, :default => 0     #被超时完成任务数
+	field :create_completed_checking, :type => Integer, :default => 0    # 待确定完成任务数 
 	#
 	
 	####  收到的任务
@@ -16,6 +17,8 @@ class Todo::Count
 	field :execute_now, :type => Integer ,:default => 0        # 进行中任务数
 	field :execute_completed_ontime,:type => Integer, :default => 0    # 已完成任务数 
 	field :execute_completed_timeout, :type => Integer, :default => 0    # 超时完成任务数 
+	field :execute_completed_timeout, :type => Integer, :default => 0    # 超时完成任务数 
+	field :execute_completed_checking, :type => Integer, :default => 0    # 待确定完成任务数 
 	
 	
 	# relations

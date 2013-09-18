@@ -2,6 +2,7 @@
 
 class ApplicationController < ActionController::Base
   include JSONMessageRender
+  include XSendFile
   
   # protect_from_forgery :only => [:create, :update, :destroy]
 

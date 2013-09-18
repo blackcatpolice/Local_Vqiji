@@ -4,6 +4,7 @@
     <div class="bk_c mr_c4">
       <div class="mr_rw">
         <div class="mr_rwt" data-type="NewTask">
+    	    <a href="<%= mine_todo_tasks_path %>" class="a_link" title="我的任务" style="margin: 5px;" data-skip-pjax></a>
           <%= link_to "+ 新建",new_todo_task_path(), :class => "btn", 'data-skip-pjax' => 'true'%>
         </div>
       </div>
@@ -15,11 +16,28 @@
     WEIBO.todoMyTasks({
       success: function(data) {
       	if(data.length == 0) {
-      		$('<div class="mr_rwk"><div class="f12" style="margin-top: 20px; text-align:center;" >还没有任务.</div></div>').insertAfter( $('[data-type="NewTask"]', '[data-type=TaskWidget]') );
+      		$(''
+      		  + '<div class="mr_rwk">'
+      		    + '<div class="f12" style="margin-top: 20px; text-align:center;" >还没有任务.</div>'
+      		  + '</div>')
+      		.insertAfter( $('[data-type="NewTask"]', '[data-type=TaskWidget]') );
       		return;
       	}
 
-    		var _tmpl = '<div class="mr_rwk {{if task_danger}} danger {{/if}}"><div class="rwk_1">${value}<span>%</span></div><div class="rwk_2"><div class="rwk_2t"><a href="/todo/tasks/${_id}" title="${title}" data-skip-pjax>${$.truncate(title, 24)}</a></div><div class="rwk_2d"><span class="left">${timeout_format}</span><span class="rwk_0${level}"></span></div></div></div>';
+    		var _tmpl = ''
+    		  + '<div class="mr_rwk {{if task_danger}} danger {{/if}}">'
+      		  + '<div class="rwk_1">${value}<span>%</span></div>'
+      		  + '<div class="rwk_2">'
+        		  + '<div class="rwk_2t">'
+        		    + '<a href="/todo/tasks/${_id}" title="${title}" data-skip-pjax>${$.truncate(title, 24)}</a>'
+      		    + '</div>'
+      		    + '<div class="rwk_2d">'
+      		      + '<span class="left">${timeout_format}</span>'
+      		      + '<span class="rwk_0${level}"></span>'
+      		    + '</div>'
+    		    + '</div>'
+  		    + '</div>';
+
     		$.tmpl(_tmpl, data)
 		      .insertAfter( $('[data-type="NewTask"]', '[data-type=TaskWidget]') );
       },

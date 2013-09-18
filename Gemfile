@@ -15,6 +15,7 @@ end
 gem 'thin'
 gem "mongoid", "~> 3.1.4"
 
+gem "mongoid_taggable", "~> 1.1.1"
 gem "mongoid_rails_migrations", "~> 1.0.1"
 gem "mongo_session_store-rails3", "~> 4.1.1"
 gem "mongoid_taggable", "~> 1.1.1"
@@ -61,6 +62,7 @@ group :development do
   gem 'quiet_assets'
   gem 'better_errors'
   gem 'binding_of_caller'
+  gem 'pry-rails'
 end
 
 group :test, :development do

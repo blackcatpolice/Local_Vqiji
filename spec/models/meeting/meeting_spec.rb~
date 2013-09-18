@@ -1,0 +1,28 @@
+# encoding: utf-8
+
+require 'spec_helper'
+
+describe Meeting do
+
+  describe "创建会议" do
+    pending "会议主题不能为空！" do
+    end
+    
+    pending "会议负责人不能为空！" do
+    end
+    
+    pending "会议开会时间不能为空！" do
+    end
+    
+    pending "会议预计时间不能为空！" do
+    end
+    
+    pending "会议负责人自动参加该会议，并且是会议的创建人" do
+    end
+  end
+  
+  describe "邀请成员参加会议" do    
+    pending "邀请成员加入该会议，状态是待定" do
+    end
+  end
+end

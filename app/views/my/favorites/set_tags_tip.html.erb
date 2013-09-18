@@ -1,0 +1,19 @@
+<div style="height: 100%;" data-tweet-id="<%= @tweet.to_param %>">
+  <div class="tip-favorites">
+		<div class="tip_note">收藏成功！</div>
+		<div class=""><input name="" type="text" class="texter" placeholder="在这里输入标签"></div>
+		<div class="tip_note tip_note_i">可输入多个标签，用空格分隔</div>
+		<% if @tags.any? %>
+		  <div class="tags">
+		    <% @tags.each do |tag| %>
+		      <a href="javascript:void(0)" title="<%= tag %>" class="tag"><%= tag %></a>
+		    <% end %>
+		    <div class="clearfix"></div>
+		  </div>
+		<% end %>
+		<div class="btns">
+		  <a class="btn btn-warning btn-ok" href="javascript:void(0)">确定</a>
+		  <a class="btn btn-cancel" href="javascript:void(0)">取消</a>
+		</div>
+  </div>
+</div>

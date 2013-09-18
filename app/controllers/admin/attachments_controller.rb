@@ -20,6 +20,6 @@ class Admin::AttachmentsController < Admin::BaseController
   
   def download
     file = Attachment::Base.find(params[:id])
-    send_file(file.path, :filename => att.name || att.filename)
+    x_send_file(file.path, :filename => file.name || file.filename)
   end
 end

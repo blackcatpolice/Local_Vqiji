@@ -41,7 +41,7 @@
         picture: this._picture,
         file: (this._file || this._selectedFile),
         success: $.proxy(this.reset, this),
-        error: App.error.handleXHRError,
+        error: App.error.XHRErrorHandler("发送私信失败！"),
         complete: done
       });
     }

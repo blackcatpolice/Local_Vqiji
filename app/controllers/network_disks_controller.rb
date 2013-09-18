@@ -138,7 +138,7 @@ class NetworkDisksController < WeiboController
 
   def download
     file = current_user.attachments.network_disks.find(params[:network_disk_id])
-    send_file file.path, :filename => (file.name || file.filename), :x_sendfile => true
+    x_send_file file.path, :filename => (file.name || file.filename)
   end
   
   # 收藏文件

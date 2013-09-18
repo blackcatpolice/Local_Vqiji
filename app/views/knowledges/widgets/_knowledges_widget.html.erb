@@ -1,6 +1,8 @@
 <% unless current_user.is_expert %>
 <div class="bk" node-type="KnowledgesWidget">
-	<div class="bk_t mr_t2"></div>
+	<div class="bk_t mr_t2">
+  	<a href="<%= knowledges_path %>" class="a_link" title="知识库" data-skip-pjax></a>
+	</div>
 	<div class="bk_c">
 		<div class="mr_lb mr_lb1 f12">
 			<ul></ul>

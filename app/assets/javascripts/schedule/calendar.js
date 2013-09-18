@@ -382,9 +382,9 @@
 	        done();
 	        self._trigger("created", null, todo);
 	      },
-	      error: function() {
+	      error: function(jqXHR, httpStatus, throwErrors) {
 	        done();
-	        App.error.handleXHRError.apply(self, arguments);
+	        App.error.handleXHRError(jqXHR, httpStatus, throwErrors, "创建待办事项失败！");
 	      }
 	    });
 	  }
@@ -507,7 +507,7 @@
               self._showDay(self._currentDay, true);
             }
           },
-          error: App.error.handleXHRError
+          error: App.error.XHRErrorHandler("删除待办事项失败！")
         });
     },
     
