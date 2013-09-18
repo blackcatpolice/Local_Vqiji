@@ -32,8 +32,8 @@ class Knowledge
   include Sunspot::Mongo
 
   searchable do
-    text :title, :stored => true
-    text :text, :stored => true
+    text :title
+    text :text
     text :pinyin_title
     boolean :public
     string :group_id
