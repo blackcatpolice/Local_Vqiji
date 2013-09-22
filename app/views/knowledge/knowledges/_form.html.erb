@@ -9,7 +9,8 @@
         <div class="zsk_tt">标题:&nbsp;&nbsp;<%= f.text_field :title, :placeholder=>"请输入文章标题" %></div>
         <div class="zsk_edt">
           <%= f.fields_for :contents do |content_fields| %>
-             <%= content_fields.text_area :content %>
+             <%= content_fields.text_area :content, :name => "knowledge_knowledge[contents][][content]" %>
+             <%= content_fields.hidden_field :page_index, :name => "knowledge_knowledge[contents][][page_index]", :value => 1 %>
           <% end %>
         </div>
 
@@ -47,25 +48,25 @@
 <%= javascript_include_tag 'kindeditor/kindeditor' %>
 
 <script>
-  // KindEditor.ready(function(K) {
-  //     window.editor = KindEditor.create('textarea', {
-		//   width: "532px",
-		//   minWidth: 500,
-		//   resizeType : 1,
-		//   allowFileManager: true,
-		//   uploadJson: '/attachments/kindsoft_picture.json',
-		//   filePostName: 'picture[file]',
-		//   items : [
-  //         'source', '|', 'undo', 'redo', '|', 'preview', 'template', 'cut', 'copy', 'paste',
-  //         'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
-  //         'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
-  //         'superscript', 'quickformat', '|',
-  //         'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
-  //         'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image',
-  //         'table', 'hr', 'link', 'unlink'
-		//   ]
-	 //  });
-  // });
+  KindEditor.ready(function(K) {
+      window.editor = KindEditor.create('textarea', {
+		  width: "532px",
+		  minWidth: 500,
+		  resizeType : 1,
+		  allowFileManager: true,
+		  uploadJson: '/attachments/kindsoft_picture.json',
+		  filePostName: 'picture[file]',
+		  items : [
+          'source', '|', 'undo', 'redo', '|', 'preview', 'template', 'cut', 'copy', 'paste',
+          'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+          'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
+          'superscript', 'quickformat', '|',
+          'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
+          'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image',
+          'table', 'hr', 'link', 'unlink'
+		  ]
+	  });
+  });
 
 	$(':radio[name="public"]').click(function(){
 		if(this.value == "1" && this.checked ){

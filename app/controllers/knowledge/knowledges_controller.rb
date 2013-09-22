@@ -46,7 +46,7 @@ class Knowledge::KnowledgesController < WeiboController
   end
 
   def show
-    @knowledge = Knowledge.find params[:id]
+    @knowledge = Knowledge::Knowledge.find params[:id]
     if current_user.id != @knowledge.creator_id
       @knowledge.clicks += 1
       @knowledge.save
@@ -62,7 +62,7 @@ class Knowledge::KnowledgesController < WeiboController
   
   def new
     @knowledge = Knowledge::Knowledge.new
-    @knowledge.contents = [Knowledge::KnowledgeContent.new,Knowledge::KnowledgeContent.new]
+    @knowledge.contents = [Knowledge::KnowledgeContent.new]
     # @knowledge.public = false unless current_user.release_public_knowledge
     respond_to do |format|
       format.html
@@ -75,16 +75,22 @@ class Knowledge::KnowledgesController < WeiboController
 
   def create
     Rails.logger.info("!!!!")
-    Rails.logger.info(params)
-    xx
-    @knowledge = Knowledge.new params[:knowledge]
-    @knowledge.creator_id = current_user.id
-    if current_user.release_public_knowledge && params[:public].to_i == 1
-      @knowledge.public = true
-    else 
-      @knowledge.public = false
-      @knowledge.status = Knowledge::KNOWLEDGE_STATUS_DRAFT unless @knowledge.group_id
+    # Rails.logger.info(params[:knowledge_knowledge])
+    knowledge_content_params = params[:knowledge_knowledge].delete(:contents)
+    @knowledge = Knowledge::Knowledge.new params[:knowledge_knowledge]
+    knowledge_content_params.each do |content_params|
+      @knowledge.contents.new(content_params)
     end
+    # Rails.logger.info(@knowledge.inspect)
+    # Rails.logger.info(@knowledge.contents.inspect)
+    # xx
+    @knowledge.creator = current_user
+    # if current_user.release_public_knowledge && params[:public].to_i == 1
+    #   @knowledge.public = true
+    # else 
+    #   @knowledge.public = false
+    #   @knowledge.status = Knowledge::KNOWLEDGE_STATUS_DRAFT unless @knowledge.group_id
+    # end
 
     respond_to do |format|
       if @knowledge.save

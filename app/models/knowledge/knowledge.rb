@@ -27,6 +27,8 @@ class Knowledge::Knowledge
 
   validates :title, :creator, presence: true
 
+  accepts_nested_attributes_for :contents
+
   def checked_by_user(user = nil, status = CHECK_AUDITED)
     raise "no user" unless user
     if self.group
