@@ -51,7 +51,7 @@
       <%= link_to "我的网盘", network_disks_path, :class=>'ic_wp', :'data-skip-pjax' => true %>
     </div>
     <div class="nav_lb <%= params[:controller] == 'knowledges' ? 'nav_on' : '' %>">
-      <%= link_to "知识库", knowledges_path, :class=>'ic_zs', :'data-skip-pjax' => true %>
+      <%= link_to "知识库", knowledge_knowledges_path, :class=>'ic_zs', :'data-skip-pjax' => true %>
     </div>
 	<% end %>
     <% if current_user.is_expert %>

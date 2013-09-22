@@ -13,8 +13,8 @@ class Knowledge::KnowledgesController < WeiboController
     #   paginate :page => params[:page], :per_page => (params[:size] || 10)
     # end
     # @knowledges = query.results
-    @knowledges = Knowledge.all
-    @knowledge_types = KnowledgeType.all.asc(:priority)
+    @knowledges = Knowledge::Knowledge.all
+    @knowledge_types = Knowledge::KnowledgeType.all.asc(:priority)
   end
   
   ##小组文档
@@ -61,8 +61,9 @@ class Knowledge::KnowledgesController < WeiboController
   end
   
   def new
-    @knowledge = Knowledge.new
-    @knowledge.public = false unless current_user.release_public_knowledge
+    @knowledge = Knowledge::Knowledge.new
+    @knowledge.contents = [Knowledge::KnowledgeContent.new,Knowledge::KnowledgeContent.new]
+    # @knowledge.public = false unless current_user.release_public_knowledge
     respond_to do |format|
       format.html
     end
@@ -73,6 +74,9 @@ class Knowledge::KnowledgesController < WeiboController
   end
 
   def create
+    Rails.logger.info("!!!!")
+    Rails.logger.info(params)
+    xx
     @knowledge = Knowledge.new params[:knowledge]
     @knowledge.creator_id = current_user.id
     if current_user.release_public_knowledge && params[:public].to_i == 1

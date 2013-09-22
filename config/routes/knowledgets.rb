@@ -1,15 +1,22 @@
 # encoding: utf-8
 
 Weibo::Application.routes.draw do
-  resources :knowledges, :except => [:destroy] do
-    collection do
-      get :my
-      get :groups
-      post :delete
-      get :widget
+  namespace :knowledge do
+    resources :knowledges, :except => [:destroy] do
+      collection do
+        get :my
+        get :groups
+        post :delete
+        get :widget
+      end
+      member do
+        get :content
+        put :check
+      end
+      resources :comments
     end
-    member do
-      get :content
+
+    resources :knowledge_collections do
     end
   end
 end
