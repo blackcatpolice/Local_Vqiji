@@ -8,6 +8,9 @@ Weibo::Application.routes.draw do
         get :groups
         post :delete
         get :widget
+        get :popular
+        get :latest
+        get :search
       end
       member do
         get :content

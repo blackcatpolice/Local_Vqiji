@@ -7,9 +7,12 @@ class Knowledge::KnowledgeComment
   field :content, :type => String
   field :check_status, :type => Integer
   field :comment_index, :type => Integer
+  field :reply_count, :type => Integer
 
   belongs_to :knowledge, :class_name => 'Knowledge::Knowledge'
   belongs_to :user, :class_name => 'User'
+  belongs_to :reply_comment, :class_name => 'Knowledge::KnowledgeComment' 
+  has_many :reply_comments, :class_name => 'Knowledge::KnowledgeComment', :inverse_of => 'reply_comment'
 
   before_save do |knowledge_comment|
     knowledge_comment.comment_index = knowledge.comments_count + 1

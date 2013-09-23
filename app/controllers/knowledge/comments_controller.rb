@@ -1,5 +1,5 @@
 # encoding: utf-8
-class Knowledge::KnowledgesController < WeiboController
+class Knowledge::CommentsController < WeiboController
   
   layout proc { |c| pjax_request? ? pjax_layout : 'knowledge' }
 
@@ -24,18 +24,6 @@ class Knowledge::KnowledgesController < WeiboController
       @popular_knowledges = Knowledge::Knowledge.published.desc(:clicks).limit(4)
       @latest_knowledges = Knowledge::Knowledge.published.desc(:updated_at).limit(4)
     end
-  end
-
-  def search
-    @query = Knowledge::Knowledge.search do
-      fulltext params[:keyword] do
-        highlight :contents
-      end
-      # order_by :created_at, :desc
-      paginate :page => params[:page], :per_page => (params[:size] || 10)
-    end
-    # @knowledges = @query.results
-    @knowledges = []
   end
 
   def popular
@@ -111,12 +99,14 @@ class Knowledge::KnowledgesController < WeiboController
   end
 
   def create
-    contents_params = params[:knowledge_knowledge].delete(:contents)
-    @knowledge = Knowledge::Knowledge.new params[:knowledge_knowledge]
-    @knowledge.add_contents(contents_params)
-    @knowledge.creator = current_user
     Rails.logger.info("!!!!!!!!!!!!!!!!!!!!!!!")
-    Rails.logger.info(@knowledge.contents)
+    knowledge = Knowledge::Knowledge.find(params[:knowledge_id])
+    knowledge.comments.create(:content => params[:content], :user => current_user)
+    # contents_params = params[:knowledge_knowledge].delete(:contents)
+    # @knowledge = Knowledge::Knowledge.new params[:knowledge_knowledge]
+    # @knowledge.add_contents(contents_params)
+    # @knowledge.creator = current_user
+    # Rails.logger.info(@knowledge.contents)
     # xx
     # if current_user.release_public_knowledge && params[:public].to_i == 1
       # @knowledge.public = true
@@ -126,8 +116,8 @@ class Knowledge::KnowledgesController < WeiboController
     # end
 
     respond_to do |format|
-      if @knowledge.save
-        format.html { redirect_to [:knowledge, @knowledge], notice: "文章创建成功."}
+      if knowledge.save
+        format.html { redirect_to knowledge, notice: "文章创建成功."}
       else
         Rails.logger.info("!!!!#{@knowledge.errors.first}")
         format.html { render action: "new"}

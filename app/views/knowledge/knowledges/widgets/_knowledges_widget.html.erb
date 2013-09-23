@@ -21,7 +21,7 @@
 				$('ul', '[node-type=KnowledgesWidget]').html('<li>知识库还没有发表文章.</li>');
 				return false;
 			}
-			var _tmpl = '<li><a href="/knowledges/${_id}" data-skip-pjax>${title}</a></li>';
+			var _tmpl = '<li><a href="/knowledge/knowledges/${_id}" data-skip-pjax>${title}</a></li>';
 			$.template( "knowledgeTemplate", _tmpl );
     		$.tmpl( "knowledgeTemplate", data ).appendTo( $('ul', '[node-type=KnowledgesWidget]') );
     	},

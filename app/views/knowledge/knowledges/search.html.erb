@@ -1,0 +1,93 @@
+<!--中间内容开始-->
+  <div class="main_ct left">
+    <div class="zs_t">
+      <span class="f22">知识库</span>
+      <div class="zs_ser"><input placeholder="请输入关键词" name="" type="text" /><input name="" type="image" src="../assets/images/top_ser_bt.png" /></div>
+    </div>
+    <div class="zs_nav">
+      <%= link_to "文档首页", knowledge_knowledges_path, :class => "on" %>
+      <%= link_to "小组文档", groups_knowledge_knowledges_path %>
+      <a href="#">我的收藏</a>
+    </div>
+    <div class="zs_k">
+      <div class="bk_t"></div>
+      <div class="bk_c">
+        <div class="zs_lbt f18">搜索结果"<%= params[:keyword] %>"</div>
+        <div class="zs_lb">
+          <ul>
+            <% @query.hits.each do |hit| %>
+              <% hit.highlights(:content).each do |highlight| %>
+                <%= highlight.format { |word| "*#{word}*" } %>
+              <% end %>
+            <% end %>
+          </ul>
+
+          <ul>
+            <% @query.results.each_with_index do |knowledge, index| %>
+              <li>
+                <div class="icon"></div>
+                <span>
+                  <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group => params[:group_id]) %>
+                </span>
+                <img src="../assets/images/px_zt6.png" />
+                <div class="title">
+                  <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+                </div>
+                <i><%= knowledge.clicks %>人已阅读</i>
+                <% hit = @query.hits[index] %>
+                <div>
+                  <%= hit.highlights %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="bk_t bk_d"></div>
+    </div>
+  </div>
+<!--中间内容结束-->
+
+
+
+
+
+
+<script>
+  $(document).ready(function(){
+
+  $(".zs_more").click(function(){
+                      
+                      $(this).siblings().toggleClass("zs_auto");
+                      
+                      })
+
+      $(".zsk_j span").click(function(){
+        $(".zsk_tlb").slideToggle();
+      });
+      $("form[data-pjax]").on('submit', function(e){
+      $.pjax.submit(e, '[data-pjax-container]');
+    });
+    
+    $('a[data-action=delete]', 'div[node-type=Knowledge]').click(function(){
+      var _knowledge = $(this).parents('div[node-type=Knowledge]');
+      $.confirm('是否删除 [ ' + _knowledge.attr('data-title') + '] ?', function(tag){
+        if(tag){
+          $('#knowledge_id').val(_knowledge.attr('data-id'));
+          $('#knowledges_form').submit();
+        }
+      });
+    });
+    // $('#knowledge_keyword').typeahead({
+    //  source: function(query, process){
+    //    return $.get('/knowledges.json', {keyword: query}, function(data){
+    //      return process(data);
+    //    });
+    //  },
+    //  matcher: function (param) {
+    //    return true;
+    //  }
+    // });
+  });
+</script>

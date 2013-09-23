@@ -8,10 +8,9 @@
       
         <div class="zsk_tt">标题:&nbsp;&nbsp;<%= f.text_field :title, :placeholder=>"请输入文章标题" %></div>
         <div class="zsk_edt">
-          <%= f.fields_for :contents do |content_fields| %>
-             <%= content_fields.text_area :content, :name => "knowledge_knowledge[contents][][content]" %>
-             <%= content_fields.hidden_field :page_index, :name => "knowledge_knowledge[contents][][page_index]", :value => 1 %>
-          <% end %>
+            <%= f.fields_for :contents do |content_fields| %>
+             <%= content_fields.text_area :content, :id => "content_textarea" %>
+            <% end %>
         </div>
 
         <div class="zsk_xx"> 
@@ -48,59 +47,63 @@
 <%= javascript_include_tag 'kindeditor/kindeditor' %>
 
 <script>
-  KindEditor.ready(function(K) {
-      window.editor = KindEditor.create('textarea', {
-		  width: "532px",
-		  minWidth: 500,
-		  resizeType : 1,
-		  allowFileManager: true,
-		  uploadJson: '/attachments/kindsoft_picture.json',
-		  filePostName: 'picture[file]',
-		  items : [
-          'source', '|', 'undo', 'redo', '|', 'preview', 'template', 'cut', 'copy', 'paste',
-          'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
-          'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
-          'superscript', 'quickformat', '|',
-          'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
-          'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image',
-          'table', 'hr', 'link', 'unlink'
-		  ]
-	  });
+  $(function() {
+    KindEditor.ready(function(K) {
+        window.editor = KindEditor.create('#content_textarea', {
+  		  width: "532px",
+  		  minWidth: 500,
+  		  resizeType : 1,
+  		  allowFileManager: true,
+  		  uploadJson: '/attachments/kindsoft_picture.json',
+  		  filePostName: 'picture[file]',
+  		  items : [
+            'source', '|', 'undo', 'redo', '|', 'preview', 'template', 'cut', 'copy', 'paste',
+            'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+            'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
+            'superscript', 'quickformat', '|',
+            'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
+            'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image',
+            'table', 'hr', 'link', 'unlink', 'pagebreak'
+  		  ],
+        pagebreakHtml: "<hr style='page-break-after: always;'' class='ke-pagebreak knowledge_page' />"
+  	  });
+    });
+
+  	$(':radio[name="public"]').click(function(){
+  		if(this.value == "1" && this.checked ){
+  			$('#knowledge_group_id').attr('disabled', 'disabled');
+  		}else{
+  			$('#knowledge_group_id').removeAttr('disabled');
+  		}
+  	});
+  	
+
+  	$('#knowledge_title').keydown(function(e){
+  		if(e.keyCode == 13){
+  	  		return false;
+  	  	}
+  	});
+
+  	function change_status(status){
+  		$('input:button', '#knowledge_form').attr('disabled', 'disabled');
+  		window.editor.sync();
+  		if(!$('#knowledge_title').val()){
+  			$.alert('请输入文章标题.');
+  			$('input:button', '#knowledge_form').removeAttr('disabled');
+  			return false;
+  		}
+  		if(!$('#knowledge_text').val()){
+  			$.alert('请输入文章内容.');
+  			$('input:button', '#knowledge_form').removeAttr('disabled');
+  			return false;
+  		}
+  		$('#knowledge_status').val(status);
+  		$('#knowledge_form').submit();
+  	}
+  	
+  	$("form[data-pjax]").on('submit', function(e){
+      editor.sync();
+  		$.pjax.submit(e, '[data-pjax-container]');
+  	});
   });
-
-	$(':radio[name="public"]').click(function(){
-		if(this.value == "1" && this.checked ){
-			$('#knowledge_group_id').attr('disabled', 'disabled');
-		}else{
-			$('#knowledge_group_id').removeAttr('disabled');
-		}
-	});
-	
-
-	$('#knowledge_title').keydown(function(e){
-		if(e.keyCode == 13){
-	  		return false;
-	  	}
-	});
-
-	function change_status(status){
-		$('input:button', '#knowledge_form').attr('disabled', 'disabled');
-		window.editor.sync();
-		if(!$('#knowledge_title').val()){
-			$.alert('请输入文章标题.');
-			$('input:button', '#knowledge_form').removeAttr('disabled');
-			return false;
-		}
-		if(!$('#knowledge_text').val()){
-			$.alert('请输入文章内容.');
-			$('input:button', '#knowledge_form').removeAttr('disabled');
-			return false;
-		}
-		$('#knowledge_status').val(status);
-		$('#knowledge_form').submit();
-	}
-	
-	$("form[data-pjax]").on('submit', function(e){
-		$.pjax.submit(e, '[data-pjax-container]');
-	});
 </script>

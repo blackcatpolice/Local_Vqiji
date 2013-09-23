@@ -1,80 +1,119 @@
-<div class="bk">
-	<div class="bk_t zsk_t f16">
-		知识库<%= link_to "",new_knowledge_path, :'data-skip-pjax' => true%>
-	</div>
-	<div class="bk_c">
-		<div class="tab zsk_tab">
-			<ul>
-				<li>
-					<%= link_to "所有文档", knowledges_path%>
-				</li>
-				<li class="zsk_j on">
-					<%= link_to "小组文档", groups_knowledges_path, :class => "qb on"%>
-					<span></span>
-					<div class="zsk_tlb">
-					<% current_user.groups.each do |g|%>
-            			<%= link_to truncate_u(g.name, 4), "#{groups_knowledges_path}?group=#{g.id}", :title => "#{g.name}"%>
-            		<% end %>
-          			</div>
-				</li>
-				<li>
-					<%= link_to "我创建的", my_knowledges_path%> 
-				</li>
-				<% if @group.blank?%>
-				<div class="right gz_ser ip">
-					<form action="<%= groups_knowledges_path %>" data-pjax method="get">
-					<input class="iput" id="knowledge_keyword" name="keyword" type="search" value="<%= params[:keyword] %>">
-					<p>
-						<input type="image" src="<%= asset_path "gz_s.png"%>"/>
-					</p>
-					</form>
-				</div>
-				<% end %>
-			</ul>
-		</div>
-		<% unless @group.blank?%>
-		<div class="zsk_lbt f18"><%= @group.name%></div>
-		<% end %>
-		<div class="zsk_lb f12">
-			<% if @knowledges.any?%>
-			  <%= render :collection => @knowledges, :partial => 'knowledges/knowledge' %>
-		    <div class="clearfix"></div>
-			  <div class="text-center">
-          <%= will_paginate @knowledges %>
+<!--中间内容开始-->
+  <div class="main_ct left">
+    <div class="zs_t">
+      <span class="f22">知识库</span>
+      <div class="zs_ser"><input placeholder="请输入关键词" name="" type="text" /><input name="" type="image" src="../assets/images/top_ser_bt.png" /></div>
+    </div>
+    <div class="zs_nav">
+    	<%= link_to "文档首页", knowledge_knowledges_path %>
+    	<%= link_to "小组文档", groups_knowledge_knowledges_path, :class => "on" %>
+    	<a href="#">我的收藏</a>
+    </div>
+    <div class="zs_k">
+    	<div class="bk_t"></div>
+    	<div class="bk_c">
+      	<div class="zs_type">
+        	<div class="zs_tm">权限：</div>
+        	<div class="zs_list">
+        		<%= link_to '公共文档', knowledge_knowledges_path(:type => params[:type]) %>
+        		<% current_user.groups.each do |group| %>
+        			<%= link_to group.name, knowledge_knowledges_path(:type => params[:type], :group_id => group) %>
+        		<% end %>
+        		<div class="clearfix"></div>
+	        </div>
+        	<div class="zs_more"><a href="javascript:void(0)">更多</a></div>
+          <div class="clearfix"></div>
         </div>
-			<% else %>
-			  <div class="empty"><span>暂时没有文档哦～</span></div>
-			<% end %>
-		</div>
-		<div class="clearfix"></div>
-	</div>
+      </div>
+    	<div class="bk_t bk_d"></div>
+    </div>
 
-	<div class="bk_t bk_d"></div>
-</div>
-<form action="<%= delete_knowledges_path %>" data-pjax id="knowledges_form" method="post">
-	<input type="hidden" id="knowledge_id" name="id" value="" />
-</form>
+    <% unless params[:group_id] %>
+    <div class="zs_k">
+    	<div class="bk_t"></div>
+    	<div class="bk_c">
+        <% @groups.each do |group| %>
+	        <div class="zs_lbt f18"><%= group.name %>
+	        	<%= link_to "更多", groups_knowledge_knowledges_path(:group_id => group) %>
+	        </div>
+	        <div class="zs_lb">
+	          <ul>
+	          	<% knowledges = Knowledge::Knowledge.published.where(:group => group).desc(:updated_at).limit(4) %>
+	          	<% knowledges.each do |knowledge| %>
+	            <li>
+	            	<span><a href="#">空乘</a></span>
+	              <img src="../assets/images/px_zt6.png" />
+	              <div class="title"><a href="#">工资福利新旧福利新旧准则</a></div>
+	              <i>854人已阅读</i>
+	            </li>
+	            <% end %>
+	          </ul>
+	        </div>
+        <% end %>
+        <div class="clearfix"></div>
+      </div>
+    	<div class="bk_t bk_d"></div>
+    </div>
+    <% else %>
+    <div class="zs_k">
+    	<div class="bk_t"></div>
+    	<div class="bk_c">
+        <div class="zs_lbt f18"><%= @group.name %>
+        	
+        </div>
+        <div class="zs_lb">
+          <ul>
+          	<% @knowledges.each do |knowledge| %>
+            <li>
+            	<span><a href="#">空乘</a></span>
+              <img src="../assets/images/px_zt6.png" />
+              <div class="title"><a href="#">工资福利新旧福利新旧准则</a></div>
+              <i>854人已阅读</i>
+            </li>
+            <% end %>
+          </ul>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    	<div class="bk_t bk_d"></div>
+    </div>
+    <% end %>
+  </div>
+<!--中间内容结束-->
+
+
+
+
+
+
 <script>
-	$('a[data-action=delete]', 'div[node-type=Knowledge]').click(function(){
-		var _knowledge = $(this).parents('div[node-type=Knowledge]');
-		$.confirm('是否删除 [ ' + _knowledge.attr('data-title') + '] ?', function(tag){
-			if(tag){
-				$('#knowledge_id').val(_knowledge.attr('data-id'));
-				$('#knowledges_form').submit();
-			}
-		});
-	});
 	$(document).ready(function(){
+
+	$(".zs_more").click(function(){
+											
+											$(this).siblings().toggleClass("zs_auto");
+											
+											})
+
   		$(".zsk_j span").click(function(){
   			$(".zsk_tlb").slideToggle();
   		});
-  		
   		$("form[data-pjax]").on('submit', function(e){
 			$.pjax.submit(e, '[data-pjax-container]');
 		});
+		
+		$('a[data-action=delete]', 'div[node-type=Knowledge]').click(function(){
+			var _knowledge = $(this).parents('div[node-type=Knowledge]');
+			$.confirm('是否删除 [ ' + _knowledge.attr('data-title') + '] ?', function(tag){
+				if(tag){
+					$('#knowledge_id').val(_knowledge.attr('data-id'));
+					$('#knowledges_form').submit();
+				}
+			});
+		});
 		// $('#knowledge_keyword').typeahead({
 		// 	source: function(query, process){
-		// 		return $.get('/knowledges/groups.json', {keyword: query}, function(data){
+		// 		return $.get('/knowledges.json', {keyword: query}, function(data){
 		// 			return process(data);
 		// 		});
 		// 	},

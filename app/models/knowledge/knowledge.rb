@@ -5,6 +5,8 @@ class Knowledge::Knowledge
   include Mongoid::Timestamps
   include Handler::PinyinTitle
 
+  EDITOR_PAGE_HTML = "<hr style=\"page-break-after: always;\" '=\"\" class=\"ke-pagebreak knowledge_page\">"
+
   CHECK_UNAUDITED = 1
   CHECK_AUDITED = 2
   CHECK_END = 3
@@ -19,15 +21,27 @@ class Knowledge::Knowledge
 
   belongs_to :creator, :class_name => 'User'
   belongs_to :group,   :class_name => 'Group'
-  belongs_to :knowledge_type, :class_name => 'Knowledge::KnowledgeType'
+  belongs_to :knowledge_type, :class_name => 'Knowledge::KnowledgeType', :inverse_of => 'knowledges'
   belongs_to :checked_user,  :class_name => 'User'
 
   has_many :contents, :class_name => 'Knowledge::KnowledgeContent', :counter_cache => true, :inverse_of => 'knowledge', :dependent => :destroy , :autosave => true 
-  has_many :comments, :class_name => 'Knowledge::KnowledgeComment', :counter_cache => true, :inverse_of => 'knowledge', :dependent => :destroy , :autosave => true 
+  has_many :comments, :class_name => 'Knowledge::KnowledgeComment', :counter_cache => true, :inverse_of => 'knowledge', :dependent => :destroy , :autosave => true
 
   validates :title, :creator, presence: true
 
-  accepts_nested_attributes_for :contents
+  scope :published, where(:check_status => CHECK_AUDITED)
+
+
+  include Sunspot::Mongo
+
+  searchable do
+    text :title
+    text :contents do |knowledge| 
+       knowledge.contents.map { |knowledge_content| knowledge_content.content } 
+    end 
+    integer :check_status
+  end
+
 
   def checked_by_user(user = nil, status = CHECK_AUDITED)
     raise "no user" unless user
@@ -38,6 +52,14 @@ class Knowledge::Knowledge
     self.check_status = status
     self.checked_at = Time.now
     self.save
+  end
+
+  def add_contents(contents_params)
+    contents = contents_params[:content]
+    contents = contents.split(Knowledge::Knowledge::EDITOR_PAGE_HTML)
+    contents.each_with_index do |content, index|
+      self.contents.new(:page_index => index, :content => content)
+    end
   end
 
 
