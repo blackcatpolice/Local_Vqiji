@@ -1,55 +1,42 @@
 <!--中间内容开始-->
-  <div class="main_ct left">
     <div class="zs_t">
       <span class="f22">知识库</span>
       <div class="zs_ser"><input placeholder="请输入关键词" name="" type="text" /><input name="" type="image" src="../assets/images/top_ser_bt.png" /></div>
     </div>
-    <div class="zs_nav">
-      <%= link_to "文档首页", knowledge_knowledges_path, :class => "on" %>
-      <%= link_to "小组文档", groups_knowledge_knowledges_path %>
-      <a href="#">我的收藏</a>
+    <div class="zs_k">
+      <div class="bk_t"></div>
+      <div class="bk_c f12">当前位置：<a href="#">知识库</a> > <span class="zs_now">搜索关键词“<%= params[:keyword] %>”</span><i class="right">找到相关文档“<%= @query.results.count %>”篇</i></div>
+      <div class="bk_t bk_d"></div>
     </div>
     <div class="zs_k">
       <div class="bk_t"></div>
       <div class="bk_c">
-        <div class="zs_lbt f18">搜索结果"<%= params[:keyword] %>"</div>
-        <div class="zs_lb">
-          <ul>
-            <% @query.hits.each do |hit| %>
-              <% hit.highlights(:content).each do |highlight| %>
-                <%= highlight.format { |word| "*#{word}*" } %>
+        <div class="zs_ser_result">
+          <% @query.results.each_with_index do |knowledge, index| %>
+          <div class="zs_rek">
+            <div class="title">
+              <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+               <%= knowledge.updated_at.strftime("%Y年%m月%d日") %>
+            </div>
+            <div class="content">
+              <% hit = @query.hits[index] %>
+              <% hit.highlights(:contents).each do |highlight| %>
+                <%= raw highlight.format { |word| "<em>#{word}</em>" } %>
               <% end %>
-            <% end %>
-          </ul>
-
-          <ul>
-            <% @query.results.each_with_index do |knowledge, index| %>
-              <li>
-                <div class="icon"></div>
-                <span>
-                  <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group => params[:group_id]) %>
-                </span>
-                <img src="../assets/images/px_zt6.png" />
-                <div class="title">
-                  <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
-                </div>
-                <i><%= knowledge.clicks %>人已阅读</i>
-                <% hit = @query.hits[index] %>
-                <div>
-                  <%= hit.highlights %>
-                </div>
-              </li>
-            <% end %>
-          </ul>
+            </div>
+            <div class="info f12">
+              <%= link_to "『 #{knowledge.knowledge_type.name} 』", knowledge_knowledges_path(:type => knowledge.knowledge_type), :class => "zs_tp" %>
+              <%= link_to "『 #{knowledge.group.name} 』", knowledge_knowledges_path(:group_id => knowledge.group_id), :class => "zs_tp" if knowledge.group %>
+              <span> <%= knowledge.clicks %>人已读(<%= knowledge.comments_count %>人评) | 共<%= knowledge.contents_count %>页 | 创建者：<%= knowledge.creator.name %></span>
+            </div>
+          </div>
+          <% end %>
         </div>
-        <div class="clearfix"></div>
       </div>
       <div class="bk_t bk_d"></div>
     </div>
-  </div>
+    
 <!--中间内容结束-->
-
-
 
 
 

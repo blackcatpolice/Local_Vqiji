@@ -2,12 +2,25 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>无标题文档</title>
+<title>知识库</title>
 <link href="../assets/stylesheets/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
 <link href="../assets/stylesheets/common.css" media="screen" rel="stylesheet" type="text/css">
 <script src="js/jquery.js"></script>
 <script src="../assets/javascripts/bootstrap/bootstrap-dropdown.js"></script>
 <script src="../assets/javascripts/bootstrap/bootstrap-transition.js"></script>
+
+<script>
+$(document).ready(function(){
+	$(".zs_more").click(function(){
+											
+											$(this).siblings().toggleClass("zs_auto");
+											
+											})
+	
+													 })
+
+</script>
+
 </head>
 
 <body>
@@ -56,26 +69,52 @@
 <!--左侧导航栏结束-->
 <!--中间内容开始-->
   <div class="main_ct left">
-    <div class="ht_t"><span>会议中心</span><a href=""><i></i>新建会议</a></div>
-    <div class="ht_nr">
-    	<div class="ht_tline f25">2013-9-15</div>
-      <div class="ht_k">
-      	<div class="ht_time"><span class="f25">15:00</span><img src="../assets/images/01.png" /><span>负责人:王晓丽</span></div>
-      	<div class="ht_rt">
-        	<div class="bk_t"></div>
-        	<div class="bk_c">sss<br />s<br />s<br />s<br />s<br />s<br />ss</div>
-        	<div class="bk_d"></div>
-        </div>
-        <div class="clearfix"></div>
-      </div>
+    <div class="zs_t">
+      <span class="f22">知识库</span>
+      <div class="zs_ser"><input placeholder="请输入关键词" name="" type="text" /><input name="" type="image" src="../assets/images/top_ser_bt.png" /></div>
     </div>
-
-    
-    
-	</div>
-<!--中间内容结束-->
+    <div class="zs_k">
+    	<div class="bk_t"></div>
+    	<div class="bk_c f12">当前位置：<a href="#">知识库</a> > <span class="zs_now">搜索关键词“空乘”</span><i class="right">找到相关文档“15”篇</i></div>
+    	<div class="bk_t bk_d"></div>
+    </div>
+    <div class="zs_k">
+    	<div class="bk_t"></div>
+<div class="bk_c zsk_ed">
+      <form class="form-inline">
+        <div class="zsk_tt">标题：<input name="" type="text" /></div>
+        <div class="zsk_edt">这里是插件地址</div>
+        <div class="zsk_xx"> 
+        <span>分类：</span><select name="">
+          <option>飞行类</option>
+        </select>
+        <span>权限：</span>
+        <label class="checkbox">
+          <input name="1" type="radio" value="" />公开
+        </label>
+        <label class="checkbox">
+          <input name="2" type="radio" value="" />分组可见：
+        </label>
+        
+       <select name="" disabled="disabled">
+          <option>客舱服务部</option>
+        </select>
+         <!--这个是前面单选框选择第一个公开的时候，多一个disabled属性
+        
+        <select name="" disabled="disabled">
+          <option>客舱服务部</option>
+        </select>
+        
+        -->
+        
+        </div>
+        </form>
   
-  <div class="main_rt left"> <a href="weibo_02.html"><img src="../assets/images/02.jpg" width="560" height="912" /></a></div>
+      </div>
+      <div class="bk_t zsk_db"><input type="button" class="btn bn btn-warning left" value="保存草稿" /><input type="button" class="btn bn btn-danger right" value="审核并发表" /><input type="button" class="btn bn right" value="取消" /></div>
+    </div>
+  </div>
+<!--中间内容结束-->
 <div class="clearfix"></div>
 </div>
 <div class="foot"><a href="#">免责声明</a>　｜　<a href="#">关于我们</a>　｜　<a href="#">联系我们</a>　｜　<a href="#">网站帮助</a><br /><small>copyright &copy;2002-2013 www.vqiji.com All Rights Reserved</small></div>

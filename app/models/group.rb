@@ -28,6 +28,15 @@ class Group
 
 	validates_presence_of :name
 	# validates_presence_of :creator
+
+
+  include Sunspot::Mongo
+
+  searchable do
+    text :name
+    text :notice
+    text :summary
+  end
   
   after_create do |group|
     group.join(group.creator, true) if group.creator # 将创建人添加为成员和管理员

@@ -118,6 +118,7 @@ class Knowledge::CommentsController < WeiboController
     respond_to do |format|
       if knowledge.save
         format.html { redirect_to knowledge, notice: "文章创建成功."}
+        format.js
       else
         Rails.logger.info("!!!!#{@knowledge.errors.first}")
         format.html { render action: "new"}

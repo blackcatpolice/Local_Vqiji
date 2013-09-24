@@ -70,14 +70,28 @@ class Knowledge::KnowledgesController < WeiboController
   
   #我创建的文档
   def my
-    query = Knowledge.search do
-      fulltext params[:keyword]
-      with :public, true
-      with :creator_id, current_user.id
-      order_by :created_at, :desc
-      paginate :page => params[:page], :per_page => (params[:size] || 10)
+    @my_unaudited_knowledges = []
+    unaudited_knowledges = Knowledge::Knowledge.unaudited
+    unaudited_knowledges.each do |knowledge|
+      @my_unaudited_knowledges << knowledge if knowledge.group && knowledge.group.creator == current_user
+      @my_unaudited_knowledges << knowledge if current_user.is_admin && knowledge.group.nil?
     end
-    @knowledges = query.results
+    @knowledges = Knowledge::Knowledge.where(:creator => current_user).desc(:updated_at).paginate(:page => params[:page], :per_page => 20)
+    # query = Knowledge.search do
+    #   fulltext params[:keyword]
+    #   with :public, true
+    #   with :creator_id, current_user.id
+    #   order_by :created_at, :desc
+    #   paginate :page => params[:page], :per_page => (params[:size] || 10)
+    # end
+    # @knowledges = query.results
+  end
+
+  def check
+    knowledge = Knowledge::Knowledge.find(params[:id])
+    knowledge.check_status = params[:status]
+    knowledge.save!
+    return redirect_to :action => :my
   end
 
   def show
@@ -85,8 +99,9 @@ class Knowledge::KnowledgesController < WeiboController
     @contents = @knowledge.contents.paginate(:page => params[:page], :per_page => 1)
     # @comment = @knowledge.comments.new
     if current_user.id != @knowledge.creator_id
-      @knowledge.clicks += 1
-      @knowledge.save
+      @knowledge.inc(:clicks, 1) unless params[:page]
+      # @knowledge.clicks += 1 
+      # @knowledge.save
     end
   end
   
@@ -107,7 +122,7 @@ class Knowledge::KnowledgesController < WeiboController
   end
   
   def edit
-    @knowledge = Knowledge.find params[:id]
+    @knowledge = Knowledge::Knowledge.find params[:id]
   end
 
   def create
@@ -127,7 +142,7 @@ class Knowledge::KnowledgesController < WeiboController
 
     respond_to do |format|
       if @knowledge.save
-        format.html { redirect_to [:knowledge, @knowledge], notice: "文章创建成功."}
+        format.html { redirect_to @knowledge, notice: "文章创建成功."}
       else
         Rails.logger.info("!!!!#{@knowledge.errors.first}")
         format.html { render action: "new"}
@@ -136,17 +151,22 @@ class Knowledge::KnowledgesController < WeiboController
   end
   
   def update
-    @knowledge = Knowledge.find params[:id]
-    _knowledge = params[:knowledge]
-    if current_user.release_public_knowledge && params[:public].to_i == 1
-      _knowledge[:public] = true
-      _knowledge[:group_id] = nil
-    else
-      _knowledge[:public] = false
-      @knowledge.status = Knowledge::KNOWLEDGE_STATUS_DRAFT unless _knowledge[:group_id]
-    end
+
+    contents_params = params[:knowledge_knowledge].delete(:contents)
+    @knowledge = Knowledge::Knowledge.find params[:id]
+    @knowledge.contents = nil
+    @knowledge.add_contents(contents_params)
+
+    # _knowledge = params[:knowledge]
+    # if current_user.release_public_knowledge && params[:public].to_i == 1
+    #   _knowledge[:public] = true
+    #   _knowledge[:group_id] = nil
+    # else
+    #   _knowledge[:public] = false
+    #   @knowledge.status = Knowledge::KNOWLEDGE_STATUS_DRAFT unless _knowledge[:group_id]
+    # end
     respond_to do |format|
-      if @knowledge.update_attributes _knowledge
+      if @knowledge.save
         format.html { redirect_to @knowledge, notice: "文章修改成功."}
       else
         format.html { render action: "edit"}

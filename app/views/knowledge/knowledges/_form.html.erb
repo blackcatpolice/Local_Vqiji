@@ -7,30 +7,29 @@
       <div class="bk_c zsk_ed">
       
         <div class="zsk_tt">标题:&nbsp;&nbsp;<%= f.text_field :title, :placeholder=>"请输入文章标题" %></div>
+        <div class="zsk_tt">关键词:&nbsp;&nbsp;<%= f.text_field :tags, :placeholder=>"请输入文章关键词" %></div>
         <div class="zsk_edt">
             <%= f.fields_for :contents do |content_fields| %>
-             <%= content_fields.text_area :content, :id => "content_textarea" %>
+             <%= content_fields.text_area :content, :id => "content_textarea", :value => @knowledge.contents_content_text %>
             <% end %>
         </div>
 
         <div class="zsk_xx"> 
         	<span>分类：</span>
-        	<select id="knowledge_knowledge_type_id" name="knowledge[knowledge_type_id]">
+        	<select id="knowledge_knowledge_type_id" name="knowledge_knowledge[knowledge_type_id]">
           		<% knowledge_types.each do |kt|%>
           		<option value="<%= kt.id%>" <% if kt.id == @knowledge.knowledge_type_id%>selected ="selected"<% end %>><%= kt.name%></option>
           		<% end %>
         	</select>
         	<span>权限：</span>
-        	<% if current_user.release_public_knowledge %>
         	<label class="checkbox">
-          		<input name="public" type="radio" value="1" <% if @knowledge.public %>checked="checked"<% end %>>公开
+          		<input name="public" type="radio" value="1" >公开
         	</label>
-        	<% end %>
         	<% if current_user.groups.length > 0%>
         	<label class="checkbox">
           		<input name="public" type="radio" value="0" <% unless @knowledge.group %>checked="checked"<% end %>>分组可见：
         	</label>
-        	<select id="knowledge_group_id" name="knowledge[group_id]" <% if @knowledge.group %>disabled="disabled"<% end %>>
+        	<select id="knowledge_group_id" name="knowledge_knowledge[group_id]" <% if @knowledge.group %>disabled="disabled"<% end %>>
         		<%  current_user.groups.each do |g|%>
           		<option value="<%= g.id%>" <% if g.id == @knowledge.group_id %>selected="selected"<% end %>><%= g.name%></option>
           		<% end %>

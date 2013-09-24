@@ -13,6 +13,7 @@
     	<%= link_to "文档首页", knowledge_knowledges_path, :class => "on" %>
     	<%= link_to "小组文档", groups_knowledge_knowledges_path %>
     	<a href="#">我的收藏</a>
+      <%= link_to "我的文档", my_knowledge_knowledges_path %>
     </div>
     <div class="zs_k">
     	<div class="bk_t"></div>
@@ -105,18 +106,23 @@
           </ul>
         </div>
         <% @knowledge_types.each do |knowledge_type| %>
+          <% next if knowledge_type.knowledges.published.blank? %>
 	        <div class="zs_lbt f18"><%= knowledge_type.name %>
 	        	<%= link_to "更多", knowledge_knowledges_path(:type => knowledge_type, :group_id => params[:group_id]) %>
 	        </div>
 	        <div class="zs_lb">
 	          <ul>
 	          	<% knowledge_type.knowledges.published.desc(:updated_at).limit(4).each do |knowledge| %>
-	            <li>
-	            	<span><a href="#">空乘</a></span>
-	              <img src="../assets/images/px_zt6.png" />
-	              <div class="title"><a href="#">工资福利新旧福利新旧准则</a></div>
-	              <i>854人已阅读</i>
-	            </li>
+              <li>
+                <span>
+                  <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group_id => params[:group_id]) %>
+                </span>
+                <img src="../assets/images/px_zt6.png" />
+                <div class="title">
+                  <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+                </div>
+                <i><%= knowledge.clicks %>人已阅读</i>
+              </li>
 	            <% end %>
 	          </ul>
 	        </div>
@@ -130,6 +136,19 @@
 <!--中间内容结束-->
 
 
+<% content_for :main_rt do %>
+    <div class="bk">
+      <div class="bk_t"></div>
+      <div class="bk_c">
+        <div class="zs_new zs_tj">当前已有<i><%= Knowledge::Knowledge.published.count %></i>份文档</div>
+        <div class="zs_new">
+          <%= link_to "", new_knowledge_knowledge_path %>
+        </div>
+
+      </div>
+      <div class="bk_t bk_d"></div>
+    </div>
+<% end %>
 
 
 

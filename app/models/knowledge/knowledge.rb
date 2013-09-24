@@ -30,14 +30,19 @@ class Knowledge::Knowledge
   validates :title, :creator, presence: true
 
   scope :published, where(:check_status => CHECK_AUDITED)
+  scope :unaudited, where(:check_status => CHECK_UNAUDITED)
+
+  before_save do |knowledge|
+    knowledge.tags = knowledge.tags.gsub(/[',',' ',';']/," ") if knowledge.tags
+  end
 
 
   include Sunspot::Mongo
 
   searchable do
     text :title
-    text :contents do |knowledge| 
-       knowledge.contents.map { |knowledge_content| knowledge_content.content } 
+    text :contents, :stored => true do |knowledge| 
+       knowledge.contents.map { |knowledge_content| knowledge_content.content.gsub(/<\/?.*?>/,"") } 
     end 
     integer :check_status
   end
@@ -60,6 +65,27 @@ class Knowledge::Knowledge
     contents.each_with_index do |content, index|
       self.contents.new(:page_index => index, :content => content)
     end
+  end
+
+  def published?
+    check_status == CHECK_AUDITED
+  end
+
+  def contents_content_text
+    contents_text = ""
+    contents.map { |knowledge_content| contents_text += knowledge_content.content } unless self.new_record?
+    return contents_text
+  end
+
+  def related_knowledges
+    return [] if self.tags.blank?
+    query = Knowledge::Knowledge.search do
+      tags.split(" ").each do |tag|
+        fulltext tag
+      end
+      paginate :page => 1, :per_page => (5)
+    end
+    knowledges = query.results
   end
 
 
