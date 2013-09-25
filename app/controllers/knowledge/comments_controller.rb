@@ -3,6 +3,27 @@ class Knowledge::CommentsController < WeiboController
   
   layout proc { |c| pjax_request? ? pjax_layout : 'knowledge' }
 
+
+  def reply_comments
+    @comment = Knowledge::KnowledgeComment.find(params[:id])
+    @comments = @comment.reply_comments.desc(:created_at)
+    # render :json => comments
+    # render :js
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def reply_comment
+    @reply_comment = Knowledge::KnowledgeComment.find(params[:id])
+    @comment = @reply_comment.reply_comments.create(:content => params[:content], 
+                                   :user => current_user, 
+                                   :knowledge => @reply_comment.knowledge)
+    respond_to do |format|
+      format.js
+    end
+  end
+
   #所有公开的文档
   def index
 
@@ -101,7 +122,7 @@ class Knowledge::CommentsController < WeiboController
   def create
     Rails.logger.info("!!!!!!!!!!!!!!!!!!!!!!!")
     knowledge = Knowledge::Knowledge.find(params[:knowledge_id])
-    knowledge.comments.create(:content => params[:content], :user => current_user)
+    @comment = knowledge.comments.create(:content => params[:content], :user => current_user)
     # contents_params = params[:knowledge_knowledge].delete(:contents)
     # @knowledge = Knowledge::Knowledge.new params[:knowledge_knowledge]
     # @knowledge.add_contents(contents_params)

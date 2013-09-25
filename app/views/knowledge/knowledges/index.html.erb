@@ -12,7 +12,6 @@
     <div class="zs_nav">
     	<%= link_to "文档首页", knowledge_knowledges_path, :class => "on" %>
     	<%= link_to "小组文档", groups_knowledge_knowledges_path %>
-    	<a href="#">我的收藏</a>
       <%= link_to "我的文档", my_knowledge_knowledges_path %>
     </div>
     <div class="zs_k">
@@ -41,6 +40,23 @@
         	<div class="zs_more"><a href="javascript:void(0)">更多</a></div>
           <div class="clearfix"></div>
         </div>
+        <% if params[:type] || params[:group_id] %>
+        <div class="zs_type">
+          <div class="zs_tm" style="width:85px;">您已选择：</div>
+          <div class="zs_list">
+            <% if params[:type] %>
+              <% knowledge_type_name = Knowledge::KnowledgeType.find(params[:type]).name %>
+              <a class="zs_x" href="#"><%= knowledge_type_name %><button class="close">&times;</button></a>
+            <% end %>
+            <% if params[:group_id] %>
+              <% group_name = Group.find(params[:group_id]).name %>
+              <a class="zs_x" href="#"><%= group_name %><button class="close">&times;</button></a>
+            <% end %>
+            <div class="clearfix"></div>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+        <% end %>
       </div>
     	<div class="bk_t bk_d"></div>
     </div>

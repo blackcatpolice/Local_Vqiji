@@ -11,20 +11,18 @@ class Settings::AvatarController < Settings::BaseController
   def octet_stream_update
     # 创建临时保存文件
     file = Tempfile.new(['foo', '.jpg'])
-    file.binmode
-    file.write(request.raw_post)
-
-    current_user.avatar = file
     
-    if current_user.save
-      render_json_message '更新头像成功！'
-    else
-      raise Setting::Error, '设置头像失败！'
-    end
-  ensure
-    if file
-      file.close
-      file.unlink # 删除文件
+    begin
+      file.binmode
+      file.write(request.raw_post)
+
+      current_user.avatar = file
+      
+      current_user.save!
+      x_render_json_message '更新头像成功！'
+    ensure
+      file.close(true) # 关闭并删除临时文件
     end
   end
+
 end

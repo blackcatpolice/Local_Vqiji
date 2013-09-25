@@ -79,13 +79,19 @@ class Knowledge::Knowledge
 
   def related_knowledges
     return [] if self.tags.blank?
+    tag_array = self.tags.split(" ")
+    Rails.logger.info("!!!!!!#{tag_array}")
     query = Knowledge::Knowledge.search do
-      tags.split(" ").each do |tag|
-        fulltext tag
-      end
+      keywords tag_array
       paginate :page => 1, :per_page => (5)
     end
     knowledges = query.results
+    knowledges = knowledges.reject {|knowledge| knowledge == self}
+  end
+
+  def knowledge_type_hot_knowledges
+    knowledges = knowledge_type.knowledges.published.desc(:clicks).limit(6)
+    knowledges = knowledges.reject {|knowledge| knowledge == self}
   end
 
 

@@ -25,7 +25,7 @@ class AttachmentsController < WeiboController
     end
     _tmp.save!
     respond_to do |format|
-      format.json { render_inline_json _tmp.to_json }
+      format.json { x_render_inline_json _tmp.to_json }
     end
   end
   
@@ -41,7 +41,7 @@ class AttachmentsController < WeiboController
     end
     if @file.save
       respond_to do |format|
-        format.json { render_inline_json @file.to_json }
+        format.json { x_render_inline_json @file.to_json }
       end
     else
       respond_to do |format|
@@ -61,7 +61,7 @@ class AttachmentsController < WeiboController
       :upload_type => Attachment::NetworkDisk::TYPE_HISTORY
     )
     respond_to do |format|
-      format.json { render_inline_json @tmp.to_json }
+      format.json { x_render_inline_json @tmp.to_json }
     end
   end
 
@@ -77,7 +77,7 @@ class AttachmentsController < WeiboController
     end
     if @picture.save
       respond_to do |format|
-        format.json { render_inline_json @picture.to_json }
+        format.json { x_render_inline_json @picture.to_json }
       end
     else
       respond_to do |format|

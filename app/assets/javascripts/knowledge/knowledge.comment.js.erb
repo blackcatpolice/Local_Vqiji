@@ -1,0 +1,160 @@
+//
+// 微博
+//
+// require jquery
+// require jquery.ui.widget
+// require weibo
+// require tweet.repost
+// require tweet.commentsList
+// require tweet.commenter
+
+(function($) {
+  $.widget("knowledge.commentTool",{
+    options: {},
+    _create: function(){
+      this._on("click", function(){
+        alert('click');
+      })
+    },
+    // 展开/收起评论列表
+    _toggleCommentsList: function() {
+
+    } // _toggleCommentsList
+  });
+
+
+  $.widget("weibo.tweet", $.rtext.rtextMessage, {
+    options: {
+      tweet: null,
+      delete_: {
+        confirm: "您确认删除这条微博吗？",
+        apiFunc: WEIBO.deleteTweet
+      }
+    },
+    
+    _create: function() {
+      this._super();
+      this._reftweet = this.element.find("[data-role=reftweet]").tweet();
+      this._counter  = this.element.find("[data-role=counter]");
+
+      this._on(this._counter, {
+        "click [data-action=comment]" : this._toggleCommentsList,
+        "click [data-action=repost]" : this._repost,
+        "click [data-action=favorite]" : this._favorite
+      });
+    },
+
+    istop: function() {
+      return (this.element.attr("data-is-top") == "true");
+    },
+
+    /*转发*/
+    _repost: function() {
+      var _popReposter = $('<div  />').repostModal(
+        {
+          tweet_id: this._messageId(),
+          autoOpen: true,
+          success: function() {
+            _popReposter.repostModal("close");
+            $.alert("转发微博成功！", 1);
+          },
+          close: function() { // 关闭后清理
+            _popReposter.repostModal("destroy").remove();
+          }
+        }
+      );
+    }, // _repost
+    
+    // 展开/收起评论列表
+    _toggleCommentsList: function() {
+      // FIXED：快速点击评论，弹出多个评论列表
+      if(this._toggleCommentsList._locked) return;
+      this._toggleCommentsList._locked = true;
+      
+      var context = this;
+      var _commentEmbedList = this._commentEmbedList;
+      
+      /* */
+      if (!_commentEmbedList) {
+        WEIBO.commentsList(context._messageId(), {
+          success: function(list) {
+            var _commentEmbedList = $(list)
+              .commentEmbedList()
+              .insertAfter(context._counter);
+            context._commentEmbedList = _commentEmbedList;
+          },
+          error: App.error.XHRErrorHandler("获取评论失败！"),
+          complete: function() {
+            context._toggleCommentsList._locked = false;
+          }
+        });
+       } else { /*收起*/
+         // _commentEmbedList.slideUp("fast", function() {
+         //    _commentEmbedList.remove();
+         //    context._commentEmbedList = null;
+         // });
+         _commentEmbedList.remove();
+         context._commentEmbedList = null;
+         this._toggleCommentsList._locked = false;
+       }
+    }, // _toggleCommentsList
+    
+    /* 收藏/取消收藏 */
+    _favorite : function(e) {
+      var target = $(e.target),
+          context = this,
+          _favorite = this.element.attr("data-favorite");
+
+       e.preventDefault();
+
+       if (_favorite != "true") {
+         WEIBO.favorite(this._messageId(), {
+           success : function() {
+             var _favorite = target.text("取消收藏");
+             context.element.attr("data-favorite", "true");
+             
+             // 加载标签设置框
+             $.ajax("/my/favorites/" + context._messageId() + "/tags_tip.html", {
+               dataType: "html",
+               success: function(tip) {
+                 var _setTagsTip = $(tip);
+                 target.data("set-tags-tip", _setTagsTip);
+               
+                 _setTagsTip.weiboSetFavoriteTagsTip({
+                   trigger: target,
+                   ok: function() { // 设置成功
+                     _setTagsTip.weiboSetFavoriteTagsTip("close");
+                   },
+                   cancel: function() { // 取消
+                     _setTagsTip.weiboSetFavoriteTagsTip("close");
+                   },
+                   close: function() { // 关闭
+                     target.data("set-tags-tip", null);
+                     
+                     setTimeout(function() {
+                       _setTagsTip.remove();
+                     }, 50);
+                   }
+                 });
+               }, // success
+               error: $.noop
+             });
+           },
+           error : App.error.XHRErrorHandler("收藏失败！")
+         });
+       } else {
+        if (_setTagsTip = target.data("set-tags-tip")) {
+          _setTagsTip.weiboSetFavoriteTagsTip("close");
+        }
+       
+         WEIBO.unfavorite(context._messageId(), {
+           success : function() {
+             target.text("收藏");
+             context.element.attr("data-favorite", "false");
+           },
+           error : App.error.XHRErrorHandler("取消收藏失败！")
+        });
+      }
+    } // _toggleFavorite
+  }); // widget: weibo
+})(jQuery);

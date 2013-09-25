@@ -6,7 +6,7 @@ class WeiboController < ApplicationController
   before_filter :authenticate_user!
   layout proc { |c| pjax_request? ? pjax_layout : 'weibo' }
   
-  #rescue_from ActiveRecord::RecordNotFound, :with => :record_not_found
+  # rescue_from ActiveRecord::RecordNotFound, :with => :record_not_found
   rescue_from WeiboError, :with => :weibo_error
   
   protected

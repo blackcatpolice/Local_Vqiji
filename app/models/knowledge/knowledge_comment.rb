@@ -8,6 +8,7 @@ class Knowledge::KnowledgeComment
   field :check_status, :type => Integer
   field :comment_index, :type => Integer
   field :reply_count, :type => Integer
+  field :is_reply, :type => Boolean, :default => false
 
   belongs_to :knowledge, :class_name => 'Knowledge::Knowledge'
   belongs_to :user, :class_name => 'User'
@@ -18,4 +19,6 @@ class Knowledge::KnowledgeComment
     knowledge_comment.comment_index = knowledge.comments_count + 1
     knowledge.inc(:comments_count, 1)
   end
+
+  scope :replyed, where(:is_reply => false)
 end

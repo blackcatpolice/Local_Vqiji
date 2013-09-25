@@ -16,10 +16,12 @@ Weibo::Application.routes.draw do
         get :content
         put :check
       end
-      resources :comments
-    end
-
-    resources :knowledge_collections do
+      resources :comments do
+        member do
+          get :reply_comments
+          post :reply_comment
+        end
+      end
     end
   end
 end

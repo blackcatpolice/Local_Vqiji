@@ -1,0 +1,5 @@
+<li>
+  <%= link_to "『 #{knowledge.knowledge_type.name} 』", knowledge_knowledges_path(:type => knowledge.knowledge_type) %>
+  <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+  <span><%= knowledge.contents_count %>页面</span>
+</li>

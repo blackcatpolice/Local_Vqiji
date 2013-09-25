@@ -97,6 +97,7 @@ class Knowledge::KnowledgesController < WeiboController
   def show
     @knowledge = Knowledge::Knowledge.find params[:id]
     @contents = @knowledge.contents.paginate(:page => params[:page], :per_page => 1)
+    @comments = @knowledge.comments.replyed.desc(:created_at)
     # @comment = @knowledge.comments.new
     if current_user.id != @knowledge.creator_id
       @knowledge.inc(:clicks, 1) unless params[:page]

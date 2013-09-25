@@ -1,7 +1,9 @@
 # encoding: utf-8
 
+require 'x_render_json'
+
 class ApplicationController < ActionController::Base
-  include JSONMessageRender
+  include XRenderJSON
   include XSendFile
   
   # protect_from_forgery :only => [:create, :update, :destroy]

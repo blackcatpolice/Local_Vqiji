@@ -1,8 +1,10 @@
 # encoding: utf-8
 
+require 'x_render_json'
+
 # 链接控制器
 class UrlsController < ActionController::Base
-  include JSONMessageRender
+  include XJSONRender
   
   respond_to :json
 
@@ -37,7 +39,7 @@ class UrlsController < ActionController::Base
         :shorten => Rt::Url.shorten(_url)
       }
     else
-      render_json_error(:bad_request, '请输入正确的视频链接！')
+      x_render_json_error(:bad_request, '请输入正确的视频链接！')
     end
   end
   
@@ -47,7 +49,7 @@ class UrlsController < ActionController::Base
   
   # Rt::Url::InvalidError
   def invalid_url_error(error)
-    render_json_error(:bad_request, '不支持的链接！')
+    x_render_json_error(:bad_request, '不支持的链接！')
   end
 end
 

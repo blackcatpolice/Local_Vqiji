@@ -1,0 +1,8 @@
+<div id="reply_comments_<%= @comment.id %>">
+<%= form_for(Knowledge::KnowledgeComment.new, :url => "/knowledge/knowledges/#{@comment.knowledge.id}/comments/#{@comment.id}/reply_comment", :remote => true) do |f| %>
+  <%= f.text_area :content, :name => "content", :id => "reply_area", :cols => 20, :rows => 4 %>
+  <%= f.submit %>
+<% end %>
+
+<%= render :collection => @comment.reply_comments, :as => :reply_comment, :partial => '/knowledge/comments/replyed_comment_item' %>
+</div>

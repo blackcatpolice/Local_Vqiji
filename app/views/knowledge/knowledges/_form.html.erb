@@ -7,7 +7,7 @@
       <div class="bk_c zsk_ed">
       
         <div class="zsk_tt">标题:&nbsp;&nbsp;<%= f.text_field :title, :placeholder=>"请输入文章标题" %></div>
-        <div class="zsk_tt">关键词:&nbsp;&nbsp;<%= f.text_field :tags, :placeholder=>"请输入文章关键词" %></div>
+        <div class="zsk_tt">关键词:&nbsp;&nbsp;<%= f.text_field :tags  , :placeholder=>"请输入文章关键词" %></div>
         <div class="zsk_edt">
             <%= f.fields_for :contents do |content_fields| %>
              <%= content_fields.text_area :content, :id => "content_textarea", :value => @knowledge.contents_content_text %>

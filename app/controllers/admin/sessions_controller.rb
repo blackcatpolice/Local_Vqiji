@@ -34,10 +34,12 @@ class Admin::SessionsController < ApplicationController
   def destroy
     current_session.destroy if current_session
     respond_to do |format|
-      format.json { render_json_message '登出成功！' }
+      format.json {
+        x_render_json_message '登出成功！'
+      }
       format.any {
         flash.notice = "登出成功!"
-        redirect_to :action=>"new"
+        redirect_to :action => 'new'
       }
     end
   end

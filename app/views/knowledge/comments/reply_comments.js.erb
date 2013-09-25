@@ -1,0 +1,3 @@
+(function($) {
+  $('#comment_<%= @comment.id %>').append("<%= j render('knowledge/comments/reply_comments') %>");
+})(jQuery);
