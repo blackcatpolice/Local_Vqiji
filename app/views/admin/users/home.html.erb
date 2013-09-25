@@ -21,6 +21,6 @@
     <li><span class="badge badge-important"><%= Todo::Task.count %></span> 个任务；</li>
     <li><span class="badge"><%= Talk::Group.count %></span> 个私信会话，单人会话 <span class="badge"><%= Talk::Group.p2p.count %></span> 个；</li>
     <li><span class="badge badge-important"><%= Training.count %></span> 个培训；</li>
-    <li><span class="badge badge-important"><%= Knowledge.count %></span> 篇知识库文章；</li>
+    <li><span class="badge badge-important"><%= Knowledge::Knowledge.count %></span> 篇知识库文章；</li>
   </ul>
 </div>

@@ -2,13 +2,9 @@
   <div class="main_ct left">
     <div class="zs_t">
       <span class="f22">知识库</span>
-      <div class="zs_ser"><input placeholder="请输入关键词" name="" type="text" /><input name="" type="image" src="../assets/images/top_ser_bt.png" /></div>
+      <%= render('search_form') %>
     </div>
-    <div class="zs_nav">
-    	<%= link_to "文档首页", knowledge_knowledges_path %>
-    	<%= link_to "小组文档", groups_knowledge_knowledges_path, :class => "on" %>
-    	<a href="#">我的收藏</a>
-    </div>
+    <%= render('top_nav', :current_nav => 'group') %>
     <div class="zs_k">
     	<div class="bk_t"></div>
     	<div class="bk_c">

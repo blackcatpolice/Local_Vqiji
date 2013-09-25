@@ -9,7 +9,10 @@ class Knowledge::Knowledge
 
   CHECK_UNAUDITED = 1
   CHECK_AUDITED = 2
-  CHECK_END = 3
+  CHECK_CANEL = 3
+  CHECK_STATUS = {CHECK_UNAUDITED => "等待审核",
+                  CHECK_AUDITED => "审核通过",
+                  CHECK_CANEL => "审核不通过"}
 
   field :title, :type => String
   field :tags,  :type => String
@@ -41,6 +44,7 @@ class Knowledge::Knowledge
 
   searchable do
     text :title
+    text :tags
     text :contents, :stored => true do |knowledge| 
        knowledge.contents.map { |knowledge_content| knowledge_content.content.gsub(/<\/?.*?>/,"") } 
     end 
@@ -92,6 +96,18 @@ class Knowledge::Knowledge
   def knowledge_type_hot_knowledges
     knowledges = knowledge_type.knowledges.published.desc(:clicks).limit(6)
     knowledges = knowledges.reject {|knowledge| knowledge == self}
+  end
+
+  def is_public?
+    group.blank?
+  end
+
+  def user_is_auditor?(user)
+    if is_public?
+      user.is_admin
+    else
+      user == group.creator
+    end
   end
 
 

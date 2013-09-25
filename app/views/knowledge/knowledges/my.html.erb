@@ -2,20 +2,15 @@
   <div class="main_ct left">
     <div class="zs_t">
       <span class="f22">知识库</span>
-      <div class="zs_ser"><input placeholder="请输入关键词" name="" type="text" /><input name="" type="image" src="../assets/images/top_ser_bt.png" /></div>
+      <%= render('search_form') %>
     </div>
-    <div class="zs_nav">
-      <%= link_to "文档首页", knowledge_knowledges_path %>
-      <%= link_to "小组文档", groups_knowledge_knowledges_path %>
-      <a href="#">我的收藏</a>
-      <%= link_to "我的文档", my_knowledge_knowledges_path, :class => "on" %>
-    </div>
+    <%= render('top_nav', :current_nav => 'my') %>
 
     <% unless @my_unaudited_knowledges.blank? %>
     <div class="zs_k">
       <div class="bk_t"></div>
       <div class="bk_c">
-        <div class="zs_lbt f18">热门阅读</div>
+        <div class="zs_lbt f18">当前有“<%= @my_unaudited_knowledges.count %>”篇文档需要您审核！</div>
         <div class="zs_lb">
           <ul>
             <% @my_unaudited_knowledges.each do |knowledge| %>
@@ -28,7 +23,7 @@
                 <div class="title">
                   <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
                 </div>
-                <i><%= knowledge.clicks %>人已阅读</i>
+                <i>共<%= knowledge.contents_count %>页</i>
               </li>
             <% end %>
           </ul>
@@ -42,8 +37,11 @@
     <div class="zs_k">
       <div class="bk_t"></div>
       <div class="bk_c">
-        <div class="zs_lbt f18">热门阅读</div>
+        <div class="zs_lbt f18">我的文档</div>
         <div class="zs_lb">
+          <% if @knowledges.blank? %>
+            您还没有发布文档！
+          <% else %>
           <ul>
             <% @knowledges.each do |knowledge| %>
               <li>
@@ -59,6 +57,7 @@
               </li>
             <% end %>
           </ul>
+          <% end %>
         </div>
         <div class="clearfix"></div>
       </div>

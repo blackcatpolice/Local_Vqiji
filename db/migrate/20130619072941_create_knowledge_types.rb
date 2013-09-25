@@ -34,7 +34,7 @@ class CreateKnowledgeTypes < Mongoid::Migration
     ]
 
     knowledge_types.each do |type|
-      KnowledgeType.create(type)
+      Knowledge::KnowledgeType.create(type)
     end
   end
 

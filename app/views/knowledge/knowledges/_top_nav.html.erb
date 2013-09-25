@@ -1,0 +1,5 @@
+<div class="zs_nav">
+  <%= link_to "文档首页", knowledge_knowledges_path, :class => "#{'on' if current_nav == 'index'}" %>
+  <%= link_to "小组文档", groups_knowledge_knowledges_path, :class => "#{'on' if current_nav == 'group'}" %>
+  <%= link_to "我的文档", my_knowledge_knowledges_path, :class => "#{'on' if current_nav == 'my'}" %>
+</div>

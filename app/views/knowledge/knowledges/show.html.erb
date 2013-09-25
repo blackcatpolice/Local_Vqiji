@@ -1,14 +1,14 @@
 <!--中间内容开始-->
     <div class="zs_t">
       <span class="f22">知识库</span>
-      <div class="zs_ser"><input placeholder="请输入关键词" name="" type="text" /><input name="" type="image" src="../assets/images/top_ser_bt.png" /></div>
+      <%= render('search_form') %>
     </div>
     <div class="zs_k">
       <div class="bk_t"></div>
       <div class="bk_c f12">当前位置：
         <%= link_to "知识库", knowledge_knowledges_path %> >
         <%= link_to @knowledge.knowledge_type.name, knowledge_knowledges_path(:type => @knowledge.knowledge_type.id) %> >
-        <%= @knowledge.title %>
+        <%= @knowledge.title %><%= Knowledge::Knowledge::CHECK_STATUS[@knowledge.check_status] unless @knowledge.published? %>
       <div class="bk_t bk_d"></div>
     </div>
     <div class="zs_k">
@@ -61,7 +61,7 @@
       </div>
       <div class="bk_t bk_d"></div>
     </div>
-    <% else %>
+    <% elsif @knowledge.user_is_auditor?(current_user) %>
       <%= link_to "审核通过", check_knowledge_knowledge_path(@knowledge, :status => 2), :method => :put %>
       <%= link_to "审核不通过", check_knowledge_knowledge_path(@knowledge, :status => 1), :method => :put %>
       <%= link_to "修改编辑", edit_knowledge_knowledge_path(@knowledge) %>
@@ -69,49 +69,51 @@
   </div>
 <!--中间内容结束-->
 
+<% if @knowledge.published? %>
+  <% content_for :main_rt do %>
 
-<% content_for :main_rt do %>
-
-    <div class="bk">
-      <div class="bk_t"></div>
-      <div class="bk_c">
-        <div class="zs_new"><a href=""></a></div>
-        <div class="zs_title f18">相关关键词<a href="">更多</a></div>
-        <div class="zs_tags">
-          <% unless @knowledge.tags.blank? %>
-            <% @knowledge.tags.split(" ").each do |tag| %>
-              <%= link_to tag, search_knowledge_knowledges_path(:keyword => tag)  %>
+      <div class="bk">
+        <div class="bk_t"></div>
+        <div class="bk_c">
+          <div class="zs_new">
+            <%= link_to "", new_knowledge_knowledge_path %>
+          </div>
+          <div class="zs_title f18">相关关键词<a href="">更多</a></div>
+          <div class="zs_tags">
+            <% unless @knowledge.tags.blank? %>
+              <% @knowledge.tags.split(" ").each do |tag| %>
+                <%= link_to tag, search_knowledge_knowledges_path(:keyword => tag)  %>
+              <% end %>
             <% end %>
-          <% end %>
-          <div class="clearfix"></div>
+            <div class="clearfix"></div>
+          </div>
+          <div class="zs_title f18">相关文档推荐<a href="">更多</a></div>
+          <div class="zs_rlb">
+            <ul>
+              <%= render :collection => @knowledge.related_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
         </div>
-        <div class="zs_title f18">相关文档推荐<a href="">更多</a></div>
-        <div class="zs_rlb">
-          <ul>
-            <%= render :collection => @knowledge.related_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
-          </ul>
-          <div class="clearfix"></div>
+        <div class="bk_t bk_d"></div>
+      </div>
+      <div class="bk zs_tr">
+        <div class="bk_t">
+          <div class="zs_title f18">该类文档热门阅读<a href="">更多</a></div>
         </div>
-      </div>
-      <div class="bk_t bk_d"></div>
-    </div>
-    <div class="bk zs_tr">
-      <div class="bk_t">
-        <div class="zs_title f18">该类文档热门阅读<a href="">更多</a></div>
-      </div>
-      <div class="bk_c mr_c4">
-        <div class="zs_rlb zs_rlb1">
-          <ul>
-            <%= render :collection => @knowledge.knowledge_type_hot_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
-          </ul>
-          <div class="clearfix"></div>
+        <div class="bk_c mr_c4">
+          <div class="zs_rlb zs_rlb1">
+            <ul>
+              <%= render :collection => @knowledge.knowledge_type_hot_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
         </div>
+        <div class="mr_t4"></div>
       </div>
-      <div class="mr_t4"></div>
-    </div>
 
+  <% end %>
 <% end %>
-
 
 
 <script>

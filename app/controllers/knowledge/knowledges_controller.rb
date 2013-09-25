@@ -31,6 +31,7 @@ class Knowledge::KnowledgesController < WeiboController
       fulltext params[:keyword] do
         highlight :contents
       end
+      with :check_status, Knowledge::Knowledge::CHECK_AUDITED
       # order_by :created_at, :desc
       paginate :page => params[:page], :per_page => (params[:size] || 10)
     end
@@ -89,20 +90,19 @@ class Knowledge::KnowledgesController < WeiboController
 
   def check
     knowledge = Knowledge::Knowledge.find(params[:id])
-    knowledge.check_status = params[:status]
-    knowledge.save!
-    return redirect_to :action => :my
+    # knowledge.check_status = params[:status]
+    knowledge.checked_by_user(current_user, params[:status])
+    # knowledge.save!
+    return redirect_to :action => :my if knowledge.save
   end
 
   def show
     @knowledge = Knowledge::Knowledge.find params[:id]
     @contents = @knowledge.contents.paginate(:page => params[:page], :per_page => 1)
     @comments = @knowledge.comments.replyed.desc(:created_at)
-    # @comment = @knowledge.comments.new
-    if current_user.id != @knowledge.creator_id
+    Rails.logger.info("-------#{@knowledge}")
+    if current_user.id != @knowledge.creator_id && @knowledge.published?
       @knowledge.inc(:clicks, 1) unless params[:page]
-      # @knowledge.clicks += 1 
-      # @knowledge.save
     end
   end
   
@@ -131,24 +131,20 @@ class Knowledge::KnowledgesController < WeiboController
     @knowledge = Knowledge::Knowledge.new params[:knowledge_knowledge]
     @knowledge.add_contents(contents_params)
     @knowledge.creator = current_user
-    Rails.logger.info("!!!!!!!!!!!!!!!!!!!!!!!")
-    Rails.logger.info(@knowledge.contents)
-    # xx
-    # if current_user.release_public_knowledge && params[:public].to_i == 1
-      # @knowledge.public = true
-    # else 
-      # @knowledge.public = false
-      # @knowledge.status = Knowledge::KNOWLEDGE_STATUS_DRAFT unless @knowledge.group_id
-    # end
 
-    respond_to do |format|
-      if @knowledge.save
-        format.html { redirect_to @knowledge, notice: "文章创建成功."}
-      else
-        Rails.logger.info("!!!!#{@knowledge.errors.first}")
-        format.html { render action: "new"}
-      end
+    if @knowledge.save
+      return render redirect_to my_knowledge_knowledges_path, notice: "文章创建成功."
+    else
+      return render :action => :new
     end
+    # respond_to do |format|
+    #   if @knowledge.save
+    #     format.html { redirect_to my_knowledge_knowledges_path, notice: "文章创建成功."}
+    #   else
+    #     Rails.logger.info("!!!!#{@knowledge.errors.first}")
+    #     format.html { render action: "new"}
+    #   end
+    # end
   end
   
   def update
