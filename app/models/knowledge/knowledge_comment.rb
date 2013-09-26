@@ -13,6 +13,7 @@ class Knowledge::KnowledgeComment
   belongs_to :knowledge, :class_name => 'Knowledge::Knowledge'
   belongs_to :user, :class_name => 'User'
   belongs_to :reply_comment, :class_name => 'Knowledge::KnowledgeComment' 
+  belongs_to :reply_to_user, :class_name => 'User'
   has_many :reply_comments, :class_name => 'Knowledge::KnowledgeComment', :inverse_of => 'reply_comment'
 
   before_save do |knowledge_comment|

@@ -42,7 +42,28 @@
 
 
 
+<div class="main_rt left">
+  <div class="mr_row mr_mar" wrl-row1>
+    <div class="bk">
+      <div class="bk_t"></div>
+      <div class="bk_c">
+        <div class="zs_new zs_tj">当前已有<i><%= Knowledge::Knowledge.published.count %></i>份文档</div>
+        <div class="zs_new">
+          <%= link_to "", new_knowledge_knowledge_path %>
+        </div>
 
+      </div>
+      <div class="bk_t bk_d"></div>
+    </div>
+  </div>
+  <div class="mr_row" wrl-row2>
+    <% if false %>
+    <div class="bk" asynch-widget aw-url="<%= asset_path 'widgets/weather.asynch.js' %>" aw-title="天气插件" wrl-strategy="prepend"></div>
+    <% end %>
+    <%#= render "/network_disks/widgets/files_widget" %>
+    <%#= render '/knowledge/knowledges/widgets/knowledges_widget' %>
+  </div>
+</div>
 
 
 <script>

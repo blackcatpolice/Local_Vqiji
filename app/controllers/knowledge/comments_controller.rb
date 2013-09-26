@@ -17,7 +17,9 @@ class Knowledge::CommentsController < WeiboController
   def reply_comment
     @reply_comment = Knowledge::KnowledgeComment.find(params[:id])
     @comment = @reply_comment.reply_comments.create(:content => params[:content], 
-                                   :user => current_user, 
+                                   :user => current_user,
+                                   :is_reply => true,
+                                   # :reply_to_user_id => params[:reply_to_user_id],
                                    :knowledge => @reply_comment.knowledge)
     respond_to do |format|
       format.js

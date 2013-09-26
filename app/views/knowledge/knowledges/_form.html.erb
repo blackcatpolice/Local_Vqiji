@@ -1,5 +1,69 @@
 <% knowledge_types = Knowledge::KnowledgeType.all %>
 
+    <div class="zs_k">
+      <div class="bk_t"></div>
+        <div class="bk_c zsk_ed">
+          <%= form_for(@knowledge, :html => { :id => "knowledge_form", :class => "form-inline", "data-pjax" => ""}) do |f|%>
+            <%= f.hidden_field :check_status %>
+            <div class="zsk_tt">
+              <label>标    题：</label>
+              <%= f.text_field :title, :placeholder=>"请输入文章标题" %>
+            </div>
+            <div class="zsk_tt">
+              <label>设置标签：</label>
+              <%= f.text_field :tags  , :placeholder=>"请输入文章关键词" %>
+            </div>
+            <div class="zsk_tt zsk_tt_tags">
+              <label>可选标签：</label>
+              <a href="" title="生活">生活</a>
+              <a href="" title="超实用">超实用</a>
+              <a href="漂亮">漂亮</a>
+            </div>
+
+            <div class="zsk_edt">
+              <%= f.fields_for :contents do |content_fields| %>
+               <%= content_fields.text_area :content, :id => "content_textarea", :value => @knowledge.contents_content_text %>
+              <% end %>
+            </div>
+            <div class="zsk_xx"> 
+            <span>分类：</span>
+            <select id="knowledge_knowledge_type_id" name="knowledge_knowledge[knowledge_type_id]">
+              <% knowledge_types.each do |kt|%>
+              <option value="<%= kt.id%>" <% if kt.id == @knowledge.knowledge_type_id%>selected ="selected"<% end %>><%= kt.name%></option>
+              <% end %>
+            </select>
+            <span>权限：</span>
+            <label class="checkbox">
+              <input name="1" type="radio" value="" />公开
+            </label>
+            <label class="checkbox">
+              <input name="2" type="radio" value="" />分组可见：
+            </label>
+            
+            <select id="knowledge_group_id" name="knowledge_knowledge[group_id]" <% if @knowledge.group %>disabled="disabled"<% end %>>
+              <%  current_user.groups.each do |g|%>
+                <option value="<%= g.id%>" <% if g.id == @knowledge.group_id %>selected="selected"<% end %>><%= g.name%></option>
+                <% end %>
+            </select>
+             <!--这个是前面单选框选择第一个公开的时候，多一个disabled属性
+            
+            <select name="" disabled="disabled">
+              <option>客舱服务部</option>
+            </select>
+            
+            -->
+            
+            </div>
+            <% end %>
+        </div>
+      <div class="bk_t zsk_db">
+        <input id="save_draft_btn" type="submit" class="btn bn btn-warning left" value="保存草稿" />
+        <input id="save_public_btn" type="submit" class="btn bn btn-danger right" value="发布" />
+        <input type="button" class="btn bn right" value="取消" onclick="history.back();" />
+      </div>
+    </div>
+
+<% if false %>
 <div class="bk">
 	<%= form_for(@knowledge, :html => { :id => "knowledge_form", :class => "form-inline", "data-pjax" => ""}) do |f|%>
 	<%= f.hidden_field :check_status %>
@@ -42,12 +106,12 @@
       <%= f.submit %>
    	<% end %>
 </div>
-
+<% end %>
 <%= javascript_include_tag 'kindeditor/kindeditor' %>
 
 <script>
   $(function() {
-    KindEditor.ready(function(K) {
+    // KindEditor.ready(function(K) {
         window.editor = KindEditor.create('#content_textarea', {
   		  width: "532px",
   		  minWidth: 500,
@@ -66,7 +130,7 @@
   		  ],
         pagebreakHtml: "<hr style='page-break-after: always;'' class='ke-pagebreak knowledge_page' />"
   	  });
-    });
+    // });
 
   	$(':radio[name="public"]').click(function(){
   		if(this.value == "1" && this.checked ){
@@ -101,8 +165,17 @@
   	}
   	
   	$("form[data-pjax]").on('submit', function(e){
+      alert($('#knowledge_knowledge_check_status').val());
       editor.sync();
   		$.pjax.submit(e, '[data-pjax-container]');
   	});
+
+    $('#save_draft_btn').on('click', function(e){
+      $('#knowledge_knowledge_check_status').val('-1');
+      $('#knowledge_form').submit();
+    });
+    $('#save_public_btn').on('click', function(e){
+      $('#knowledge_form').submit();
+    });
   });
 </script>

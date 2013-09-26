@@ -16,13 +16,15 @@ class Knowledge::KnowledgesController < WeiboController
     # @knowledges = query.results
     @knowledge_types = Knowledge::KnowledgeType.all.asc(:priority)
     if params[:type] || params[:group_id]
+      @knowledge_type = Knowledge::KnowledgeType.find(params[:type]) if params[:type]
       @knowledges = Knowledge::Knowledge.published
-      @knowledges = @knowledges.where(:group_id => params[:group_id]) if params[:group_id]
+      @knowledges = params[:group_id].nil? ? @knowledges.public : @knowledges.where(:group_id => params[:group_id])
+      # @knowledges = @knowledges.where(:group_id => params[:group_id]) if params[:group_id]
       @knowledges = @knowledges.where(:knowledge_type_id => params[:type]) if params[:type]
       @knowledges = @knowledges.paginate(:page => params[:page], :per_page => 15)
     else
-      @popular_knowledges = Knowledge::Knowledge.published.desc(:clicks).limit(4)
-      @latest_knowledges = Knowledge::Knowledge.published.desc(:updated_at).limit(4)
+      @popular_knowledges = Knowledge::Knowledge.published.desc(:clicks).limit(6)
+      @latest_knowledges = Knowledge::Knowledge.published.desc(:updated_at).limit(6)
     end
   end
 
@@ -78,6 +80,10 @@ class Knowledge::KnowledgesController < WeiboController
       @my_unaudited_knowledges << knowledge if current_user.is_admin && knowledge.group.nil?
     end
     @knowledges = Knowledge::Knowledge.where(:creator => current_user).desc(:updated_at).paginate(:page => params[:page], :per_page => 20)
+    # 清除新文档审核通知
+    current_user.notification.reset!(Notification::Knowledge)
+    current_user.notification.reset!(Notification::KnowledgeCheck)
+    
     # query = Knowledge.search do
     #   fulltext params[:keyword]
     #   with :public, true
@@ -93,12 +99,15 @@ class Knowledge::KnowledgesController < WeiboController
     # knowledge.check_status = params[:status]
     knowledge.checked_by_user(current_user, params[:status])
     # knowledge.save!
-    return redirect_to :action => :my if knowledge.save
+
+    return redirect_to :action => :my, notice: "文档审核成功！" if knowledge.save
   end
 
   def show
     @knowledge = Knowledge::Knowledge.find params[:id]
     @contents = @knowledge.contents.paginate(:page => params[:page], :per_page => 1)
+    return render 'personal_show' if current_user == @knowledge.creator && !@knowledge.published?
+    return render 'check_show' if current_user == @knowledge.checked_user && !@knowledge.published?
     @comments = @knowledge.comments.replyed.desc(:created_at)
     Rails.logger.info("-------#{@knowledge}")
     if current_user.id != @knowledge.creator_id && @knowledge.published?
@@ -133,9 +142,9 @@ class Knowledge::KnowledgesController < WeiboController
     @knowledge.creator = current_user
 
     if @knowledge.save
-      return render redirect_to my_knowledge_knowledges_path, notice: "文章创建成功."
+      redirect_to my_knowledge_knowledges_path, notice: "文档创建成功!"
     else
-      return render :action => :new
+      render :action => :new
     end
     # respond_to do |format|
     #   if @knowledge.save
@@ -171,6 +180,13 @@ class Knowledge::KnowledgesController < WeiboController
     end
   end
   
+  def destroy
+    @knowledge = Knowledge::Knowledge.find params[:id]
+    if @knowledge && @knowledge.creator_id == current_user.id
+      @knowledge.destroy
+    end
+    redirect_to  :action => "my"
+  end
   
   def delete
     @knowledge = Knowledge.find params[:id]

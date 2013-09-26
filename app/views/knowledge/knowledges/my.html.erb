@@ -6,69 +6,94 @@
     </div>
     <%= render('top_nav', :current_nav => 'my') %>
 
-    <% unless @my_unaudited_knowledges.blank? %>
-    <div class="zs_k">
-      <div class="bk_t"></div>
-      <div class="bk_c">
-        <div class="zs_lbt f18">当前有“<%= @my_unaudited_knowledges.count %>”篇文档需要您审核！</div>
-        <div class="zs_lb">
-          <ul>
-            <% @my_unaudited_knowledges.each do |knowledge| %>
-              <li>
-                <div class="icon"></div>
-                <span>
-                  <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group => params[:group_id]) %>
-                </span>
-                <img src="../assets/images/px_zt6.png" />
-                <div class="title">
-                  <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
-                </div>
-                <i>共<%= knowledge.contents_count %>页</i>
-              </li>
-            <% end %>
-          </ul>
-        </div>
-        <div class="clearfix"></div>
+    <% if flash[:notice] %>
+      <div class="alert alert-success">
+        <div style="padding: 7px 0;" class="f12"><%= flash[:notice] %></div>
       </div>
-      <div class="bk_t bk_d"></div>
-    </div>
     <% end %>
 
-    <div class="zs_k">
+    <% unless @my_unaudited_knowledges.blank? %>
+      <div class="zs_k">
+        <div class="bk_t"></div>
+        <div class="bk_c">
+          <div class="zs_n f16">当前有”<%= @my_unaudited_knowledges.count %>  ”篇文档需要您审核</div>
+          <div class="zs_ser_result zs_sh">
+            <% @my_unaudited_knowledges.each do |knowledge| %>
+            <div class="zs_rek">
+              <div class="title">
+                <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+              </div>
+              <div class="info f12">
+                <%= link_to "『 #{knowledge.knowledge_type.name} 』", knowledge_knowledges_path(:type => knowledge.knowledge_type), :class => "zs_tp icon" %>
+                <%= link_to "『 #{knowledge.group.name} 』", knowledge_knowledges_path(:group => params[:group_id]) if knowledge.group %>
+                <span class="left">共<%= knowledge.contents_count %>页 | 创建者：<%= knowledge.creator.name %></span>
+                <span><%= knowledge.created_at.strftime("%Y年%m月%d日") %></span>
+              </div>
+            </div>
+            <% end %>
+          </div>
+          <div class="zs_sh_mo zs_more"><a href="javascrip:void(0)">查看更多</a></div>
+        </div>
+        <div class="bk_t bk_d"></div>
+      </div>
+
+    <% end %>
+
+
+
+
+<div class="zs_k">
       <div class="bk_t"></div>
       <div class="bk_c">
-        <div class="zs_lbt f18">我的文档</div>
-        <div class="zs_lb">
-          <% if @knowledges.blank? %>
-            您还没有发布文档！
-          <% else %>
-          <ul>
-            <% @knowledges.each do |knowledge| %>
-              <li>
-                <div class="icon"></div>
-                <span>
-                  <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group => params[:group_id]) %>
-                </span>
-                <img src="../assets/images/px_zt6.png" />
-                <div class="title">
-                  <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
-                </div>
-                <i><%= knowledge.clicks %>人已阅读</i>
-              </li>
-            <% end %>
-          </ul>
+        <div class="zs_lbt zs_line1 f18 left">我的文档</div>
+        <div class="zs_zj left">
+          <% @knowledges.each do |knowledge| %>
+          <div class="zs_zj_k">
+            <div class="zj_time f16"><%= time_ago_in_words(knowledge.updated_at)  %></div>
+            <div class="zj_nr f18">
+              <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+              <% 
+                check_class = "ing" if knowledge.check_status == Knowledge::Knowledge::CHECK_AUDITING
+                check_class = "ok" if knowledge.check_status == Knowledge::Knowledge::CHECK_AUDITED
+                check_class = "no" if knowledge.check_status == Knowledge::Knowledge::CHECK_UNAUDITED
+              %>
+              <span class="<%= check_class %>">
+                <%= knowledge_public_name(knowledge) %>
+              </span>
+            </div>
+            <div class="zj_info f12">
+              <%= link_to "『 #{knowledge.knowledge_type.name} 』", knowledge_knowledges_path(:type => knowledge.knowledge_type) %>
+              <%= link_to "『 #{knowledge.group.name} 』", knowledge_knowledges_path(:group => params[:group_id]) if knowledge.group %>
+              <span> 共<%= knowledge.contents_count %>页</span>
+            </div>
+          </div>
           <% end %>
         </div>
         <div class="clearfix"></div>
       </div>
       <div class="bk_t bk_d"></div>
-    </div>
+    </div>  
+
+
   </div>
 <!--中间内容结束-->
 
 
+<div class="main_rt left">
+  <div class="mr_row mr_mar" wrl-row1>
+    <div class="bk">
+      <div class="bk_t"></div>
+      <div class="bk_c">
+        <div class="zs_new zs_tj">当前已有<i><%= Knowledge::Knowledge.published.count %></i>份文档</div>
+        <div class="zs_new">
+          <%= link_to "", new_knowledge_knowledge_path %>
+        </div>
 
-
+      </div>
+      <div class="bk_t bk_d"></div>
+    </div>
+  </div>
+</div>
 
 
 <script>

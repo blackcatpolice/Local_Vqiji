@@ -1,3 +1,4 @@
+<div class="main_ct left" >
 <!--中间内容开始-->
   <div class="main_ct left">
     <div class="zs_t">
@@ -37,11 +38,15 @@
           <div class="zs_list">
             <% if params[:type] %>
               <% knowledge_type_name = Knowledge::KnowledgeType.find(params[:type]).name %>
-              <a class="zs_x" href="#"><%= knowledge_type_name %><button class="close">&times;</button></a>
+
+              <%= link_to "#{knowledge_type_name}<button class='close'>&times;</button>".html_safe, knowledge_knowledges_path(:group_id => params[:group_id]), :class => "zs_x" %>
+
             <% end %>
             <% if params[:group_id] %>
               <% group_name = Group.find(params[:group_id]).name %>
-              <a class="zs_x" href="#"><%= group_name %><button class="close">&times;</button></a>
+
+              <%= link_to "#{group_name}<button class='close'>&times;</button>".html_safe, knowledge_knowledges_path(:type => params[:type]), :class => "zs_x" %>
+
             <% end %>
             <div class="clearfix"></div>
           </div>
@@ -53,6 +58,36 @@
     </div>
 
     <% if params[:type] || params[:group_id] %>
+      <% if @knowledge_type %>
+        <div class="zs_k">
+          <div class="bk_t"></div>
+          <div class="bk_c">
+            <div class="zs_lbt f18"><%= @knowledge_type.name %></div>
+            <div class="zs_lb">
+              <%= "暂时还没有发布文档！" if @knowledge_type.knowledges.published.blank? %>
+              <ul>
+                <% @knowledge_type.knowledges.published.each do |knowledge| %>
+                  <li>
+                    <div class="icon"></div>
+                    <span>
+                      <%= link_to @knowledge_type.name, knowledge_knowledges_path(:type => @knowledge_type, :group => params[:group_id]) %>
+                    </span>
+                    <img src="../assets/images/px_zt6.png" />
+                    <div class="title">
+                      <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+                    </div>
+                    <i><%= knowledge.clicks %>人已阅读</i>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          <div class="bk_t bk_d"></div>
+        </div>
+
+
+      <% else %>
 			<div class="zs_k">
         <div class="zs_lb">
           <ul>
@@ -72,46 +107,11 @@
           </ul>
         </div>
       </div>
+      <% end %>
     <% else %>
     <div class="zs_k">
     	<div class="bk_t"></div>
     	<div class="bk_c">
-        <div class="zs_lbt f18">热门阅读 <%= link_to "更多", popular_knowledge_knowledges_path %></div>
-        <div class="zs_lb">
-          <ul>
-          	<% @popular_knowledges.each do |knowledge| %>
-	            <li>
-	            	<div class="icon"></div>
-	            	<span>
-	            		<%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group_id => params[:group_id]) %>
-	            	</span>
-	              <img src="../assets/images/px_zt6.png" />
-	              <div class="title">
-	              	<%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
-	              </div>
-	              <i><%= knowledge.clicks %>人已阅读</i>
-	            </li>
-            <% end %>
-          </ul>
-        </div>
-        <div class="zs_lbt f18">最新更新<%= link_to "更多", latest_knowledge_knowledges_path %></div>
-        <div class="zs_lb">
-          <ul>
-
-          	<% @latest_knowledges.each do |knowledge| %>
-	            <li>
-	            	<span>
-									<%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group_id => params[:group_id]) %>
-	            	</span>
-	              <img src="../assets/images/px_zt6.png" />
-	              <div class="title">
-	              	<%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
-	              </div>
-	              <i><%= knowledge.clicks %>人已阅读</i>
-	            </li>
-            <% end %>
-          </ul>
-        </div>
         <% @knowledge_types.each do |knowledge_type| %>
           <% next if knowledge_type.knowledges.published.blank? %>
 	        <div class="zs_lbt f18"><%= knowledge_type.name %>
@@ -141,9 +141,11 @@
     <% end %>
   </div>
 <!--中间内容结束-->
+</div>
 
 
-<% content_for :main_rt do %>
+<div class="main_rt left">
+  <div class="mr_row mr_mar" wrl-row1>
     <div class="bk">
       <div class="bk_t"></div>
       <div class="bk_c">
@@ -155,7 +157,49 @@
       </div>
       <div class="bk_t bk_d"></div>
     </div>
-<% end %>
+
+    <div class="bk zs_tr">
+      <div class="bk_t">
+        <div class="zs_title f18">热门阅读
+          <%= link_to "更多", popular_knowledge_knowledges_path %></div>
+      </div>
+      <div class="bk_c mr_c4">
+        <div class="zs_rlb zs_rlb1">
+          <ul>
+            <%= render :collection => @popular_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+      <div class="mr_t4"></div>
+    </div>
+
+    <div class="bk zs_tr">
+      <div class="bk_t">
+        <div class="zs_title f18">最新更新
+          <%= link_to "更多", latest_knowledge_knowledges_path %></div>
+      </div>
+      <div class="bk_c mr_c4">
+        <div class="zs_rlb zs_rlb1">
+          <ul>
+            <%= render :collection => @latest_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+      <div class="mr_t4"></div>
+    </div>
+
+  </div>
+  <div class="mr_row" wrl-row2>
+    <% if false %>
+    <div class="bk" asynch-widget aw-url="<%= asset_path 'widgets/weather.asynch.js' %>" aw-title="天气插件" wrl-strategy="prepend"></div>
+    <% end %>
+    <%#= render "/network_disks/widgets/files_widget" %>
+    <%#= render '/knowledge/knowledges/widgets/knowledges_widget' %>
+  </div>
+</div>
+
 
 
 

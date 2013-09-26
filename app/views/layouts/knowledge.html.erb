@@ -24,24 +24,9 @@
 		<!--左侧导航栏开始-->
 		<%= render "/layouts/nav/left"%>
 		<!--左侧导航栏结束-->
-		<div class="main_ct left" data-pjax-containergg>
-   		<%= content_for?(:main_left) ? yield(:main_left) : yield %>
-		</div>
-		<div class="main_rt left">
-  		<div class="mr_row mr_mar" wrl-row1>
-        <%= content_for?(:main_rt) ? yield(:main_rt) : nil %>
-    		<%#= render 'widgets/user_card' %>
-    		<%#= render '/schedule/calendar' %>
-    		<%#= render '/todo/tasks/widget/my_tasks' %>
-  		</div>
-  		<div class="mr_row" wrl-row2>
-        <% if false %>
-    		<div class="bk" asynch-widget aw-url="<%= asset_path 'widgets/weather.asynch.js' %>" aw-title="天气插件" wrl-strategy="prepend"></div>
-        <% end %>
-    		<%#= render "/network_disks/widgets/files_widget" %>
-    		<%#= render '/knowledge/knowledges/widgets/knowledges_widget' %>
-  		</div>
-  	</div>
+    <div data-pjax-container>
+      <%= yield %>
+    </div>
 		<div class="clearfix"></div>
 	</div>
 	<%= render "/layouts/nav/foot"%>

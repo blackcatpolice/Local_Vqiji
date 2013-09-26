@@ -7,12 +7,12 @@ class Knowledge::Knowledge
 
   EDITOR_PAGE_HTML = "<hr style=\"page-break-after: always;\" '=\"\" class=\"ke-pagebreak knowledge_page\">"
 
-  CHECK_UNAUDITED = 1
+  CHECK_AUDITING = 1
   CHECK_AUDITED = 2
-  CHECK_CANEL = 3
-  CHECK_STATUS = {CHECK_UNAUDITED => "等待审核",
+  CHECK_UNAUDITED = 3
+  CHECK_STATUS = {CHECK_AUDITING => "等待审核",
                   CHECK_AUDITED => "审核通过",
-                  CHECK_CANEL => "审核不通过"}
+                  CHECK_UNAUDITED => "审核不通过"}
 
   field :title, :type => String
   field :tags,  :type => String
@@ -20,7 +20,7 @@ class Knowledge::Knowledge
   field :contents_count,  :type => Integer,  :default => 0
   field :comments_count,  :type => Integer,  :default => 0
   field :checked_at, :type => Time
-  field :check_status, :type => Integer, :default => CHECK_UNAUDITED
+  field :check_status, :type => Integer, :default => CHECK_AUDITING
 
   belongs_to :creator, :class_name => 'User'
   belongs_to :group,   :class_name => 'Group'
@@ -32,11 +32,13 @@ class Knowledge::Knowledge
 
   validates :title, :creator, presence: true
 
+  scope :public, where(:group_id => nil)
   scope :published, where(:check_status => CHECK_AUDITED)
-  scope :unaudited, where(:check_status => CHECK_UNAUDITED)
+  scope :unaudited, where(:check_status => CHECK_AUDITING)
 
   before_save do |knowledge|
     knowledge.tags = knowledge.tags.gsub(/[',',' ',';']/," ") if knowledge.tags
+    knowledge.checked_user = knowledge.group.nil? ? User.where(:is_admin => true).first : knowledge.group.creator
   end
 
 

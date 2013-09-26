@@ -25,6 +25,7 @@ class Group
 	field :members_count, :type => Integer, :default => 0 # 成员数量
 	
   has_many :feeds, class_name: 'Gfeed', inverse_of: :group, dependent: :destroy
+  has_many :knowledges, class_name: 'Knowledge::Knowledge', inverse_of: :group
 
 	validates_presence_of :name
 	# validates_presence_of :creator

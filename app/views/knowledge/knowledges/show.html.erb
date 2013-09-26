@@ -1,4 +1,5 @@
 <!--中间内容开始-->
+  <div class="main_ct left">
     <div class="zs_t">
       <span class="f22">知识库</span>
       <%= render('search_form') %>
@@ -9,36 +10,36 @@
         <%= link_to "知识库", knowledge_knowledges_path %> >
         <%= link_to @knowledge.knowledge_type.name, knowledge_knowledges_path(:type => @knowledge.knowledge_type.id) %> >
         <%= @knowledge.title %><%= Knowledge::Knowledge::CHECK_STATUS[@knowledge.check_status] unless @knowledge.published? %>
+      </div>
       <div class="bk_t bk_d"></div>
     </div>
     <div class="zs_k">
       <div class="bk_t"></div>
       <div class="bk_c">
-        <div class="zsk_tit zs_det_t"><img alt="Logo" src="../assets/images/logo.png" width="95"><span>-1-</span></div>
+        <div class="zsk_tit zs_det_t">
+          <img alt="Logo" src="../assets/images/logo.png" width="95">
+          <span>-1-</span>
+        </div>
         <div class="zs_content">
           <h1><%= @knowledge.title %></h1>
           <h2>
             <span><%= @knowledge.updated_at.strftime("%Y年%m月%d日") %></span>
             <span>创建人：<%= @knowledge.creator.name %></span>
-            <span>类别：<%= link_to @knowledge.knowledge_type.name, knowledge_knowledges_path(:type => @knowledge.knowledge_type.id) %></span>
+            <span>类别：<%= link_to @knowledge.knowledge_type.name, knowledge_knowledges_path(:type => @knowledge.knowledge_type) %></span>
             <span><%= @knowledge.contents_count %>页</span>
             <span><%= @knowledge.clicks %>人阅读</span>
           </h2>
           <div class="zs_nr">
-            <div>
-              <%= raw @contents.first.content %>
-            </div>
-
+            <%= raw @contents.first.content %>
             <div class="pagination">
               <%= will_paginate @contents %>
             </div>
           </div>
         </div>
+        <div class="clearfix"></div>
       </div>
-      <div class="bk_t bk_d"></div>
     </div>
-    
-    <% if @knowledge.published? %>
+
     <div class="zs_k">
       <div class="bk_t"></div>
       <div class="bk_c">
@@ -47,38 +48,31 @@
           <p>评论</p>
           <%= form_for(Knowledge::KnowledgeComment.new, :url => "/knowledge/knowledges/#{@knowledge.id}/comments", :remote => true) do |f| %>
             <%= f.text_area :content, :name => "content", :id => "reply_area" %>
-            <%= f.submit %>
+            <p><a id="submit_comment_btn" class="f16" href="javascript:void(0)" data-skip-pjax>发表评论</a></p>
           <% end %>
           <div class="clearfix"></div>
         </div>
 
         <div id="comments_div">
-
         <%= render :collection => @comments, :as => :comment, :partial => '/knowledge/comments/item' %>
-
         </div>
         <div class="clearfix"></div>
       </div>
       <div class="bk_t bk_d"></div>
     </div>
-    <% elsif @knowledge.user_is_auditor?(current_user) %>
-      <%= link_to "审核通过", check_knowledge_knowledge_path(@knowledge, :status => 2), :method => :put %>
-      <%= link_to "审核不通过", check_knowledge_knowledge_path(@knowledge, :status => 1), :method => :put %>
-      <%= link_to "修改编辑", edit_knowledge_knowledge_path(@knowledge) %>
-    <% end %>
+
   </div>
 <!--中间内容结束-->
 
-<% if @knowledge.published? %>
-  <% content_for :main_rt do %>
-
+  <div class="main_rt left">
+    <div class="mr_row mr_mar" wrl-row1>
       <div class="bk">
         <div class="bk_t"></div>
         <div class="bk_c">
           <div class="zs_new">
             <%= link_to "", new_knowledge_knowledge_path %>
           </div>
-          <div class="zs_title f18">相关关键词<a href="">更多</a></div>
+          <div class="zs_title f18">相关关键词</div>
           <div class="zs_tags">
             <% unless @knowledge.tags.blank? %>
               <% @knowledge.tags.split(" ").each do |tag| %>
@@ -87,7 +81,7 @@
             <% end %>
             <div class="clearfix"></div>
           </div>
-          <div class="zs_title f18">相关文档推荐<a href="">更多</a></div>
+          <div class="zs_title f18">相关文档推荐</div>
           <div class="zs_rlb">
             <ul>
               <%= render :collection => @knowledge.related_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
@@ -99,7 +93,8 @@
       </div>
       <div class="bk zs_tr">
         <div class="bk_t">
-          <div class="zs_title f18">该类文档热门阅读<a href="">更多</a></div>
+          <div class="zs_title f18">该类文档热门阅读
+            <%= link_to "更多", knowledge_knowledges_path(:type => @knowledge.knowledge_type) %></div>
         </div>
         <div class="bk_c mr_c4">
           <div class="zs_rlb zs_rlb1">
@@ -111,9 +106,8 @@
         </div>
         <div class="mr_t4"></div>
       </div>
-
-  <% end %>
-<% end %>
+    </div>
+  </div>
 
 
 <script>
@@ -129,11 +123,17 @@ function SetCwinHeight(){
    		}
   	}
   }
-  
+
   $(function(){
 
+      $('#submit_comment_btn').on('click', function(){
+        $('#new_knowledge_knowledge_comment').submit();
+      });
+
+
+
       $('.reply_comment_btn').on('click', function(){
-        alert('start');
+        // alert('start');
         var comment_id = $(this).attr('comment-id');
         var reply_comment_div = $("#reply_comments_"+comment_id);
         console.log(reply_comment_div);
@@ -141,7 +141,8 @@ function SetCwinHeight(){
         var open = $(this).attr('comments-open');
         console.log(open);
         if(open == 'true'){
-          reply_comment_div.hide();
+          // reply_comment_div.hide();
+          $("#reply_comments_"+comment_id).remove();
           $(this).attr('comments-open', 'false');
           return false;
         }else{

@@ -1,3 +1,15 @@
 (function($) {
   $('#comment_<%= @comment.id %>').append("<%= j render('knowledge/comments/reply_comments') %>");
+  $('#reply_replyed_comment_btn_<%= @comment.id %>').on('click', function(){
+    console.log('<%= @comment.id %>');
+    alert('start!');
+    var content = $('#reply_replyed_content_<%= @comment.id %>').val();
+    console.log(content);
+    $.post("<%= reply_comment_knowledge_knowledge_comment_path(@comment) %>", {'content' : content});
+    // , function(data){
+    //   console.log(data);
+    //   alert(data);
+    //   $('#reply_comments_div_<%= @comment.id %>').append(data);
+    // });
+  });
 })(jQuery);

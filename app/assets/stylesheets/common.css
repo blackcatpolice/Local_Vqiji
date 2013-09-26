@@ -813,8 +813,25 @@ border-radius: 0px;
 .main_ct .bk_c .lb .dhk_gn .right { height:18px;}
 .main_ct .zsk_ed { width:533px; padding:0px;}
 .main_ct .zsk_ed form { margin:0px;}
-.main_ct .zsk_ed .zsk_tt { width:533px; height:65px; padding-top:20px; padding-left:10px;}
-.main_ct .zsk_ed .zsk_tt input { width:450px; height:25px; border:1px solid #eaddd3; color:#b7aaa1; font-weight:bold;}
+.main_ct .zsk_ed .zsk_tt { width:500px; height:45px; padding-top:20px; padding-left:10px;}
+.main_ct .zsk_ed .zsk_tt_tags { padding-top:5px; }
+.main_ct .zsk_ed .zsk_tt label { width:80px; height:25px; display:block; float:left; text-align:right; line-height:35px;}
+.main_ct .zsk_ed .zsk_tt input { width:400px; height:25px; border:1px solid #eaddd3; color:#b7aaa1; font-weight:bold; float:left;}
+.main_ct .zsk_ed .zsk_tt a { border-radius: 5px;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
+border: 1px solid #eaddd3;
+background-color: #f8f3f0;
+margin: 5px;
+padding-left: 5px;
+padding-right: 5px;
+font-size: 12px;
+width: auto;
+height: 20px;
+line-height:20px;
+float: left;
+white-space: nowrap;}
 .main_ct .zsk_ed .zsk_edt { width:533px; height:auto;}
 .main_ct .zsk_ed .zsk_xx { width:533px; height:40px; line-height:35px; background-color:#f8f3f0;border-top:1px solid #eaddd3; border-bottom:1px solid #eaddd3;}
 .main_ct .zsk_ed .zsk_xx span { color:#dc5f5e; padding-left:15px;}

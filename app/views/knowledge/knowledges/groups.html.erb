@@ -29,22 +29,26 @@
     	<div class="bk_t"></div>
     	<div class="bk_c">
         <% @groups.each do |group| %>
+          <% next if Knowledge::Knowledge.published.where(:group => group).blank? %>
 	        <div class="zs_lbt f18"><%= group.name %>
 	        	<%= link_to "更多", groups_knowledge_knowledges_path(:group_id => group) %>
 	        </div>
-	        <div class="zs_lb">
-	          <ul>
-	          	<% knowledges = Knowledge::Knowledge.published.where(:group => group).desc(:updated_at).limit(4) %>
-	          	<% knowledges.each do |knowledge| %>
-	            <li>
-	            	<span><a href="#">空乘</a></span>
-	              <img src="../assets/images/px_zt6.png" />
-	              <div class="title"><a href="#">工资福利新旧福利新旧准则</a></div>
-	              <i>854人已阅读</i>
-	            </li>
-	            <% end %>
-	          </ul>
-	        </div>
+          <div class="zs_lb">
+            <ul>
+              <% group.knowledges.published.desc(:updated_at).limit(4).each do |knowledge| %>
+              <li>
+                <span>
+                  <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group_id => params[:group_id]) %>
+                </span>
+                <img src="../assets/images/px_zt6.png" />
+                <div class="title">
+                  <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+                </div>
+                <i><%= knowledge.clicks %>人已阅读</i>
+              </li>
+              <% end %>
+            </ul>
+          </div>
         <% end %>
         <div class="clearfix"></div>
       </div>
@@ -57,18 +61,24 @@
         <div class="zs_lbt f18"><%= @group.name %>
         	
         </div>
+
         <div class="zs_lb">
           <ul>
-          	<% @knowledges.each do |knowledge| %>
+            <% @group.knowledges.published.desc(:updated_at).limit(4).each do |knowledge| %>
             <li>
-            	<span><a href="#">空乘</a></span>
+              <span>
+                <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group_id => params[:group_id]) %>
+              </span>
               <img src="../assets/images/px_zt6.png" />
-              <div class="title"><a href="#">工资福利新旧福利新旧准则</a></div>
-              <i>854人已阅读</i>
+              <div class="title">
+                <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+              </div>
+              <i><%= knowledge.clicks %>人已阅读</i>
             </li>
             <% end %>
           </ul>
         </div>
+
         <div class="clearfix"></div>
       </div>
     	<div class="bk_t bk_d"></div>
@@ -77,6 +87,19 @@
   </div>
 <!--中间内容结束-->
 
+<% content_for :main_rt do %>
+    <div class="bk">
+      <div class="bk_t"></div>
+      <div class="bk_c">
+        <div class="zs_new zs_tj">当前已有<i><%= Knowledge::Knowledge.published.count %></i>份文档</div>
+        <div class="zs_new">
+          <%= link_to "", new_knowledge_knowledge_path %>
+        </div>
+
+      </div>
+      <div class="bk_t bk_d"></div>
+    </div>
+<% end %>
 
 
 
