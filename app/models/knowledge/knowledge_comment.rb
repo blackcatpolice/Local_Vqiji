@@ -16,9 +16,13 @@ class Knowledge::KnowledgeComment
   belongs_to :reply_to_user, :class_name => 'User'
   has_many :reply_comments, :class_name => 'Knowledge::KnowledgeComment', :inverse_of => 'reply_comment'
 
+  validates :content, :user, presence: true
+
   before_save do |knowledge_comment|
-    knowledge_comment.comment_index = knowledge.comments_count + 1
-    knowledge.inc(:comments_count, 1)
+    unless knowledge_comment.is_reply
+      knowledge_comment.comment_index = knowledge.comments_count + 1
+      knowledge.inc(:comments_count, 1)
+    end
   end
 
   scope :replyed, where(:is_reply => false)

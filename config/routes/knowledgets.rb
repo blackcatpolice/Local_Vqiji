@@ -2,7 +2,7 @@
 
 Weibo::Application.routes.draw do
   namespace :knowledge do
-    resources :knowledges, :except => [:destroy] do
+    resources :knowledges do
       collection do
         get :my
         get :groups

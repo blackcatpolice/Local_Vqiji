@@ -1,1 +1,8 @@
-<%= render "form" %>
+<div class="main_ct left" >
+  <div class="zs_k">
+    <div class="bk_t"></div>
+    <div class="bk_c f12">当前位置：<%= link_to "知识库", knowledge_knowledges_path %> > <span class="zs_now">编辑 《<%= @knowledge.title %>》 文档</span></div>
+    <div class="bk_t bk_d"></div>
+  </div>
+  <%= render "form" %>
+</div>

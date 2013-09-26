@@ -22,10 +22,10 @@
         </div>
         <div class="zs_content">
           <div class="zsk_gn">
-            <%= link_to "删除", knowledge_knowledge_path(@knowledge), :method => :delete, confirm: "确定删除该文档么？！", :class => "zsk_sc" %>
+            <%= link_to "删除", @knowledge, :method => :delete, confirm: "确定删除该文档么？！", :class => "zsk_sc" %>
             <%= link_to "编辑", edit_knowledge_knowledge_path(@knowledge), :class => "zsk_bj" %>
           </div>
-          <h1><%= @knowledge.title %> <span class="oran_fb">(审核中)</span></h1>
+          <h1><%= @knowledge.title %> <span class="oran_fb">(<%= Knowledge::Knowledge::CHECK_STATUS[@knowledge.check_status] %>)</span></h1>
           <h2>
             <span><%= @knowledge.updated_at.strftime("%Y年%m月%d日") %></span>
             <span>创建人：<%= @knowledge.creator.name %></span>

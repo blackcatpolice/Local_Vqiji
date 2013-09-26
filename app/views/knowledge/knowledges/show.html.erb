@@ -94,7 +94,7 @@
       <div class="bk zs_tr">
         <div class="bk_t">
           <div class="zs_title f18">该类文档热门阅读
-            <%= link_to "更多", knowledge_knowledges_path(:type => @knowledge.knowledge_type) %></div>
+            <%#= link_to "更多", knowledge_knowledges_path(:type => @knowledge.knowledge_type) %></div>
         </div>
         <div class="bk_c mr_c4">
           <div class="zs_rlb zs_rlb1">
@@ -127,6 +127,11 @@ function SetCwinHeight(){
   $(function(){
 
       $('#submit_comment_btn').on('click', function(){
+        var content = $('#reply_area').val();
+        if(content.length == 0){
+          alert('请您输入评论内容！');
+          return false;
+        }
         $('#new_knowledge_knowledge_comment').submit();
       });
 
@@ -147,18 +152,11 @@ function SetCwinHeight(){
           return false;
         }else{
           $(this).attr('comments-open', 'true');
-          if(reply_comment_div){
-            reply_comment_div.show();
             var url = "/knowledge/knowledges/<%= @knowledge.id %>/comments/" + comment_id + "/reply_comments.js";
             $.get(url);
-          }else{
-            var url = "/knowledge/knowledges/<%= @knowledge.id %>/comments/" + comment_id + "/reply_comments.js";
-            $.get(url);
-          }
         }
       });
 
-      $('#comments_div').commentTool();
 
       $('#button_x').click(function() {
           alert('go');

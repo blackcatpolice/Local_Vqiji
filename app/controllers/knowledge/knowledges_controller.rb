@@ -55,9 +55,13 @@ class Knowledge::KnowledgesController < WeiboController
     if params[:group_id]
       @group = Group.where(_id: params[:group_id]).first unless params[:group_id].blank?
       @knowledges = Knowledge::Knowledge.published.where(:group => @group).paginate(:page => params[:page], :per_page => 20)
+      @popular_knowledges = @group.knowledges.published.desc(:clicks).limit(6)
+      @latest_knowledges = @group.knowledges.published.desc(:updated_at).limit(6)
     else
       group_ids = Group.get_group_ids_by_user_id current_user.id #用户所在组id
       @groups = Group.find(group_ids)
+      @popular_knowledges = Knowledge::Knowledge.published.where(:group_id.ne => nil).desc(:clicks).limit(6)
+      @latest_knowledges = Knowledge::Knowledge.published.where(:group_id.ne => nil).desc(:updated_at).limit(6)
     end
 
     # query = Knowledge.search do
@@ -100,7 +104,13 @@ class Knowledge::KnowledgesController < WeiboController
     knowledge.checked_by_user(current_user, params[:status])
     # knowledge.save!
 
-    return redirect_to :action => :my, notice: "文档审核成功！" if knowledge.save
+    if knowledge.save
+      redirect_to my_knowledge_knowledges_path, notice: "文档审核成功！"
+    # else
+      # render :action => :new
+    end
+
+    # return redirect_to :action => :my, notice: "文档审核成功！" if knowledge.save
   end
 
   def show
@@ -160,7 +170,9 @@ class Knowledge::KnowledgesController < WeiboController
 
     contents_params = params[:knowledge_knowledge].delete(:contents)
     @knowledge = Knowledge::Knowledge.find params[:id]
+    @knowledge.update_attributes(params[:knowledge_knowledge])
     @knowledge.contents = nil
+    @knowledge.contents_count = 0
     @knowledge.add_contents(contents_params)
 
     # _knowledge = params[:knowledge]
@@ -171,12 +183,20 @@ class Knowledge::KnowledgesController < WeiboController
     #   _knowledge[:public] = false
     #   @knowledge.status = Knowledge::KNOWLEDGE_STATUS_DRAFT unless _knowledge[:group_id]
     # end
-    respond_to do |format|
-      if @knowledge.save
-        format.html { redirect_to @knowledge, notice: "文章修改成功."}
-      else
-        format.html { render action: "edit"}
-      end
+    # respond_to do |format|
+    #   if @knowledge.save
+    #     format.html { redirect_to action: :my, notice: "文章修改成功."}
+    #   else
+    #     format.html { render action: :edit}
+    #   end
+    # end
+
+    # redirect_to :my, :notice => "文章修改成功" and retrun if @knowledge.save
+    # render :action => :edit and retrun
+    if @knowledge.save
+      redirect_to :action => :my, notice: "文档创建成功!"
+    else
+      render :action => :edit
     end
   end
   

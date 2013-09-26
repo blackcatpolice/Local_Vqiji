@@ -11,9 +11,9 @@
       	<div class="zs_type">
         	<div class="zs_tm">权限：</div>
         	<div class="zs_list">
-        		<%= link_to '公共文档', knowledge_knowledges_path(:type => params[:type]) %>
+        		<%= link_to '公共文档', groups_knowledge_knowledges_path %>
         		<% current_user.groups.each do |group| %>
-        			<%= link_to group.name, knowledge_knowledges_path(:type => params[:type], :group_id => group) %>
+        			<%= link_to group.name, groups_knowledge_knowledges_path(:group_id => group) %>
         		<% end %>
         		<div class="clearfix"></div>
 	        </div>
@@ -87,7 +87,8 @@
   </div>
 <!--中间内容结束-->
 
-<% content_for :main_rt do %>
+<div class="main_rt left">
+  <div class="mr_row mr_mar" wrl-row1>
     <div class="bk">
       <div class="bk_t"></div>
       <div class="bk_c">
@@ -99,7 +100,48 @@
       </div>
       <div class="bk_t bk_d"></div>
     </div>
-<% end %>
+
+    <div class="bk zs_tr">
+      <div class="bk_t">
+        <div class="zs_title f18"><%= params[:group_id].nil? ? "小组" : "\"#{Group.find(params[:group_id]).name}\"" %>热门阅读
+          <%#= link_to "更多", popular_knowledge_knowledges_path %></div>
+      </div>
+      <div class="bk_c mr_c4">
+        <div class="zs_rlb zs_rlb1">
+          <ul>
+            <%= render :collection => @popular_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+      <div class="mr_t4"></div>
+    </div>
+
+    <div class="bk zs_tr">
+      <div class="bk_t">
+        <div class="zs_title f18"><%= params[:group_id].nil? ? "小组" : "\"#{Group.find(params[:group_id]).name}\"" %>最新更新
+          <%#= link_to "更多", latest_knowledge_knowledges_path %></div>
+      </div>
+      <div class="bk_c mr_c4">
+        <div class="zs_rlb zs_rlb1">
+          <ul>
+            <%= render :collection => @latest_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+      <div class="mr_t4"></div>
+    </div>
+
+  </div>
+  <div class="mr_row" wrl-row2>
+    <% if false %>
+    <div class="bk" asynch-widget aw-url="<%= asset_path 'widgets/weather.asynch.js' %>" aw-title="天气插件" wrl-strategy="prepend"></div>
+    <% end %>
+    <%#= render "/network_disks/widgets/files_widget" %>
+    <%#= render '/knowledge/knowledges/widgets/knowledges_widget' %>
+  </div>
+</div>
 
 
 

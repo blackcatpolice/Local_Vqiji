@@ -15,9 +15,10 @@
             </div>
             <div class="zsk_tt zsk_tt_tags">
               <label>可选标签：</label>
-              <a href="" title="生活">生活</a>
-              <a href="" title="超实用">超实用</a>
-              <a href="漂亮">漂亮</a>
+              <a class="top_tags" href="#" title="生活" data-skip-pjax>生活</a>
+              <a class="top_tags" href="#" title="超实用" data-skip-pjax>超实用</a>
+              <a class="top_tags" href="#" title="漂亮" data-skip-pjax>漂亮</a>
+              <a class="top_tags" href="#" title="成都" data-skip-pjax>成都</a>
             </div>
 
             <div class="zsk_edt">
@@ -34,10 +35,11 @@
             </select>
             <span>权限：</span>
             <label class="checkbox">
-              <input name="1" type="radio" value="" />公开
+              <input name="public" type="radio" value="1" <%= "checked='checked'" if @knowledge.is_public? %>>公开
             </label>
+
             <label class="checkbox">
-              <input name="2" type="radio" value="" />分组可见：
+              <input name="public" type="radio" value="0" <%= "checked='checked'" unless @knowledge.is_public?%>>分组可见：
             </label>
             
             <select id="knowledge_group_id" name="knowledge_knowledge[group_id]" <% if @knowledge.group %>disabled="disabled"<% end %>>
@@ -111,6 +113,11 @@
 
 <script>
   $(function() {
+
+    $('.top_tags').on('click',function(){
+      var val = $('#knowledge_knowledge_tags').val();
+      $('#knowledge_knowledge_tags').val(val + " " + $(this).attr('title'));
+    });
     // KindEditor.ready(function(K) {
         window.editor = KindEditor.create('#content_textarea', {
   		  width: "532px",
@@ -165,8 +172,18 @@
   	}
   	
   	$("form[data-pjax]").on('submit', function(e){
-      alert($('#knowledge_knowledge_check_status').val());
       editor.sync();
+      if(!$('#knowledge_knowledge_title').val()){
+        $.alert('请输入文章标题.');
+        $('input:button', '#knowledge_form').removeAttr('disabled');
+        return false;
+      }
+      if(!$('#content_textarea').val()){
+        $.alert('请输入文章内容.');
+        $('input:button', '#knowledge_form').removeAttr('disabled');
+        return false;
+      }
+
   		$.pjax.submit(e, '[data-pjax-container]');
   	});
 
@@ -175,6 +192,7 @@
       $('#knowledge_form').submit();
     });
     $('#save_public_btn').on('click', function(e){
+      $('#knowledge_knowledge_check_status').val('1');
       $('#knowledge_form').submit();
     });
   });
