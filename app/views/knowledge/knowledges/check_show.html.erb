@@ -17,8 +17,8 @@
       <div class="bk_t"></div>
       <div class="bk_c">
         <div class="zsk_tit zs_det_t">
-          <img alt="Logo" src="../assets/images/logo.png" width="95">
-          <span>-1-</span>
+          <%= image_tag("logo.png", :width => "95") %>
+          <span>-<%= @contents.first.page_index %>-</span>
         </div>
         <div class="zs_content">
           <div class="zsk_gn">
@@ -43,8 +43,8 @@
       </div>
       <div class="bk_t bk_d"></div>
       <div class="zs_sc f16">
-        <%= link_to "审核通过", check_knowledge_knowledge_path(@knowledge, :status => 2), :method => :put, :class => "acc" %>
-        <%= link_to "审核不通过", check_knowledge_knowledge_path(@knowledge, :status => 1), :method => :put, :class => "fai" %>
+        <%= link_to "审核通过", check_knowledge_knowledge_path(@knowledge, :status => 2), :method => :put, :class => "acc", :'data-skip-pjax' => true %>
+        <%= link_to "审核不通过", check_knowledge_knowledge_path(@knowledge, :status => 1), :method => :put, :class => "fai", :'data-skip-pjax' => true %>
       </div>
     </div>
   </div>

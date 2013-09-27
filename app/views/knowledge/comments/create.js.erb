@@ -1,4 +1,34 @@
 (function($) {
   $('#reply_area').val("");
   $('#comments_div').append("<%=j render('knowledge/comments/item') %>");
+  $('.delete_comment_btn').on('click', function(){
+    if(confirm("确定删除该条评论么？"))
+    {
+      var comment_id = $(this).attr('comment-id');
+      var url = "/knowledge/knowledges/51fwefwef/comments/"+comment_id;
+      $.post(url, {"_method" : "delete", "is_reply" : "false"});
+    }
+  });
+
+  $('.reply_comment_btn').on('click', function(){
+    // alert('start');
+    var comment_id = $(this).attr('comment-id');
+    var reply_comment_div = $("#reply_comments_"+comment_id);
+    console.log(reply_comment_div);
+    console.log(comment_id);
+    var open = $(this).attr('comments-open');
+    console.log(open);
+    if(open == 'true'){
+      // reply_comment_div.hide();
+      $("#reply_comments_"+comment_id).remove();
+      $(this).attr('comments-open', 'false');
+      return false;
+    }else{
+      $(this).attr('comments-open', 'true');
+        var url = "/knowledge/knowledges/5644654654/comments/" + comment_id + "/reply_comments.js";
+        $.get(url);
+    }
+  });
+
+
 })(jQuery);

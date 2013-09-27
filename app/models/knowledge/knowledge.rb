@@ -26,11 +26,11 @@ class Knowledge::Knowledge
 
   belongs_to :creator, :class_name => 'User'
   belongs_to :group,   :class_name => 'Group'
-  belongs_to :knowledge_type, :class_name => 'Knowledge::KnowledgeType', :inverse_of => 'knowledges'
+  belongs_to :knowledge_type, :class_name => 'Knowledge::Type', :inverse_of => 'knowledges'
   belongs_to :checked_user,  :class_name => 'User'
 
-  has_many :contents, :class_name => 'Knowledge::KnowledgeContent', :counter_cache => true, :inverse_of => 'knowledge', :dependent => :destroy , :autosave => true 
-  has_many :comments, :class_name => 'Knowledge::KnowledgeComment', :counter_cache => true, :inverse_of => 'knowledge', :dependent => :destroy , :autosave => true
+  has_many :contents, :class_name => 'Knowledge::Content', :counter_cache => true, :inverse_of => 'knowledge', :dependent => :destroy , :autosave => true 
+  has_many :comments, :class_name => 'Knowledge::Comment', :counter_cache => true, :inverse_of => 'knowledge', :dependent => :destroy , :autosave => true
 
   validates :title, :creator, presence: true
 
@@ -58,8 +58,10 @@ class Knowledge::Knowledge
 
   def checked_by_user(user = nil, status = CHECK_AUDITED)
     raise "no user" unless user
-    if self.group
-      raise "not group admin user" unless user == self.group.creator
+    unless status == CHECK_UNAUDITED
+      if self.group
+        raise "not group admin user" unless user == self.group.creator
+      end
     end
     self.checked_user =  user
     self.check_status = status
@@ -77,6 +79,10 @@ class Knowledge::Knowledge
 
   def published?
     check_status == CHECK_AUDITED
+  end
+
+  def is_draft?
+    check_status == CHECK_DRAFT
   end
 
   def contents_content_text

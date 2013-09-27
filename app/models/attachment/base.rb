@@ -7,7 +7,7 @@ class Attachment::Base
 
   # 附件所属的实体,比如 微博/评论/私信/文章 等
   belongs_to :target, polymorphic: true
-  belongs_to :uploader, :class_name => 'User'
+  belongs_to :uploader, :class_name => 'User', inverse_of: :attachments
   
   attr_readonly :target, :uploader
 

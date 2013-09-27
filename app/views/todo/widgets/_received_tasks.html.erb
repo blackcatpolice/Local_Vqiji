@@ -1,0 +1,54 @@
+<% unless current_user.is_expert %>
+  <div class="bk" data-type="ReceivedTasksWidget">
+    <div class="bk_t mr_t4"></div>
+    <div class="bk_c mr_c4">
+      <div class="mr_rw">
+        <div class="mr_rwt" data-role="new-task">
+    	    <a href="<%= todo_tasks_path %>" class="a_link" title="我的任务" style="margin: 5px;" data-skip-pjax></a>
+          <%= link_to "+ 新建",new_todo_task_path(), :class => "btn", 'data-skip-pjax' => 'true'%>
+        </div>
+      </div>
+    </div>
+    <div class="bk_t mr_t4 mr_d4"></div>
+  </div>
+
+  <script>
+    var widget = $("[data-type=ReceivedTasksWidget]")
+      , newTask = widget.find("[data-role=new-task]");
+      
+    var update = function(tasks) {
+      if(tasks.length == 0) {
+    		$(''
+    		  + '<div class="mr_rwk">'
+    		    + '<div class="f12" style="margin-top: 20px; text-align:center;" >还没有任务.</div>'
+    		  + '</div>')
+    		.insertAfter( newTask );
+    		return;
+    	}
+
+  		var _tmpl = ''
+  		  + '<div class="mr_rwk {{if will_timeout}} danger {{/if}}">'
+    		  + '<div class="rwk_1">${progress}<span>%</span></div>'
+    		  + '<div class="rwk_2">'
+      		  + '<div class="rwk_2t">'
+      		    + '<a href="/todo/tasks/${_id}" title="${title}" data-skip-pjax>${$.truncate(title, 24)}</a>'
+    		    + '</div>'
+    		    + '<div class="rwk_2d">'
+    		      + '<span class="left">${formated_end_at}</span>'
+    		      + '<span class="rwk_0${priority}"></span>'
+    		    + '</div>'
+  		    + '</div>'
+		    + '</div>';
+
+  		$.tmpl(_tmpl, tasks).insertAfter( newTask );
+    }
+  
+    $.ajax("/todo/tasks/received.json", {
+      type: "GET",
+      dataType: "json",
+      cache: false,
+      success: update,
+      error: App.error.XHRErrorHandler("初始化插件'我的任务'失败！")
+    });
+  </script>
+<% end %>

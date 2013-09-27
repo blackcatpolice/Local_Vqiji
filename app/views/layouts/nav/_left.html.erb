@@ -45,7 +45,7 @@
 	<% unless current_user.is_expert %>
     <div class="nav_lb">办公助手</div>
     <div class="nav_lb <%= /^todo/.match(params[:controller]) ? 'nav_on' : '' %>">
-      <%= link_to "任务中心", mine_todo_tasks_path, :class=>"ic_rw", :'data-skip-pjax' => true %>
+      <%= link_to "任务中心", todo_root_path, :class=>"ic_rw", :'data-skip-pjax' => true %>
     </div>
     <div class="nav_lb <%= params[:controller] == 'network_disks' ? 'nav_on' : '' %>">
       <%= link_to "我的网盘", network_disks_path, :class=>'ic_wp', :'data-skip-pjax' => true %>

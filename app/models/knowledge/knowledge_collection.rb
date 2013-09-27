@@ -1,6 +1,6 @@
 #coding: utf-8
 
-class Knowledge::KnowledgeCollection
+class Knowledge::Collection
   include Mongoid::Document
   
   field :excerpt_text, :type => String

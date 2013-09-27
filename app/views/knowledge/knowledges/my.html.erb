@@ -7,7 +7,7 @@
     <%= render('top_nav', :current_nav => 'my') %>
 
     <% if flash[:notice] %>
-      <div class="alert alert-success">
+      <div class="alert alert-success text-center">
         <div style="padding: 7px 0;" class="f12"><%= flash[:notice] %></div>
       </div>
     <% end %>
@@ -16,7 +16,7 @@
       <div class="zs_k">
         <div class="bk_t"></div>
         <div class="bk_c">
-          <div class="zs_n f16">当前有”<%= @my_unaudited_knowledges.count %>  ”篇文档需要您审核</div>
+          <div class="zs_n f16">当前有” <%= @my_unaudited_knowledges.count %>  ”篇文档需要您审核</div>
           <div class="zs_ser_result zs_sh">
             <% @my_unaudited_knowledges.each do |knowledge| %>
             <div class="zs_rek">
@@ -32,7 +32,8 @@
             </div>
             <% end %>
           </div>
-          <div class="zs_sh_mo zs_more"><a href="javascrip:void(0)">查看更多</a></div>
+          <!-- 
+          <div class="zs_sh_mo zs_more"><a href="javascrip:void(0)">查看更多</a></div> -->
         </div>
         <div class="bk_t bk_d"></div>
       </div>
@@ -51,15 +52,17 @@
           <div class="zs_zj_k">
             <div class="zj_time f16"><%= time_ago_in_words(knowledge.updated_at)  %></div>
             <div class="zj_nr f18">
-              <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+              <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %> <%= "<i>( 草稿 )</i>".html_safe if knowledge.is_draft? %>
               <% 
                 check_class = "ing" if knowledge.check_status == Knowledge::Knowledge::CHECK_AUDITING
                 check_class = "ok" if knowledge.check_status == Knowledge::Knowledge::CHECK_AUDITED
                 check_class = "no" if knowledge.check_status == Knowledge::Knowledge::CHECK_UNAUDITED
               %>
-              <span class="<%= check_class %>">
-                <%= knowledge_public_name(knowledge) %>
-              </span>
+              <% unless knowledge.is_draft? %>
+                <span class="<%= check_class %>">
+                  <%= knowledge_public_name(knowledge) %>
+                </span>
+              <% end %>
             </div>
             <div class="zj_info f12">
               <%= link_to "『 #{knowledge.knowledge_type.name} 』", knowledge_knowledges_path(:type => knowledge.knowledge_type) %>

@@ -1,12 +1,11 @@
 module Todo::UserExtends
-  extend ActiveSupport::Concern
-  
-  included do |base|
+  def self.included(base)
     base.class_eval do
-      # 创建的任务
-      has_many :created_todo_tasks, class_name: 'Todo::Task', inverse_of: :creater
-      # 创被指定的任务
-      has_many :todo_tasks, class_name: 'Todo::Task', inverse_of: :executor
+      has_many :todo_tasks, class_name: 'Todo::Task', inverse_of: :executor, dependent: :destroy
+      has_many :created_todo_tasks, class_name: 'Todo::Task', inverse_of: :creator, dependent: :destroy
+      has_many :todo_logs, class_name: 'Todo::Log', inverse_of: :user, dependent: :destroy
+
+      has_one :todo_counter, class_name: 'Todo::Counter', inverse_of: :user, dependent: :destroy
     end
   end
 

@@ -8,7 +8,7 @@ class Notification::NewTodoTask < Notification::Base
   
   class << self
     def view_url(user = nil)
-      url_helpers.myexecute_todo_tasks_path
+      url_helpers.received_todo_tasks_path
     end
   end
 end

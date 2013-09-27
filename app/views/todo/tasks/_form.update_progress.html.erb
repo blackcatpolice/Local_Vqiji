@@ -1,0 +1,104 @@
+<div class="bk_t"></div>
+<div class="bk_c" data-type="TodoTaskLogEditor">
+  <%= form_for @task, url: update_progress_todo_task_path(@task), html: { id: 'update-todo-task-progress-form' } do |f| %>
+    
+    <div class="rw_cj">
+      <div id="todo-task-progress-slider" >
+        <% @task.logs.changed_progress.asc(:created_at).each do |l| %>
+          <div class="rw_jdz <%= (l.old_progress > l.progress) ?  "rw_jdz2" : ""%> f12" style="left:<%= l.progress-2 %>%;cursor: pointer;" title="<%= l.old_progress > l.progress ? "任务退回到: #{l.progress}%" : "任务进展到: #{l.progress}%"%>"><%= l.progress %>%</div>
+        <% end %>
+        <div class="rw_jdz rw_jdz1 f12 slider-tag" style="left:<%= @task.progress - 2 %>%;"><%= @task.progress %>%</div>
+      </div>
+      
+      <%= f.hidden_field :progress, id: 'todo-task-progress' %>
+    </div>
+    
+    <% if @task.creator?(current_user) %>
+      <div class="rw_xjk1">
+        <label>截止时间：</label>
+        <div class="input-append date" id="todo-task-end-at">
+          <%= f.text_field :end_at, value: l(@task.end_at, :format => :en_long), class: 'span2', readonly: true, style: 'cursor: pointer;' %>
+          <span class="add-on"><i class="icon-calendar"></i></span>
+        </div>
+      </div>
+      <div class="rw_xjk1" style="padding-left:30px;" id="todo-task-priority-picker">
+        <label>优先级：</label>
+        <div class="rw_xz <%= "rw_xz#{ @task.priority }" %>">
+          <a href="javascript:void(0)" data-priority="0"></a>
+          <a href="javascript:void(0)" data-priority="1"></a>
+          <a href="javascript:void(0)" data-priority="2"></a>
+        </div>
+        
+        <%= f.hidden_field :priority, id: 'todo-task-priority' %>
+      </div>
+    <% end %>
+    
+    <div class="rw_inp">
+      <%= text_area_tag :info, nil, class: 'texter', id: 'todo-task-log-info' %>
+      <%= hidden_field_tag :picture_id, nil, class: 'todo-task-log-picture-id' %>
+      <%= hidden_field_tag :file_id, nil, class: 'todo-task-log-file-id' %>
+    </div>
+    
+    <div class="dhk_gn f12 toolbar" style="display: block;padding-left:0px; width:495px;">
+      <%= f.submit nil, class: 'hide' %>
+      <a href="javascript:void(0)" class="tijiao submiter"></a>
+    </div>
+  <% end %>
+  <div class="clearfix"></div>
+</div>
+<div class="bk_t bk_d"></div>
+
+<script>
+  $(function() {
+    // 任务进度条
+    var taskProgressSlider = $('#todo-task-progress-slider')
+      , taskProgressSliderTag = taskProgressSlider.find(".slider-tag");
+    
+    taskProgressSlider.slider({
+        animate: "fast",
+        range: 'min',
+        max: 100,
+        min:0,
+        step: 1,
+        value: $('#todo-task-progress').val(),
+        change: function(event, ui) {
+          taskProgressSliderTag
+            .css({
+              left: (ui.value - 2) + "%"
+            }).show()
+            .text(ui.value + '%');
+
+          $('#todo-task-progress').val( ui.value );
+        }
+      });
+      
+    // 完成时间
+    $("#todo-task-end-at").datetimepicker({
+      format: "yyyy-mm-dd hh:ii",
+      autoclose: true,
+      pickerPosition: "bottom-left"
+    });
+    
+    // 任务优先级
+    $('#todo-task-priority-picker a[data-priority]')
+      .click(function(e) {
+        var _self = $(e.target)
+          , _priority = _self.attr('data-priority');
+        _self.parent()
+          .removeClass('rw_xz0 rw_xz1 rw_xz2')
+          .addClass( "rw_xz" + _priority );
+
+        $('#todo-task-priority').val(_priority);
+        // e.preventDefault();
+      });
+
+    // 日志编辑器
+		$('[data-type=TodoTaskLogEditor]')
+		  .todoTaskLogEditor()
+		  .on("todotasklogeditorsubmit", function() {
+		    setTimeout(function() {
+		      $("#update-todo-task-progress-form").submit();
+		    }, 0);
+		  });
+  });
+</script>

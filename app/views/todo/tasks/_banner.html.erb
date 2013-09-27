@@ -1,0 +1,21 @@
+<div class="bk bk_rw">
+	<div class="bk_t rw_t f17" title="<%= @task.title %>"><%= truncate_u @task.title, 20 %></div>
+	<div class="bk_c rw_c">
+		<div class="tx f13"><%= image_tag(@task.creator.avatar_url('v50x50'), :class => '') %><br><%= user_tag @task.creator %></div>
+   	<div class="xx">
+      <%= @task.details %>
+   		<% if @task.file %>
+		    <div class="rw_fj"><%= link_to @task.file.name, "/download/#{ @task.file.id }", :target => '_blank', :'data-skip-pjax' => true, :title=>@task.file.name %></div>
+		  <% end %>
+		  <% if @task.picture %>
+		    <div class="rw_fj rw_tp"><%= link_to @task.picture.name || @task.picture.filename, @task.picture.file.thumb.url, :target => '_blank', :'data-skip-pjax' => true, :title=>@task.picture.filename %></div>
+		  <% end %>
+    	<p>
+      	截止时间：<%= l(@task.end_at, :format => :long) %>
+      	<span>负责人：<%= user_tag @task.executor %></span>
+    	</p>
+    </div>
+    <div class="clearfix"></div>
+	</div>
+	<div class="bk_t bk_d"></div>
+</div>

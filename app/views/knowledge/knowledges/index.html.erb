@@ -21,7 +21,7 @@
           <div class="clearfix"></div>
         </div>
       	<div class="zs_type">
-        	<div class="zs_tm">权限：</div>
+        	<div class="zs_tm">工作组：</div>
         	<div class="zs_list">
         		<%= link_to '公共文档', knowledge_knowledges_path(:type => params[:type]) %>
         		<% current_user.groups.each do |group| %>
@@ -37,7 +37,7 @@
           <div class="zs_tm" style="width:85px;">您已选择：</div>
           <div class="zs_list">
             <% if params[:type] %>
-              <% knowledge_type_name = Knowledge::KnowledgeType.find(params[:type]).name %>
+              <% knowledge_type_name = Knowledge::Type.find(params[:type]).name %>
 
               <%= link_to "#{knowledge_type_name}<button class='close'>&times;</button>".html_safe, knowledge_knowledges_path(:group_id => params[:group_id]), :class => "zs_x" %>
 
@@ -64,15 +64,19 @@
           <div class="bk_c">
             <div class="zs_lbt f18"><%= @knowledge_type.name %></div>
             <div class="zs_lb">
-              <%= "暂时还没有发布文档！" if @knowledge_type.knowledges.published.blank? %>
+              <% if @knowledges.blank? %>
+                <div class="empty">
+                  <span>暂时还没有发布文档！</span>
+                </div>
+              <% end %>
               <ul>
-                <% @knowledge_type.knowledges.published.each do |knowledge| %>
+                <% @knowledges.each do |knowledge| %>
                   <li>
                     <div class="icon"></div>
                     <span>
                       <%= link_to @knowledge_type.name, knowledge_knowledges_path(:type => @knowledge_type, :group => params[:group_id]) %>
                     </span>
-                    <img src="../assets/images/px_zt6.png" />
+                    <%= image_tag("px_zt6.png") %>
                     <div class="title">
                       <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
                     </div>
@@ -85,11 +89,15 @@
           </div>
           <div class="bk_t bk_d"></div>
         </div>
-
-
       <% else %>
 			<div class="zs_k">
-        <div class="zs_lb">
+        <div class="bk_t"></div>
+          <div class="bk_c">
+          <% if @knowledges.blank? %>
+            <div class="empty">
+              <span>暂时还没有发布文档！</span>
+            </div>
+          <% end %>
           <ul>
           	<% @knowledges.each do |knowledge| %>
 	            <li>
@@ -97,7 +105,7 @@
 	            	<span>
 	            		<%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group_id => params[:group_id]) %>
 	            	</span>
-	              <img src="../assets/images/px_zt6.png" />
+	              <%= image_tag("px_zt6.png") %>
 	              <div class="title">
 	              	<%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
 	              </div>
@@ -112,6 +120,11 @@
     <div class="zs_k">
     	<div class="bk_t"></div>
     	<div class="bk_c">
+        <% if @knowledges.blank? %>
+          <div class="empty">
+            <span>暂时还没有发布文档！</span>
+          </div>
+        <% end %>
         <% @knowledge_types.each do |knowledge_type| %>
           <% next if knowledge_type.knowledges.published.blank? %>
 	        <div class="zs_lbt f18"><%= knowledge_type.name %>
@@ -124,7 +137,7 @@
                 <span>
                   <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group_id => params[:group_id]) %>
                 </span>
-                <img src="../assets/images/px_zt6.png" />
+                <%= image_tag("px_zt6.png") %>
                 <div class="title">
                   <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
                 </div>
@@ -206,28 +219,26 @@
 
 <script>
 	$(document).ready(function(){
+	  $(".zs_more").click(function(){
+		  $(this).siblings().toggleClass("zs_auto");
+	  })
 
-	$(".zs_more").click(function(){
-											
-											$(this).siblings().toggleClass("zs_auto");
-											
-											})
-
-  		$(".zsk_j span").click(function(){
-  			$(".zsk_tlb").slideToggle();
-  		});
-  		$("form[data-pjax]").on('submit', function(e){
-			$.pjax.submit(e, '[data-pjax-container]');
+		$(".zsk_j span").click(function(){
+			$(".zsk_tlb").slideToggle();
 		});
 		
-		$('a[data-action=delete]', 'div[node-type=Knowledge]').click(function(){
-			var _knowledge = $(this).parents('div[node-type=Knowledge]');
-			$.confirm('是否删除 [ ' + _knowledge.attr('data-title') + '] ?', function(tag){
-				if(tag){
-					$('#knowledge_id').val(_knowledge.attr('data-id'));
-					$('#knowledges_form').submit();
-				}
-			});
+		$("form[data-pjax]").on('submit', function(e){
+		$.pjax.submit(e, '[data-pjax-container]');
+	});
+
+	$('a[data-action=delete]', 'div[node-type=Knowledge]').click(function(){
+		var _knowledge = $(this).parents('div[node-type=Knowledge]');
+		$.confirm('是否删除 [ ' + _knowledge.attr('data-title') + '] ?', function(tag){
+			if(tag){
+				$('#knowledge_id').val(_knowledge.attr('data-id'));
+				$('#knowledges_form').submit();
+			}
+		});
 		});
 		// $('#knowledge_keyword').typeahead({
 		// 	source: function(query, process){

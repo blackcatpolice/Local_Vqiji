@@ -1,0 +1,84 @@
+<div class="bk" data-type="TodoTaskProgressWidget" data-task-id="<%= task.id %>">
+  <div class="bk_t mr_t5"></div>
+  <div class="bk_c">
+  	<div style="padding: 5px 0px 5px 5px;"></div>
+  	<div class="plot-canvas" style="width:260px;height:200px;left:8px;"></div>
+  	<% if last_log = task.logs.changed_progress.desc(:created_at).first %>
+  	  <div class="f16" style="padding: 10px 0px 10px 10px;">最后更新: <span><%= l(last_log.created_at, :format => :short) %></span></div>
+  	<% end %>
+  	<div class="f16" style="padding: 0px 0px 10px 10px;">开始时间: <span><%= l(task.start_at, :format => :short) %></span></div>
+  	<div class="f16" style="padding: 0px 0px 10px 10px;">截至时间: <span style="color: #dc5f5e;"><%= l(task.end_at, :format => :short) %></span></div>
+  </div>
+  <div class="bk_t bk_d"></div>
+  <div class="mr_t5_tip plot-flag" style="display:none;"></div>
+</div>
+
+<script >
+  $(function() {
+    var widget = $("[data-type=TodoTaskProgressWidget][data-task-id=<%= task.id  %>]")
+      , canvas = widget.find(".plot-canvas")
+      , flag = widget.find(".plot-flag");
+
+    var plotOptions = {
+      colors: [ "#00c2c2" ],
+      series: {
+        lines: {
+          show: true,
+          fill: true,
+          fillColor: "rgba(239, 255, 255, 0.5)" 
+        },
+        points: {
+          show: true,
+          radius: 2
+        }
+      },
+      yaxis: {
+        min: 0, 
+        max: 100,
+        ticks: 5
+      }
+    };
+    
+    var update = function(progress) {
+      var _options = $.extend(true, {}, plotOptions, {
+        xaxis: {
+          show: true,
+          mode: "time",
+          min: progress.min,
+          max: progress.max,
+          ticks: progress.ticks,
+          timeformat: "%m月%d日"
+        },
+        grid: {
+          borderWidth: 0,
+          hoverable: true,
+          markings: progress.markings
+        }
+      });
+
+      $.plot(canvas, [ progress.data ], _options);
+    }
+    
+    canvas.on('plothover', function(event, pos, item) {
+      if(item) {
+        flag
+          .css({
+            'position': 'absolute',
+            'top': (item.pageY -35),
+            'left': (item.pageX -18)
+          })
+          .text(item.datapoint[1] + "%")
+          .show();
+      } else {
+        flag.hide();
+      }
+    });
+
+    Todo.api.taskProgress("<%= task.id %>", {
+      success: update,
+      error: App.error.XHRErrorHandler("获取任务进度失败！")
+    });
+  });
+</script>
+
+

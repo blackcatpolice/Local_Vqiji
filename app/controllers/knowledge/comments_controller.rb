@@ -5,7 +5,7 @@ class Knowledge::CommentsController < WeiboController
 
 
   def reply_comments
-    @comment = Knowledge::KnowledgeComment.find(params[:id])
+    @comment = Knowledge::Comment.find(params[:id])
     @comments = @comment.reply_comments.desc(:created_at)
     # render :json => comments
     # render :js
@@ -15,7 +15,7 @@ class Knowledge::CommentsController < WeiboController
   end
 
   def reply_comment
-    @reply_comment = Knowledge::KnowledgeComment.find(params[:id])
+    @reply_comment = Knowledge::Comment.find(params[:id])
     @comment = @reply_comment.reply_comments.create(:content => params[:content], 
                                    :user => current_user,
                                    :is_reply => true,
@@ -37,7 +37,7 @@ class Knowledge::CommentsController < WeiboController
     #   paginate :page => params[:page], :per_page => (params[:size] || 10)
     # end
     # @knowledges = query.results
-    @knowledge_types = Knowledge::KnowledgeType.all.asc(:priority)
+    @knowledge_types = Knowledge::Type.all.asc(:priority)
     if params[:type] || params[:group_id]
       @knowledges = Knowledge::Knowledge.published
       @knowledges = @knowledges.where(:group_id => params[:group_id]) if params[:group_id]
@@ -110,7 +110,7 @@ class Knowledge::CommentsController < WeiboController
   
   def new
     @knowledge = Knowledge::Knowledge.new
-    @knowledge.contents = [Knowledge::KnowledgeContent.new]
+    @knowledge.contents = [Knowledge::Content.new]
     # @knowledge.public = false unless current_user.release_public_knowledge
     respond_to do |format|
       format.html
@@ -168,6 +168,13 @@ class Knowledge::CommentsController < WeiboController
     end
   end
   
+  def destroy
+    @comment = Knowledge::Comment.find(params[:id])
+    @comment.destroy
+    respond_to do |format|
+        format.js
+    end
+  end
   
   def delete
     @knowledge = Knowledge.find params[:id]

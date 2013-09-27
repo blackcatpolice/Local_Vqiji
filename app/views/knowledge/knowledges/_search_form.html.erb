@@ -1,6 +1,19 @@
 <div class="zs_ser">
-  <form action="<%= search_knowledge_knowledges_path %>" method="get">
-    <input placeholder="请输入关键词" name="keyword" type="text" value="<%= params[:keyword] %>" />
+  <form id="knowledge_search_form" action="<%= search_knowledge_knowledges_path %>" method="get">
+    <input id="knowledge_search_keyword" placeholder="请输入关键词" name="keyword" type="text" value="<%= params[:keyword] %>" />
     <input type="submit" value="" />
   </form>
 </div>
+<script type="text/javascript">
+  $(function(){
+    $('#knowledge_search_form').on('submit', function(e){
+      var keyword = $('#knowledge_search_keyword').val();
+      if(keyword.length == 0){
+        // alert('请输入搜索关键词！');
+        $('#knowledge_search_keyword').focus();
+        return false;
+      }
+      $.pjax.submit(e, '[data-pjax-container]');
+    });
+  });
+</script>

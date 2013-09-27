@@ -1,31 +1,21 @@
-<% if false %>
 <div id="reply_comments_<%= @comment.id %>">
-<%= form_for(Knowledge::KnowledgeComment.new, :url => "/knowledge/knowledges/#{@comment.knowledge.id}/comments/#{@comment.id}/reply_comment", :remote => true) do |f| %>
-  <%= f.text_area :content, :name => "content", :id => "reply_area", :cols => 20, :rows => 4 %>
-  <%= f.submit %>
-<% end %>
-
-<%= render :collection => @comment.reply_comments, :as => :reply_comment, :partial => '/knowledge/comments/replyed_comment_item' %>
-</div>
-<% end %>
-<div id="reply_comments_<%= @comment.id %>">
-<div class="lb zs_com_lb">
-  <div class="comm_t"></div>
-  <div class="lb_comm">
-    <div class="comm_form" data-role="comment-editor">
-      <div class="comm_ip">
-        <textarea id="reply_replyed_content_<%= @comment.id %>" class="texter chackTextarea" placeholder="请在这里输入您的评论" style="overflow-y: hidden;" aria-disabled="false"></textarea>
+  <div class="lb zs_com_lb">
+    <div class="comm_t"></div>
+    <div class="lb_comm">
+      <div class="comm_form" data-role="comment-editor">
+        <div class="comm_ip">
+          <textarea id="reply_replyed_content_<%= @comment.id %>" class="texter chackTextarea" placeholder="请在这里输入您的评论" style="overflow-y: hidden;" aria-disabled="false"></textarea>
+        </div>
+        <div class="dhk_gn f12 toolbar" style="display: block;">
+          <a id="reply_replyed_comment_btn_<%= @comment.id %>" class="btn btn-danger bn submiter" comment-id="<%= @comment.id %>" data-skip-pjax>评论</a>
+        </div>
       </div>
-      <div class="dhk_gn f12 toolbar" style="display: block;">
-        <a id="reply_replyed_comment_btn_<%= @comment.id %>" class="btn btn-danger bn submiter" comment-id="<%= @comment.id %>" data-skip-pjax>评论</a>
+      
+      <div id="reply_comments_div_<%= @comment.id %>" class="comment-list f12" data-role="comment-list">
+        <%= render :collection => @comment.reply_comments, :as => :reply_comment, :partial => '/knowledge/comments/replyed_comment_item' %>
       </div>
-    </div>
-    
-    <div id="reply_comments_div_<%= @comment.id %>" class="comment-list f12" data-role="comment-list">
-      <%= render :collection => @comment.reply_comments, :as => :reply_comment, :partial => '/knowledge/comments/replyed_comment_item' %>
-    </div>
-    <div class="clearfix"></div>
-    
- </div>
-</div>
+      <div class="clearfix"></div>
+      
+   </div>
+  </div>
 </div>

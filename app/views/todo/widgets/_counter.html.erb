@@ -1,0 +1,32 @@
+<div class="bk">
+  <% counter = current_user.todo.counter -%>
+  <div class="bk_t mr_t6"></div>
+  <div class="bk_c mr_c6">
+    <div class="mr_c6k">
+      <div class="c61">待完成</div>
+      <div class="c62"><%= counter.received_tasks_uncompleted_count %></div>
+      <div class="c62"><%= counter.created_tasks_uncompleted_count %></div>
+    </div>
+    <div class="mr_c6k">
+      <div class="c61">待确认</div>
+      <div class="c62"><%= counter.received_tasks_confirming_count %></div>
+      <div class="c62"><%= counter.created_tasks_confirming_count %></div>
+    </div>
+    <div class="mr_c6k">
+      <div class="c61">超时完成</div>
+      <div class="c62 c62_yel"><%= counter.received_tasks_finished_timeout_count %></div>
+      <div class="c62 c62_yel"><%= counter.created_tasks_finished_timeout_count %></div>
+    </div>
+    <div class="mr_c6k">
+      <div class="c61">按时完成</div>
+      <div class="c62"><%= counter.received_tasks_finished_ontime_count %></div>
+      <div class="c62"><%= counter.created_tasks_finished_ontime_count %></div>
+    </div>
+    <div class="mr_c6k">
+      <div class="c61">合计</div>
+      <div class="c62"><%= link_to counter.received_tasks_count, received_todo_tasks_path %></div>
+      <div class="c62"><%= link_to counter.created_tasks_count, created_todo_tasks_path %></div>
+    </div>
+  </div>
+  <div class="bk_t mr_d6"></div>
+</div>

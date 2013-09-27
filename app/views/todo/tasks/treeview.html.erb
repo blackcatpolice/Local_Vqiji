@@ -1,0 +1,27 @@
+<%= render 'banner' %>
+
+<div class="rw_tabw" data-role="todo-task-tabs">
+	<div class="rw_tabs rw_tab1">
+		<a href="<%= todo_task_path(@task) %>" class="rw_tab"></a>
+		<a href="<%= treeview_todo_task_path(@task) %>" class="rw_tab"></a>
+		<%= link_to '', @task.finished? ? '' : new_sub_todo_task_path(@task), class: 'rw_tab' %>
+	</div>
+</div>
+
+<div class="bk bk_rw" data-type="todo-task-tree">
+	<div class="bk_t"></div>
+	<div class="bk_c">
+  	<div class="rw_xjt rw_xjt1 f18">任务层级</div>
+    	<div class="rw_tv">
+    		<ul id="todo_task_treeview" class="filetree"></ul>
+    	</div>
+    </div>
+	<div class="bk_t bk_d"></div>
+
+  <script>
+	  $(function() {
+	    $('#todo_task_treeview').todoTaskTreeview("<%= @task.id %>");
+	  });
+  </script>
+</div>
+<div class="clearfix"></div>

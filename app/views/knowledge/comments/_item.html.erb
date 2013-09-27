@@ -1,5 +1,5 @@
 <% comment = comment || @comment %>
-<div class="zs_comm_list">
+<div id="comment_item_<%= comment.id %>" class="zs_comm_list">
   <div class="tx"><img src="../assets/images/04.png" /></div>
   <div class="nr">
     <%= link_to comment.user.name, user_path(comment.user) %><br/>
@@ -7,6 +7,13 @@
   </div>
   <div id="comment_<%= comment.id %>" class="nr f12">
     <span class="left"><%= comment.created_at.strftime("%Y年%m月%d日 %H:%M") %></span>
-    <span class="right"><a class="reply_comment_btn" href="javascript:void(0);" comment-id="<%= comment.id %>" comments-open="false" data-skip-pjax>评论</a></span>
+    <span class="right">
+      <a class="reply_comment_btn" href="javascript:void(0);" comment-id="<%= comment.id %>" comments-open="false" data-skip-pjax>评论</a>
+    </span>
+    <% if comment.user == current_user %>
+      <span class="right">
+        <a class="delete_comment_btn" href="javascript:void(0);" comment-id="<%= comment.id %>" comments-open="false" data-skip-pjax>删除</a>&nbsp;|&nbsp;
+      </span>    
+    <% end %>
   </div>
 </div>

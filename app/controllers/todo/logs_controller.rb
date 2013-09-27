@@ -1,27 +1,34 @@
-# todo logs controller
-# @suxu
 class Todo::LogsController < Todo::BaseController
-	before_filter do
-  	@task = @service.find_task_by_id(params[:task_id])
-	end
 
 	def index
+  	@task = @service.tasks.find(params[:task_id])
 	end
 
 	def new
-		@log = @service.new_log(:task => @task)
-	end
-
-	def show
+  	@task = @service.tasks.find(params[:task_id])
+		@log = @service.logs.new do |log|
+		  log.task = @task
+		end
 	end
 
 	def create
-	  todo_log = { :msg => params[:msg] || "...", :value => params[:value]}
-	  todo_task = { :end_date => params[:end_date], :level => params[:level]}
-		@log = @service.create_log(@task, todo_log, todo_task, params[:file_id], params[:picture_id])
-		render :partial => "todo/logs/log", :locals => {:log => @log}
+  	@task = @service.tasks.find(params[:task_id])
+	  _log = params
+	  
+    picture = current_user.attachments.pictures.find_by_id(_log.delete(:picture_id)) if _log.key?(:picture_id) && !_log[:picture_id].blank?
+    file = current_user.attachments.find_by_id(_log.delete(:file_id)) if _log.key?(:file_id) && !_log[:file_id].blank?
+	  
+		@log = @service.logs.new(_log) do |log|
+		  log.task = @task
+		  log.set_picture(picture) if defined?(picture) && picture
+		  log.set_file(file) if defined?(file) && file
+		end
+		
+		if @log.save
+		  render :partial => "todo/logs/log", :locals => { :log => @log }
+		else
+		  raise WeiboError, @log.errors.full_messages.join(',')
+		end
 	end
 
-	def destroy
-	end
 end

@@ -9,7 +9,7 @@
     	<div class="bk_t"></div>
     	<div class="bk_c">
       	<div class="zs_type">
-        	<div class="zs_tm">权限：</div>
+        	<div class="zs_tm">工作组：</div>
         	<div class="zs_list">
         		<%= link_to '公共文档', groups_knowledge_knowledges_path %>
         		<% current_user.groups.each do |group| %>
@@ -28,6 +28,11 @@
     <div class="zs_k">
     	<div class="bk_t"></div>
     	<div class="bk_c">
+        <% if Knowledge::Knowledge.published.where(:group.ne => nil).blank? %>
+          <div class="empty">
+            <span>暂时还没有发布文档！</span>
+          </div>
+        <% end %>
         <% @groups.each do |group| %>
           <% next if Knowledge::Knowledge.published.where(:group => group).blank? %>
 	        <div class="zs_lbt f18"><%= group.name %>
@@ -40,7 +45,7 @@
                 <span>
                   <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group_id => params[:group_id]) %>
                 </span>
-                <img src="../assets/images/px_zt6.png" />
+                <%= image_tag("px_zt6.png") %>
                 <div class="title">
                   <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
                 </div>
@@ -58,9 +63,16 @@
     <div class="zs_k">
     	<div class="bk_t"></div>
     	<div class="bk_c">
+
+
         <div class="zs_lbt f18"><%= @group.name %>
-        	
+          
         </div>
+        <% if Knowledge::Knowledge.published.where(:group => params[:group_id]).blank? %>
+          <div class="empty">
+            <span>暂时还没有发布文档！</span>
+          </div>
+        <% end %>
 
         <div class="zs_lb">
           <ul>

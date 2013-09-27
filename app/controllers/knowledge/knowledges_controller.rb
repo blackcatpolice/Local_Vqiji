@@ -5,27 +5,17 @@ class Knowledge::KnowledgesController < WeiboController
 
   #所有公开的文档
   def index
+    @knowledge_types = Knowledge::Type.all.asc(:priority)
+    @knowledge_type = Knowledge::Type.find(params[:type]) if params[:type]
+    @group = Group.find(params[:group_id]) if params[:group_id]
+    conditions = {:check_status => 2}
+    conditions.merge!(:group_id => params[:group_id]) if params[:group_id]
+    conditions.merge!(:knowledge_type_id => params[:type]) if params[:type]
 
-    # query = Knowledge.search do
-    #   fulltext params[:keyword]
-    #   with :knowledge_type_id, params[:type] if params[:type]
-    #   with :public, true
-    #   order_by :created_at, :desc
-    #   paginate :page => params[:page], :per_page => (params[:size] || 10)
-    # end
-    # @knowledges = query.results
-    @knowledge_types = Knowledge::KnowledgeType.all.asc(:priority)
-    if params[:type] || params[:group_id]
-      @knowledge_type = Knowledge::KnowledgeType.find(params[:type]) if params[:type]
-      @knowledges = Knowledge::Knowledge.published
-      @knowledges = params[:group_id].nil? ? @knowledges.public : @knowledges.where(:group_id => params[:group_id])
-      # @knowledges = @knowledges.where(:group_id => params[:group_id]) if params[:group_id]
-      @knowledges = @knowledges.where(:knowledge_type_id => params[:type]) if params[:type]
-      @knowledges = @knowledges.paginate(:page => params[:page], :per_page => 15)
-    else
-      @popular_knowledges = Knowledge::Knowledge.published.desc(:clicks).limit(6)
-      @latest_knowledges = Knowledge::Knowledge.published.desc(:updated_at).limit(6)
-    end
+    @knowledges = Knowledge::Knowledge.where(conditions).paginate(:page => params[:page], :per_page => 15)
+
+    @popular_knowledges = Knowledge::Knowledge.published.desc(:clicks).limit(6)
+    @latest_knowledges = Knowledge::Knowledge.published.desc(:updated_at).limit(6)
   end
 
   def search
@@ -34,11 +24,8 @@ class Knowledge::KnowledgesController < WeiboController
         highlight :contents
       end
       with :check_status, Knowledge::Knowledge::CHECK_AUDITED
-      # order_by :created_at, :desc
       paginate :page => params[:page], :per_page => (params[:size] || 10)
     end
-    # @knowledges = @query.results
-    @knowledges = []
   end
 
   def popular
@@ -104,11 +91,11 @@ class Knowledge::KnowledgesController < WeiboController
     knowledge.checked_by_user(current_user, params[:status])
     # knowledge.save!
 
-    if knowledge.save
-      redirect_to my_knowledge_knowledges_path, notice: "文档审核成功！"
-    # else
-      # render :action => :new
-    end
+    notice_text = "文档#{ params[:status] == '1' ? '发布' : '审核'}成功！"
+
+    # redirect_to my_knowledge_knowledges_path, notice: "文档创建成功!"
+
+    redirect_to my_knowledge_knowledges_path, notice: notice_text if knowledge.save
 
     # return redirect_to :action => :my, notice: "文档审核成功！" if knowledge.save
   end
@@ -134,7 +121,7 @@ class Knowledge::KnowledgesController < WeiboController
   
   def new
     @knowledge = Knowledge::Knowledge.new
-    @knowledge.contents = [Knowledge::KnowledgeContent.new]
+    @knowledge.contents = [Knowledge::Content.new]
     # @knowledge.public = false unless current_user.release_public_knowledge
     respond_to do |format|
       format.html
@@ -147,6 +134,7 @@ class Knowledge::KnowledgesController < WeiboController
 
   def create
     contents_params = params[:knowledge_knowledge].delete(:contents)
+    params[:knowledge_knowledge].delete(:group_id) if params[:public] == '1'
     @knowledge = Knowledge::Knowledge.new params[:knowledge_knowledge]
     @knowledge.add_contents(contents_params)
     @knowledge.creator = current_user

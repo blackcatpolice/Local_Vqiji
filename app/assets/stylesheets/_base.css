@@ -5,6 +5,10 @@
  *= require widgets.asynch
  */
 
+.field_with_errors {
+  display: inline;
+}
+
 .atwho-view {
   z-index: 2060;
 }

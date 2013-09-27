@@ -4,7 +4,7 @@ require 'x_render_json'
 
 # 链接控制器
 class UrlsController < ActionController::Base
-  include XJSONRender
+  include XRenderJSON
   
   respond_to :json
 

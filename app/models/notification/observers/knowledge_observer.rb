@@ -8,15 +8,22 @@ class Notification::Observers::KnowledgeObserver < Mongoid::Observer
       Notification::Knowledge.create(
         :user => knowledge.checked_user,
         :knowledge => knowledge
-      ).deliver
+      ).deliver unless knowledge.is_draft?
   end
 
   def after_save(knowledge)
-    if knowledge.check_status_changed?
-      Notification::KnowledgeCheck.create(
-        :user => knowledge.creator,
-        :knowledge => knowledge
-      ).deliver    
+    if knowledge.check_status_changed? 
+      if knowledge.check_status_was != -1
+        Notification::KnowledgeCheck.create(
+          :user => knowledge.creator,
+          :knowledge => knowledge
+        ).deliver
+      else
+        Notification::Knowledge.create(
+          :user => knowledge.checked_user,
+          :knowledge => knowledge
+        ).deliver
+      end
     end
   end
 

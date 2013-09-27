@@ -1,0 +1,7 @@
+(function($) {
+  <% unless params[:is_reply] %>
+    $('#reply_comment_div_<%= @comment.id %>').remove();
+  <% else %>
+    $('#comment_item_<%= @comment.id %>').remove();
+  <% end %>
+})(jQuery);

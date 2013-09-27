@@ -17,10 +17,16 @@
       <div class="bk_t"></div>
       <div class="bk_c">
         <div class="zsk_tit zs_det_t">
-          <img alt="Logo" src="../assets/images/logo.png" width="95">
-          <span>-1-</span>
+          <%= image_tag("logo.png", :width => "95") %>
+          <span>-<%= @contents.first.page_index %>-</span>
         </div>
         <div class="zs_content">
+          <% if current_user == @knowledge.creator %>
+          <div class="zsk_gn">
+            <%= link_to "删除", @knowledge, :method => :delete, confirm: "确定删除该文档么？！", :class => "zsk_sc" %>
+            <%= link_to "编辑", edit_knowledge_knowledge_path(@knowledge), :class => "zsk_bj" %>
+          </div>
+          <% end %>
           <h1><%= @knowledge.title %></h1>
           <h2>
             <span><%= @knowledge.updated_at.strftime("%Y年%m月%d日") %></span>
@@ -46,7 +52,7 @@
 
         <div class="zs_comm">
           <p>评论</p>
-          <%= form_for(Knowledge::KnowledgeComment.new, :url => "/knowledge/knowledges/#{@knowledge.id}/comments", :remote => true) do |f| %>
+          <%= form_for(Knowledge::Comment.new, :url => "/knowledge/knowledges/#{@knowledge.id}/comments", :remote => true) do |f| %>
             <%= f.text_area :content, :name => "content", :id => "reply_area" %>
             <p><a id="submit_comment_btn" class="f16" href="javascript:void(0)" data-skip-pjax>发表评论</a></p>
           <% end %>
@@ -132,10 +138,17 @@ function SetCwinHeight(){
           alert('请您输入评论内容！');
           return false;
         }
-        $('#new_knowledge_knowledge_comment').submit();
+        $('#new_knowledge_comment').submit();
       });
 
-
+      $('.delete_comment_btn').on('click', function(){
+        if(confirm("确定删除该条评论么？"))
+        {
+          var comment_id = $(this).attr('comment-id');
+          var url = "/knowledge/knowledges/<%= @knowledge.id %>/comments/"+comment_id;
+          $.post(url, {"_method" : "delete", "is_reply" : "false"});
+        }
+      });
 
       $('.reply_comment_btn').on('click', function(){
         // alert('start');

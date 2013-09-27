@@ -520,7 +520,7 @@
           deleted: function() {
             context._file = null;
             if(context._selectedFile){
-              context._selecedFileText.text("已选附件: " + _subString(context._selectedFile.name, 10)).show();
+              context._selecedFileText.text("已选附件: " + $.truncate(context._selectedFile.name, 10)).show();
             }else{
               if(context._selecedFileText){
               	context._selecedFileText.text("").hide();

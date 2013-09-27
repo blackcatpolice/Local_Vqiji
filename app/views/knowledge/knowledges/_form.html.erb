@@ -1,4 +1,4 @@
-<% knowledge_types = Knowledge::KnowledgeType.all %>
+<% knowledge_types = Knowledge::Type.all %>
 
     <div class="zs_k">
       <div class="bk_t"></div>
@@ -23,7 +23,7 @@
 
             <div class="zsk_edt">
               <%= f.fields_for :contents do |content_fields| %>
-               <%= content_fields.text_area :content, :id => "content_textarea", :value => @knowledge.contents_content_text %>
+               <%= content_fields.text_area :content, :id => "content_textarea", :value => @knowledge.contents_content_text, :size => "60x30" %>
               <% end %>
             </div>
             <div class="zsk_xx"> 
@@ -104,7 +104,6 @@
         	
         </div>
       </div>
-
       <%= f.submit %>
    	<% end %>
 </div>
@@ -142,6 +141,7 @@
   	$(':radio[name="public"]').click(function(){
   		if(this.value == "1" && this.checked ){
   			$('#knowledge_group_id').attr('disabled', 'disabled');
+        $('#knowledge_group_id').val('');
   		}else{
   			$('#knowledge_group_id').removeAttr('disabled');
   		}
@@ -183,7 +183,6 @@
         $('input:button', '#knowledge_form').removeAttr('disabled');
         return false;
       }
-
   		$.pjax.submit(e, '[data-pjax-container]');
   	});
 
@@ -192,7 +191,11 @@
       $('#knowledge_form').submit();
     });
     $('#save_public_btn').on('click', function(e){
-      $('#knowledge_knowledge_check_status').val('1');
+      <% if current_user == @knowledge.creator %>
+        $('#knowledge_knowledge_check_status').val('2');
+      <% else %>
+        $('#knowledge_knowledge_check_status').val('1');
+      <% end %>
       $('#knowledge_form').submit();
     });
   });

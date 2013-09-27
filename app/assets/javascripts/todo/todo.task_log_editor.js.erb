@@ -1,0 +1,28 @@
+;(function($) {
+  "use strict";
+
+	$.widget("todo.todoTaskLogEditor", $.rtext.rtextEditor, {
+    options: {
+    	allowBlank: false,
+    	placeHolder: "请填写日志",
+    	tools: ["picture", "file"]
+    },
+    
+    _submit: function(text, done) {
+      this._setAttachmentIds();
+      this._trigger("submit");
+      
+      done();
+      return false;
+    },
+    
+    _setAttachmentIds: function() {
+      this.element.find("input.todo-task-log-picture-id").val( this._picture ? this._picture.id : null );
+      var _fileId = null;
+      if (this._file || this._selectedFile) {
+        _fileId = (this._file || this._selectedFile).id;
+      }
+      this.element.find("input.todo-task-log-file-id").val( _fileId );
+    }
+	});
+})( jQuery );

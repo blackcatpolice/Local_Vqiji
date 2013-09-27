@@ -351,51 +351,6 @@
       _args["cache"] = false;
       return API._request("/network_disks", _args, context.filesWidget);
     };
-    
-    // 填写任务日志
-    // id => todo_task_id, text => todo_log_msg 
-    this.todoTaskLog = function(id, text, options) {
-      var _args = options || {}; 
-      _args["type"] = "POST";
-      
-      _args["data"] = { msg: text, value: options.value };
-      
-      if(options.end_date){
-      	_args["data"].end_date = options.end_date
-      }
-      if(options.level){
-      	_args["data"].level = options.level
-      }
-      if(options.picture_id){
-      	_args["data"].picture_id = options.picture_id
-      }
-      if(options.picture_id){
-      	_args["data"].picture_id = options.picture_id
-      }
-      if(options.file_id){
-      	_args["data"].file_id = options.file_id
-      }
-      _args["dataType"] = "html";
-      _args["cache"] = false; 
-      return API._request("/todo/tasks/" + id + "/logs.html", _args, context.todoTaskLog);
-    };
-    
-    this.todoTaskProgress = function(id, options){
-      var _args = options || {};
-      _args["data"] = { id: id};
-      _args["type"] = "POST";
-      _args["dataType"] = "json";
-      _args["cache"] = false; 
-      return API._request("/todo/tasks/progress.json", _args, context.todoTaskProgress);
-    };
-    
-    this.todoMyTasks = function(options){
-      var _args = options || {};
-      _args["type"] = "POST";
-      _args["dataType"] = "json";
-      _args["cache"] = false; 
-      return API._request("/todo/tasks/my_tasks.json", _args, context.todoMyTasks);
-    }
 
 	  this.attachmentDisks = function(options){
 	    var _args = options || {};

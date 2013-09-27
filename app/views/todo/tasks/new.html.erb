@@ -1,15 +1,13 @@
-<% provide(:title, '新建任务') %>
+<% provide(:title, '新建任务') -%>
 <div class="bk">
 	<div class="bk_t"></div>
 	<div class="bk_c">
 		<div class="rw_xjt f18">新建任务<a href="javascript:window.history.back();"></a></div>
 		<div class="rw_xj" id="todo_task_editor">
-			<%= render "form" %>
+			<%= render 'form.new', :task => @task %>
 			<div class="clearfix"></div>
 		</div>
 	</div>
 	<div class="bk_t bk_d"></div>
 </div>
-<script>
-	$('#todo_task_editor').task({preset: "<%= @task.details%>"});
-</script>
+

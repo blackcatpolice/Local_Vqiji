@@ -1,169 +1,183 @@
-# todo tasks controller
-# @suxu
 class Todo::TasksController < Todo::BaseController
-  # actions 
+
   def index
-    @tasks = @service.find_tasks.paginate :page => params[:page], :per_page => 10
+    @confirming_tasks = @service.created_tasks.completed.unconfirmed
+    @will_timeout_tasks = @service.received_tasks.will_timeout
+    @timeout_tasks = @service.received_tasks._timeout
   end
 
-  def mine
-    @will_timeout_tasks = @service.will_timeout_tasks(current_user)
-    @will_finish_tasks = @service.will_finish_tasks(current_user)
-    @timeout_tasks = @service.timeout_tasks current_user
+  def received
+    @tasks = @service.received_tasks
+                     .uncompleted.desc(:created_at)
+                     .paginate :page => params[:page], :per_page => 10
   end
 
-  def myexecute
-    @tasks = @service.find_tasks_by_executor(current_user).unfinished_scope.desc(:created_at).paginate :page => params[:page], :per_page => 10
-    @list_title = "我收到的任务"
-    @top_nav_class = "rw_nav1"
-    render :template => "todo/tasks/list"
+  def created
+    @tasks = @service.created_tasks
+                     .unconfirmed.desc(:created_at)
+                     .paginate :page => params[:page], :per_page => 10
+  end
+
+  def received
+    @tasks = @service.received_tasks
+                     .desc(:created_at)
+                     .paginate :page => params[:page], :per_page => 10
+
+    render
     
     # 清除新任务通知
     current_user.notification.reset!(Notification::NewTodoTask) if (@tasks.current_page == 1)
   end
 
-  def mycreate
-    @tasks = @service.find_tasks_by_creator(current_user).unfinished_scope.desc(:created_at).paginate :page => params[:page], :per_page => 10
-    @list_title = "我分配的任务"
-    @top_nav_class = "rw_nav2"
-    render :template => "todo/tasks/list"
-  end
-
   def finished
-    @tasks = @service.find_tasks_by_executor_and_creator(current_user).finished_scope.desc(:completed_at).paginate :page => params[:page], :per_page => 10
-    @list_title = "已完成的任务"
-    @top_nav_class = "rw_nav3"
-    render :template => "todo/tasks/list"
-  end
-
-
-  def bycreate
-    @creator = @service.find_user_by_id(params[:user_id])
-    @tasks = @service.find_tasks_by_creator(creator) if @creator
-  end
-
-  def byexecute
-    @executor = @service.find_user_by_id(params[:user_id])
-    @tasks = @service.find_tasks_by_executor(executor) if @executor
-  end
-
-
-  def new
-  	@task = @service.new_task(:sup_id=>params[:sup_id])
+    @tasks = @service.received_tasks
+                     .finished.desc(:completed_at)
+                     .paginate :page => params[:page], :per_page => 10
   end
 
   def show
-     @task_info = @service.find_task_by_id(params[:id])
-     if @task_info.is_new && @task_info.executor == current_user
-       @task_info.is_new = false
-       @task_info.save
-     end
-     @task = @service.new_task(:sup_id=>@task_info.id)
+    @task = @service.tasks.find(params[:id])
+
+    render
+
+    if (@task.is_new && @task.executor?(current_user))
+      @task.update_attribute(:is_new, false)
+    end
+  end
+
+  # 当前节点的子节点、当前节点、当前节点的父节点、父节点的父节点...(一直递归到根节点)
+  def treeview
+    @task = @service.tasks.find(params[:id])
+  end
+
+  def new
+    _task = params[:todo_task] || {}
+
+    executor = User.find_by_name(_task.delete(:executor_name)) if _task.key?(:executor_name) && !_task[:executor_name].blank?
+    sup_task = @service.tasks.find_by_id(_task.delete(:sup_id)) if _task.key?(:sup_id) && !_task[:sup_id].blank?
+    
+  	@task = @service.created_tasks.new(_task) do |task|
+		  task.executor = executor if defined?(executor)
+		  task.sup = sup_task if defined?(sup_task)
+		end
   end
 
   def create
-     @task = @service.create_task(params[:todo_task], params[:file_id], params[:picture_id])
-     if @service.pass
-         redirect_to todo_task_path(@task)
-     else
-        unless @task.sup_id.blank?
-          @task_info = @service.find_task_by_id(@task.sup_id)
-          render :action => "show"
-        else
-          render :action => "new"
-        end
-     end
-  end
+    _task = params[:todo_task] || {}
 
-  def confirm
-    @task = @service.find_task_by_id(params[:id])
-    @service.confirm_task(@task)
-    redirect_to todo_task_path(@task)
+    executor = User.find_by_name(_task.delete(:executor_name)) unless _task[:executor_name].blank?
+    picture = current_user.attachments.pictures.find_by_id(_task.delete(:picture_id)) unless _task[:picture_id].blank?
+    file = current_user.attachments.find_by_id(_task.delete(:file_id)) unless _task[:file_id].blank?
+    
+    _task_params = params.require(:todo_task).permit(:title, :details, :start_at, :end_at, :priority)
+
+		@task = @service.created_tasks.new(_task_params) do |task|
+		  task.executor = executor if defined?(executor)
+		  task.set_picture(picture) if defined?(picture) && picture
+		  task.set_file(file) if defined?(file) && file
+		end
+		
+		if @task.save
+		  flash.notice = '任务创建成功!'
+      redirect_to todo_task_path(@task)
+		else
+		  flash.now[:error] = @task.errors.full_messages.join(',')
+      render 'new'
+		end
   end
 
   def update
-  	 @task = @service.find_task_by_id(params[:id])
-     @service.update_task(@task,params[:todo_task])
-     redirect_to todo_task_path(@task)
+  	@task = @service.created_tasks.find(params[:id])
+    @service.update_task(@task,params[:todo_task])
+    redirect_to todo_task_path(@task)
   end
 
   def edit
-     @task = @service.find_task_by_id(params[:id])
+    @task = @service.created_tasks.find(params[:id])
   end
 
   def destroy
-    @task = @service.find_task_by_id(params[:id])
+    @task = @service.created_tasks.find(params[:id])
     @service.destroy_task(@task) 
-    redirect_to mine_todo_tasks_path()
+    redirect_to :action => :created
   end
   
   def executors
-    executors = []
-    executors = @service.find_users_by_name params[:name] unless params[:name].blank?
-    render :json => executors
-  end
-  
-  
-  #只能看到  当前节点的子节点、当前节点、当前节点的父节点、父节点的父节点...(一直递归到根节点), 
-  def treeview
-    task = @service.find_task_by_id(params[:id])
-    nodes = []
-    unless params[:get_children_nodes].blank?
-      nodes = task.to_tree_node.children
-    else
-      root_node = get_parent_tree({ :task => task, :tree_node => task.to_tree_node({:classes => "current"})})
-      nodes << root_node
+    unless params[:name].blank?
+      @executor_names = User.fuzzy_search_by_name(params[:name]).pluck(:name)
     end
-    render :json => nodes
+    render :json => @executor_names || []
   end
 
-
+  # 查看进度
   def progress
-    data = { :status => 200, :ticks => [], :markings => [], :data => []}
-    task = @service.find_task_by_id(params[:id])
-    logs = task.logs.where("this.old_value != this.value").asc(:created_at)
+    @task = @service.tasks.find(params[:id])
+  end
+  
+  # 更新进度
+  def update_progress
+    @task = @service.tasks.find(params[:id])
 
-    unless logs.blank?
-      data[:min] = logs.first.created_at <= task.start_date ? logs.first.created_at.to_i * 1000 : task.start_date.to_i * 1000
-      #data[:max] = logs.last.created_at > task.end_date ? logs.last.created_at.to_i * 1000 : task.end_date.to_i * 1000
-    else
-      data[:min] = task.start_date.to_i * 1000
-    end
-    if task.schedule == Todo::Task::SCHEDULE_COMPLETED
-      data[:max] = task.end_date.to_i > task.confirm_at.to_i ? task.end_date.to_i * 1000 : task.confirm_at.to_i * 1000
-    else
-      data[:max] = task.end_date.to_i > Time.now.to_i ? task.end_date.to_i * 1000 : Time.now.to_i * 1000      
+    _todo_task = params[:todo_task]
+    _params = {}
+    _params[:picture] = current_user.attachments.pictures.find(params[:picture_id]) unless params[:picture_id].blank?
+    _params[:file] = current_user.attachments.find(params[:file_id]) unless params[:file_id].blank?
+    
+    @service.update_progress!(@task, _todo_task[:progress].to_i, params[:info], _params)
+    
+    # 创建人可以编辑基础信息
+    if (@task.creator?(current_user))
+      _task_params = params.require(:todo_task).permit(:end_at, :priority)
+      @task.update_attributes!(_task_params)
     end
     
-    data[:ticks] << data[:min]
-    #data[:ticks] << task.end_date.to_i * 1000 if !logs.blank? && logs.last.created_at > task.end_date 
-    data[:ticks] << data[:max]
-
-    data[:data] << [data[:min], 0]
-    logs.each do |l|
-      data[:data] << [l.created_at.to_i * 1000, l.value]
-    end
-    data[:markings] = [{ :xaxis => { :from => task.end_date.to_i * 1000, :to => task.end_date.to_i * 1000 }, :color => "red" }]
-
-    render :json => data
+    redirect_to todo_task_path(@task)
   end
 
-  def my_tasks
-    @tasks = @service.find_unfinished_tasks_by(current_user).limit(5)
-    render :json => @tasks.as_json
+  def confirm
+    @task = @service.created_tasks.unconfirmed.completed.find(params[:id])
+    @service.confirm!(@task)
+    redirect_to todo_task_path(@task)
   end
   
-  private 
-  
-  #opts = { :task => task, :children => task.children}
-  #递归获取根节点
-  #当前节点的子节点  和  父节点
-  def get_parent_tree opts 
-    node = opts[:tree_node]
-    unless opts[:task].sup.blank?
-      sub_task = opts[:task].sup # 父任务
-      node = get_parent_tree( { :task => opts[:task].sup, :tree_node => Todo::TreeNode.new(:id => sub_task.id, :text => sub_task.title, :children => [node], :creator => sub_task.creator.name, :executor => sub_task.executor.name) })
+  # subs（子任务）
+
+  def new_sub
+    @task = @service.tasks.unconfirmed.find(params[:id])
+    @sub_task = @task.subs.new do |task|
+      task.end_at = @task.end_at
     end
-    return node
   end
+  
+  def create_sub
+    @task = @service.tasks.unconfirmed.find(params[:id])
+    _task = params[:todo_task] || {}
+
+    executor = User.find_by_name(_task.delete(:executor_name)) unless _task[:executor_name].blank?
+    picture = current_user.attachments.pictures.find_by_id(_task.delete(:picture_id)) unless _task[:picture_id].blank?
+    file = current_user.attachments.find_by_id(_task.delete(:file_id)) unless _task[:file_id].blank?
+	  
+    _task_params = params.require(:todo_task).permit(:title, :details, :start_at, :end_at, :priority)
+    
+		@sub_task = @task.subs.new(_task_params) do |task|
+		  task.creator = current_user
+		  task.executor = executor if defined?(executor)
+		  task.sup = sup_task if defined?(sup_task)
+		  task.set_picture(picture) if defined?(picture) && picture
+		  task.set_file(file) if defined?(file) && file
+		end
+		
+		if @sub_task.save
+		  flash.notice = '创建子任务成功!'
+      redirect_to todo_task_path(@sub_task)
+		else
+		  flash.now[:error] = @sub_task.errors.full_messages.join(',')
+      render 'new_sub'
+		end
+  end
+
+  def subs_treeview
+    @task = @service.tasks.find(params[:id])
+  end
+
 end

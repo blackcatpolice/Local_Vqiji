@@ -17,13 +17,14 @@
       <div class="bk_t"></div>
       <div class="bk_c">
         <div class="zsk_tit zs_det_t">
-          <img alt="Logo" src="../assets/images/logo.png" width="95">
-          <span>-1-</span>
+          <%= image_tag("logo.png", :width => "95") %>
+          <span>-<%= @contents.first.page_index %>-</span>
         </div>
         <div class="zs_content">
           <div class="zsk_gn">
             <%= link_to "删除", @knowledge, :method => :delete, confirm: "确定删除该文档么？！", :class => "zsk_sc" %>
             <%= link_to "编辑", edit_knowledge_knowledge_path(@knowledge), :class => "zsk_bj" %>
+            <%= link_to "发布", check_knowledge_knowledge_path(@knowledge, :status => 1), :method => :put, :class => "zsk_fb", :'data-skip-pjax' => true %>
           </div>
           <h1><%= @knowledge.title %> <span class="oran_fb">(<%= Knowledge::Knowledge::CHECK_STATUS[@knowledge.check_status] %>)</span></h1>
           <h2>

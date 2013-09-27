@@ -1,0 +1,24 @@
+<div class="rw_zx_lbk">
+	<a href="<%= todo_task_path(task) %>" class="dk" data-skip-pjax="true">
+		<div class="tt f16" title="<%= task.title%>"><%= truncate_u(task.title, 12)%></div>
+		<div class="rw_jd">
+			<% if task.is_new %>
+			  <div class="re_jd_new">New</div>
+			<% else %>
+			  <div class="re_jd_xx" style="">
+				  <%= todo_task_status(task) %><br />
+				  <% if task.finished? %>
+				    <span class="ok"></span>
+				  <% else %>
+				    <span><%= task.progress %></span>%
+				  <% end %>
+			  </div>
+			<% end %>
+			<input class="knob" value="<%= task.progress %>" style="<%= 'display:none;' if task.is_new %>">
+		</div>
+		<div class="inf f12">
+			<%= l task.end_at, :format => :short %><br>优先级：<span class="rwk_0<%= task.priority %>"></span><br>
+		  创建人：<%= task.creator.name %>
+		</div>
+	</a>
+</div>

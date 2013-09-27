@@ -1,0 +1,134 @@
+<div id="error_message_box">
+  <% if flash.now[:error] %>
+    <div class="alert alert-error text-center">
+      <div style="padding: 7px 0;" class="f12"><%= flash.now[:error] %></div>
+    </div>
+  <% end %>
+</div>
+
+<%= form_for(task, url: subs_todo_task_path(:id => task.sup.id), html: { :id => 'new-sub-todo-task-form' }) do |f| %>
+  <div class="rw_xjk">
+    <label for="todo_task_title">任务名称：</label>
+    <%= f.text_field :title, :placeholder => '请输入任务名称' %>
+    <span class="help-block"></span>
+  </div>
+
+  <div class="rw_xjk">
+    <label for="todo_task_details">任务描述：</label>
+    <%= f.text_area :details, :rows => 8, :class => 'texter', :required => 'required', :placeholder => '请输入任务描述' %>
+    <%= f.hidden_field :picture_id, :value => task.picture.try(:id), :class => 'todo-task-log-picture-id' %>
+    <%= f.hidden_field :file_id, :value => task.file.try(:id), :class => 'todo-task-log-file-id' %>
+  </div>
+
+  <div class="dhk_gn f12 toolbar"></div>
+
+  <div class="rw_xjk1">
+    <label for="todo_task_executor_name">负责人：</label>
+    <%= f.text_field :executor_name, :required => 'required', :value => task.executor.try(:name), :'data-role' => 'todo-task-executor-name' %>
+  </div>
+
+  <div class="rw_xjk1" data-role="todo-task-priority-picker">
+    <label>优先级：</label>
+    <div class="rw_xz rw_xz<%= task.priority %>">
+      <a href="javascript:void(0)" data-class="rw_xz0" data-priority="0"></a>
+      <a href="javascript:void(0)" data-class="rw_xz1" data-priority="1"></a>
+      <a href="javascript:void(0)" data-class="rw_xz2" data-priority="2"></a>
+    </div>
+    <%= f.hidden_field :priority %>
+  </div>
+
+  <div class="rw_xjk1">
+    <label>开始时间：</label>
+    <div class="input-append date" data-role="datetime-picker">
+      <%= f.text_field :start_at, :required => 'required', :readonly => true, :class => 'span2', :value => l(task.start_at, :format => :en_long), :style => 'cursor: pointer;' %>
+      <span class="add-on"><i class="icon-calendar"></i></span>
+    </div>
+  </div>
+
+  <div class="rw_xjk1">
+    <label>结束时间：</label>
+    <div class="input-append date" data-role="datetime-picker">
+      <%= f.text_field :end_at, :required => 'required', :readonly => true, :class => 'span2', :value => task.end_at && l(task.end_at, :format => :en_long), :style => 'cursor: pointer;' %>
+      <span class="add-on"><i class="icon-calendar"></i></span>
+    </div>
+  </div>
+
+  <div class="rw_tj"><a href="javascript:void(0)" class="submiter"></a></div>
+<% end %>
+
+<script>
+  $(function() {
+    var form = $("#new-sub-todo-task-form")
+      , error = $('#error_message_box');
+    
+    // 时间
+    form.find("[data-role=datetime-picker]").datetimepicker({
+      format: "yyyy-mm-dd hh:ii",
+      autoclose: true,
+      pickerPosition: "bottom-left"
+    });
+    
+    // 优先级
+    form.find('[data-role=todo-task-priority-picker]').on("click", "a[data-priority]", function() {
+      $('#todo_task_priority').val($(this).attr('data-priority'));
+      $(this).parent().removeClass('rw_xz0 rw_xz1 rw_xz2').addClass($(this).attr('data-class'));
+    });
+    
+    // 执行人
+    form.find('[data-role=todo-task-executor-name]').typeahead({
+      source: function(query, process) {
+        return $.get('/todo/tasks/executors', { name: query }, function(data) {
+          return process(data);
+        });
+      },
+      matcher: function (param) {
+        return true;
+      }
+    });
+    
+    form.validate({
+      rules: {
+        'todo_task[title]': {
+          required: true,
+            maxlength: 25
+        }
+      },
+      messages: {
+        'todo_task[title]': {
+          required: '请输入任务标题.',
+          maxlength: '任务标题长度不超过25字.'
+        },
+        'todo_task[details]': '请输入任务描述.',
+        'todo_task[executor_name]': '请输入任务负责人.',
+        'todo_task[start_at]': '请选择任务开始日期.',
+        'todo_task[end_at]': '请选择任务结束日期.'
+      },
+      onkeyup: false,
+      onfocusout: false,
+      invalidHandler: function() {
+        error.empty();
+      },
+      showErrors: function(_, errorList) {
+        if (errorList.length > 0) {
+          $('<div class="alert alert-error">'
+            + '<div style="padding: 7px 0;" class="f12"></div>'
+          + '</div>')
+            .append( $.tmpl('<div style="padding: 7px 0;" class="f12">${message}</div>', errorList) )
+            .appendTo( error );
+        }
+      }
+    });
+
+	  form
+	    .todoTaskDetailsEditor({
+	      preset: "<%= task.details %>",
+	      allowBlank: true
+	    })
+	    .on("todotaskdetailseditorsubmit",
+	      function() {
+	        setTimeout(function() {
+	          form.submit();
+	        }, 0);
+	      });
+  });
+</script>

@@ -10,7 +10,7 @@
     </div>
     <% @mrs.each do |mr| %> 
       <div class="med_dhk mb10" id="show<%=mr.id%>">
-      	<div class="chk"><input name="files" type="checkbox" value="<%=mr.id%>" /></div>
+      	<div class="chk"><input name="files" type="checkbox" value="<%= mr.id %>" /></div>
       	<div class="con">
       		<div ><%= link_to mr.title, mr.record_url, :target => "_blank", :id=>"title#{mr.id}"%><a href="javascript:void(0)" id="<%=mr.id%>" class="changeName f12" >重命名</a></div>
       		<div class="mt5 f12">
