@@ -1,6 +1,7 @@
 <div id="reply_comment_div_<%= reply_comment.id %>" class="lb">
   <div class="lb_tx">
     <!-- <img alt="V30x30_avatar" src="/uploads/users/51622cd6ea8dbc4a56000013/v30x30_avatar.png"> -->
+    <%= image_tag(reply_comment.user.avatar.v50x50.url) %>
   </div>
   <div class="lb_nr">
     <a href="#"><%= reply_comment.user.name %></a>：<span class="rtext">回复 <%= reply_comment.reply_comment.user.name %>:<%= reply_comment.content %></span>

@@ -6,22 +6,27 @@ Weibo::Application.routes.draw do
       collection do
         get :my
         get :groups
-        post :delete
         get :widget
         get :popular
         get :latest
         get :search
       end
+      
       member do
-        get :content
-        put :check
+        put :pass_audit
+        put :not_pass_audit
+        put :publish
+        put :draft
       end
-      resources :comments do
+      
+      resources :comments, :only => [:create, :destroy] do
         member do
           get :reply_comments
           post :reply_comment
         end
       end
     end
+    
+    root to: 'knowledges#index'
   end
 end

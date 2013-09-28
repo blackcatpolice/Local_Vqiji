@@ -2042,21 +2042,21 @@ border-radius: 3px;}*/
 
 /* 通知弹窗 */
 [data-action=toggle_notifications_board] .badge { margin-right: 5px; }
-.ntb { position: fixed; width: 190px; }
-/*.ntb.bottom  .arrow { left:20%}*/
-.ntb .list { width: 100%; padding:8px 0px 8px 0px; }
-.ntb .list li { height:23px; font-size:12px; line-height:23px; padding-left:10px;}
-.ntb .list li:hover { background-color:#faf6f2;}
-.ntb .list li span { color:#dc5f5e; margin-right:5px;}
-.ntb [data-role=content] { height: auto; }
-.ntb .no-new,
-.ntb .error {
+.notify-board { position: fixed; width: 190px; }
+/*.notify-board.bottom  .arrow { left:20%}*/
+.notify-board .list { width: 100%; padding:8px 0px 8px 0px; }
+.notify-board .list li { height:23px; font-size:12px; line-height:23px; padding-left:10px;}
+.notify-board .list li:hover { background-color:#faf6f2;}
+.notify-board .list li span { color:#dc5f5e; margin-right:5px;}
+.notify-board [data-role=content] { height: auto; }
+.notify-board .empty,
+.notify-board .error {
   width: 100%;
   height: auto;
   padding: 20px 0 10px 0;
   text-align: center;
 }
-.ntb .error { color: red; }
+.notify-board .error { color: red; }
 /* /通知弹窗*/
 
 /* 任务进度 */

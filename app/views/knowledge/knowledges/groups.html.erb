@@ -1,3 +1,4 @@
+<div class="main_ct left" >
 <!--中间内容开始-->
   <div class="main_ct left">
     <div class="zs_t">
@@ -6,193 +7,49 @@
     </div>
     <%= render('top_nav', :current_nav => 'group') %>
     <div class="zs_k">
-    	<div class="bk_t"></div>
-    	<div class="bk_c">
-      	<div class="zs_type">
-        	<div class="zs_tm">工作组：</div>
-        	<div class="zs_list">
-        		<%= link_to '公共文档', groups_knowledge_knowledges_path %>
-        		<% current_user.groups.each do |group| %>
-        			<%= link_to group.name, groups_knowledge_knowledges_path(:group_id => group) %>
-        		<% end %>
-        		<div class="clearfix"></div>
-	        </div>
-        	<div class="zs_more"><a href="javascript:void(0)">更多</a></div>
-          <div class="clearfix"></div>
-        </div>
-      </div>
-    	<div class="bk_t bk_d"></div>
-    </div>
-
-    <% unless params[:group_id] %>
-    <div class="zs_k">
-    	<div class="bk_t"></div>
-    	<div class="bk_c">
-        <% if Knowledge::Knowledge.published.where(:group.ne => nil).blank? %>
-          <div class="empty">
-            <span>暂时还没有发布文档！</span>
-          </div>
-        <% end %>
-        <% @groups.each do |group| %>
-          <% next if Knowledge::Knowledge.published.where(:group => group).blank? %>
-	        <div class="zs_lbt f18"><%= group.name %>
-	        	<%= link_to "更多", groups_knowledge_knowledges_path(:group_id => group) %>
-	        </div>
-          <div class="zs_lb">
-            <ul>
-              <% group.knowledges.published.desc(:updated_at).limit(4).each do |knowledge| %>
-              <li>
-                <span>
-                  <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group_id => params[:group_id]) %>
-                </span>
-                <%= image_tag("px_zt6.png") %>
-                <div class="title">
-                  <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
-                </div>
-                <i><%= knowledge.clicks %>人已阅读</i>
-              </li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-        <div class="clearfix"></div>
-      </div>
-    	<div class="bk_t bk_d"></div>
-    </div>
-    <% else %>
-    <div class="zs_k">
-    	<div class="bk_t"></div>
-    	<div class="bk_c">
-
-
-        <div class="zs_lbt f18"><%= @group.name %>
-          
-        </div>
-        <% if Knowledge::Knowledge.published.where(:group => params[:group_id]).blank? %>
-          <div class="empty">
-            <span>暂时还没有发布文档！</span>
-          </div>
-        <% end %>
-
-        <div class="zs_lb">
-          <ul>
-            <% @group.knowledges.published.desc(:updated_at).limit(4).each do |knowledge| %>
-            <li>
-              <span>
-                <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:type => knowledge.knowledge_type, :group_id => params[:group_id]) %>
-              </span>
-              <img src="../assets/images/px_zt6.png" />
-              <div class="title">
-                <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
-              </div>
-              <i><%= knowledge.clicks %>人已阅读</i>
-            </li>
-            <% end %>
-          </ul>
-        </div>
-
-        <div class="clearfix"></div>
-      </div>
-    	<div class="bk_t bk_d"></div>
-    </div>
-    <% end %>
-  </div>
-<!--中间内容结束-->
-
-<div class="main_rt left">
-  <div class="mr_row mr_mar" wrl-row1>
-    <div class="bk">
       <div class="bk_t"></div>
       <div class="bk_c">
-        <div class="zs_new zs_tj">当前已有<i><%= Knowledge::Knowledge.published.count %></i>份文档</div>
-        <div class="zs_new">
-          <%= link_to "", new_knowledge_knowledge_path %>
+        <div class="zs_type">
+          <div class="zs_tm">工作组：</div>
+          <div class="zs_list zs_list1">
+            <%= link_to '公共文档', groups_knowledge_knowledges_path %>
+            <% current_user.groups.each do |group| %>
+              <%= link_to group.name, groups_knowledge_knowledges_path(:group_id => group) %>
+            <% end %>
+            <div class="clearfix"></div>
+          </div>
+          <div class="zs_more"><a href="javascript:void(0)">更多</a></div>
+          <div class="clearfix"></div>
         </div>
-
       </div>
       <div class="bk_t bk_d"></div>
     </div>
 
-    <div class="bk zs_tr">
-      <div class="bk_t">
-        <div class="zs_title f18"><%= params[:group_id].nil? ? "小组" : "\"#{Group.find(params[:group_id]).name}\"" %>热门阅读
-          <%#= link_to "更多", popular_knowledge_knowledges_path %></div>
-      </div>
-      <div class="bk_c mr_c4">
-        <div class="zs_rlb zs_rlb1">
-          <ul>
-            <%= render :collection => @popular_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
-          </ul>
+    <% if @group %>
+      <%= render('knowledge/knowledges/knowledges_list', :knowledges => @knowledges, :title => @group.name) %>
+    <% else %>
+      <div class="zs_k">
+        <div class="bk_t"></div>
+        <div class="bk_c">
+          <%= render :collection => @groups, :as => :group, :partial => 'knowledge/knowledges/group_item' %>
           <div class="clearfix"></div>
         </div>
+        <div class="bk_t bk_d"></div>
       </div>
-      <div class="mr_t4"></div>
-    </div>
-
-    <div class="bk zs_tr">
-      <div class="bk_t">
-        <div class="zs_title f18"><%= params[:group_id].nil? ? "小组" : "\"#{Group.find(params[:group_id]).name}\"" %>最新更新
-          <%#= link_to "更多", latest_knowledge_knowledges_path %></div>
-      </div>
-      <div class="bk_c mr_c4">
-        <div class="zs_rlb zs_rlb1">
-          <ul>
-            <%= render :collection => @latest_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
-          </ul>
-          <div class="clearfix"></div>
-        </div>
-      </div>
-      <div class="mr_t4"></div>
-    </div>
-
-  </div>
-  <div class="mr_row" wrl-row2>
-    <% if false %>
-    <div class="bk" asynch-widget aw-url="<%= asset_path 'widgets/weather.asynch.js' %>" aw-title="天气插件" wrl-strategy="prepend"></div>
     <% end %>
-    <%#= render "/network_disks/widgets/files_widget" %>
-    <%#= render '/knowledge/knowledges/widgets/knowledges_widget' %>
   </div>
+<!--中间内容结束-->
 </div>
 
-
-
-
-
+<%= render('knowledge/knowledges/right_operation_bar', :knowledge_options => [{:title => "#{@group.try('name')} 热门阅读", :knowledges => @popular_knowledges}, {:title => "#{@group.try('name')} 最近更新", :knowledges => @latest_knowledges}], :show_more_link => false) %>
 <script>
-	$(document).ready(function(){
+  $(document).ready(function(){
+    $(".zs_more").click(function(){
+      $(this).siblings().toggleClass("zs_auto");
+    })
 
-	$(".zs_more").click(function(){
-											
-											$(this).siblings().toggleClass("zs_auto");
-											
-											})
-
-  		$(".zsk_j span").click(function(){
-  			$(".zsk_tlb").slideToggle();
-  		});
-  		$("form[data-pjax]").on('submit', function(e){
-			$.pjax.submit(e, '[data-pjax-container]');
-		});
-		
-		$('a[data-action=delete]', 'div[node-type=Knowledge]').click(function(){
-			var _knowledge = $(this).parents('div[node-type=Knowledge]');
-			$.confirm('是否删除 [ ' + _knowledge.attr('data-title') + '] ?', function(tag){
-				if(tag){
-					$('#knowledge_id').val(_knowledge.attr('data-id'));
-					$('#knowledges_form').submit();
-				}
-			});
-		});
-		// $('#knowledge_keyword').typeahead({
-		// 	source: function(query, process){
-		// 		return $.get('/knowledges.json', {keyword: query}, function(data){
-		// 			return process(data);
-		// 		});
-		// 	},
-		// 	matcher: function (param) {
-		// 		return true;
-		// 	}
-		// });
-	});
+    $(".zsk_j span").click(function(){
+      $(".zsk_tlb").slideToggle();
+    });
+  });
 </script>

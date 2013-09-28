@@ -1,6 +1,6 @@
 <% comment = comment || @comment %>
 <div id="comment_item_<%= comment.id %>" class="zs_comm_list">
-  <div class="tx"><img src="../assets/images/04.png" /></div>
+  <div class="tx"><%= image_tag(comment.user.avatar.v50x50.url) %></div>
   <div class="nr">
     <%= link_to comment.user.name, user_path(comment.user) %><br/>
     <%= comment.content %>

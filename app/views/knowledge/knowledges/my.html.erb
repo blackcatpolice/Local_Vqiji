@@ -24,7 +24,7 @@
                 <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
               </div>
               <div class="info f12">
-                <%= link_to "『 #{knowledge.knowledge_type.name} 』", knowledge_knowledges_path(:type => knowledge.knowledge_type), :class => "zs_tp icon" %>
+                <%= link_to "『 #{knowledge.knowledge_type.name} 』", knowledge_knowledges_path(:type => knowledge.knowledge_type) %>
                 <%= link_to "『 #{knowledge.group.name} 』", knowledge_knowledges_path(:group => params[:group_id]) if knowledge.group %>
                 <span class="left">共<%= knowledge.contents_count %>页 | 创建者：<%= knowledge.creator.name %></span>
                 <span><%= knowledge.created_at.strftime("%Y年%m月%d日") %></span>
@@ -81,58 +81,4 @@
   </div>
 <!--中间内容结束-->
 
-
-<div class="main_rt left">
-  <div class="mr_row mr_mar" wrl-row1>
-    <div class="bk">
-      <div class="bk_t"></div>
-      <div class="bk_c">
-        <div class="zs_new zs_tj">当前已有<i><%= Knowledge::Knowledge.published.count %></i>份文档</div>
-        <div class="zs_new">
-          <%= link_to "", new_knowledge_knowledge_path %>
-        </div>
-
-      </div>
-      <div class="bk_t bk_d"></div>
-    </div>
-  </div>
-</div>
-
-
-<script>
-  $(document).ready(function(){
-
-  $(".zs_more").click(function(){
-                      
-                      $(this).siblings().toggleClass("zs_auto");
-                      
-                      })
-
-      $(".zsk_j span").click(function(){
-        $(".zsk_tlb").slideToggle();
-      });
-      $("form[data-pjax]").on('submit', function(e){
-      $.pjax.submit(e, '[data-pjax-container]');
-    });
-    
-    $('a[data-action=delete]', 'div[node-type=Knowledge]').click(function(){
-      var _knowledge = $(this).parents('div[node-type=Knowledge]');
-      $.confirm('是否删除 [ ' + _knowledge.attr('data-title') + '] ?', function(tag){
-        if(tag){
-          $('#knowledge_id').val(_knowledge.attr('data-id'));
-          $('#knowledges_form').submit();
-        }
-      });
-    });
-    // $('#knowledge_keyword').typeahead({
-    //  source: function(query, process){
-    //    return $.get('/knowledges.json', {keyword: query}, function(data){
-    //      return process(data);
-    //    });
-    //  },
-    //  matcher: function (param) {
-    //    return true;
-    //  }
-    // });
-  });
-</script>
+<%= render('knowledge/knowledges/right_operation_bar') %>

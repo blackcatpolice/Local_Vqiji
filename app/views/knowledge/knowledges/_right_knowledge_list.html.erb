@@ -1,0 +1,15 @@
+<div class="bk zs_tr">
+  <div class="bk_t">
+    <div class="zs_title f18"><%= title %>
+      <%= link_to "更多", popular_knowledge_knowledges_path if show_more_link %></div>
+  </div>
+  <div class="bk_c mr_c4">
+    <div class="zs_rlb zs_rlb1">
+      <ul>
+        <%= render :collection => knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/right_knowledge_item' %>
+      </ul>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+  <div class="mr_t4"></div>
+</div>

@@ -1,0 +1,23 @@
+<%
+  knowledges = group.knowledges.published.desc(:updated_at).limit(4)
+  return nil if knowledges.blank?
+%>
+<div class="zs_lbt f18"><%= group.name %>
+  <%= link_to "更多", groups_knowledge_knowledges_path(:group_id => group.id) %>
+</div>
+<div class="zs_lb">
+  <ul>
+    <% knowledges.each do |knowledge| %>
+    <li>
+      <span>
+        <%= link_to knowledge.knowledge_type.name, knowledge_knowledges_path(:group_id => params[:group_id]) %>
+      </span>
+      <%= image_tag("px_zt6.png") %>
+      <div class="title">
+        <%= link_to knowledge.title, knowledge_knowledge_path(knowledge) %>
+      </div>
+      <i><%= knowledge.clicks %>人已阅读</i>
+    </li>
+    <% end %>
+  </ul>
+</div>

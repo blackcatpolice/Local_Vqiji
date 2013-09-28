@@ -3,7 +3,22 @@ class Knowledge::KnowledgesController < WeiboController
   
   layout proc { |c| pjax_request? ? pjax_layout : 'knowledge' }
 
-  #所有公开的文档
+  after_filter :only => [:show] do
+    @knowledge.inc(:clicks, 1) if @knowledge.published? && @knowledge.creator != current_user && params[:page].nil?
+  end
+
+  before_filter :except => [:index, :search, :popular, :latest, :groups, :my, :widget, :new, :create] do
+    @knowledge = Knowledge::Knowledge.find params[:id]
+  end
+
+  after_filter :only => [:pass_audit, :not_pass_audit] do
+    @knowledge.deliver_audited_notification
+  end
+
+  after_filter :only => [:publish] do
+    @knowledge.deliver_auditing_notification
+  end
+
   def index
     @knowledge_types = Knowledge::Type.all.asc(:priority)
     @knowledge_type = Knowledge::Type.find(params[:type]) if params[:type]
@@ -12,7 +27,7 @@ class Knowledge::KnowledgesController < WeiboController
     conditions.merge!(:group_id => params[:group_id]) if params[:group_id]
     conditions.merge!(:knowledge_type_id => params[:type]) if params[:type]
 
-    @knowledges = Knowledge::Knowledge.where(conditions).paginate(:page => params[:page], :per_page => 15)
+    @knowledges = Knowledge::Knowledge.where(conditions).paginate(:page => params[:page], :per_page => 20)
 
     @popular_knowledges = Knowledge::Knowledge.published.desc(:clicks).limit(6)
     @latest_knowledges = Knowledge::Knowledge.published.desc(:updated_at).limit(6)
@@ -29,11 +44,15 @@ class Knowledge::KnowledgesController < WeiboController
   end
 
   def popular
+    @title = "热门阅读"
     @knowledges = Knowledge::Knowledge.published.desc(:clicks).paginate(:page => params[:page], :per_page => 20)
+    render 'knowledge/knowledges/simple_index'
   end
 
   def latest
+    @title = "最近更新"
     @knowledges = Knowledge::Knowledge.published.desc(:updated_at).paginate(:page => params[:page], :per_page => 20)
+    render 'knowledge/knowledges/simple_index'
   end
   
   ##小组文档
@@ -51,15 +70,6 @@ class Knowledge::KnowledgesController < WeiboController
       @latest_knowledges = Knowledge::Knowledge.published.where(:group_id.ne => nil).desc(:updated_at).limit(6)
     end
 
-    # query = Knowledge.search do
-    #   fulltext params[:keyword]
-    #   with :public, true
-    #   with :group_id, params[:group] if params[:group]
-    #   with :group_id, group_ids unless params[:group]
-    #   order_by :created_at, :desc
-    #   paginate :page => params[:page], :per_page => (params[:size] || 10)
-    # end
-    # @knowledges = query.results
   end
   
   #我创建的文档
@@ -67,49 +77,20 @@ class Knowledge::KnowledgesController < WeiboController
     @my_unaudited_knowledges = []
     unaudited_knowledges = Knowledge::Knowledge.unaudited
     unaudited_knowledges.each do |knowledge|
-      @my_unaudited_knowledges << knowledge if knowledge.group && knowledge.group.creator == current_user
-      @my_unaudited_knowledges << knowledge if current_user.is_admin && knowledge.group.nil?
+      @my_unaudited_knowledges << knowledge if knowledge.can_audit?(current_user)
     end
     @knowledges = Knowledge::Knowledge.where(:creator => current_user).desc(:updated_at).paginate(:page => params[:page], :per_page => 20)
     # 清除新文档审核通知
     current_user.notification.reset!(Notification::Knowledge)
     current_user.notification.reset!(Notification::KnowledgeCheck)
-    
-    # query = Knowledge.search do
-    #   fulltext params[:keyword]
-    #   with :public, true
-    #   with :creator_id, current_user.id
-    #   order_by :created_at, :desc
-    #   paginate :page => params[:page], :per_page => (params[:size] || 10)
-    # end
-    # @knowledges = query.results
-  end
-
-  def check
-    knowledge = Knowledge::Knowledge.find(params[:id])
-    # knowledge.check_status = params[:status]
-    knowledge.checked_by_user(current_user, params[:status])
-    # knowledge.save!
-
-    notice_text = "文档#{ params[:status] == '1' ? '发布' : '审核'}成功！"
-
-    # redirect_to my_knowledge_knowledges_path, notice: "文档创建成功!"
-
-    redirect_to my_knowledge_knowledges_path, notice: notice_text if knowledge.save
-
-    # return redirect_to :action => :my, notice: "文档审核成功！" if knowledge.save
   end
 
   def show
-    @knowledge = Knowledge::Knowledge.find params[:id]
     @contents = @knowledge.contents.paginate(:page => params[:page], :per_page => 1)
+    @content = @contents.first
     return render 'personal_show' if current_user == @knowledge.creator && !@knowledge.published?
-    return render 'check_show' if current_user == @knowledge.checked_user && !@knowledge.published?
+    return render 'check_show' if @knowledge.can_audit?(current_user) && !@knowledge.published?
     @comments = @knowledge.comments.replyed.desc(:created_at)
-    Rails.logger.info("-------#{@knowledge}")
-    if current_user.id != @knowledge.creator_id && @knowledge.published?
-      @knowledge.inc(:clicks, 1) unless params[:page]
-    end
   end
   
   def widget
@@ -122,14 +103,10 @@ class Knowledge::KnowledgesController < WeiboController
   def new
     @knowledge = Knowledge::Knowledge.new
     @knowledge.contents = [Knowledge::Content.new]
-    # @knowledge.public = false unless current_user.release_public_knowledge
-    respond_to do |format|
-      format.html
-    end
   end
   
   def edit
-    @knowledge = Knowledge::Knowledge.find params[:id]
+    # @knowledge = Knowledge::Knowledge.find params[:id]
   end
 
   def create
@@ -144,69 +121,46 @@ class Knowledge::KnowledgesController < WeiboController
     else
       render :action => :new
     end
-    # respond_to do |format|
-    #   if @knowledge.save
-    #     format.html { redirect_to my_knowledge_knowledges_path, notice: "文章创建成功."}
-    #   else
-    #     Rails.logger.info("!!!!#{@knowledge.errors.first}")
-    #     format.html { render action: "new"}
-    #   end
-    # end
   end
   
   def update
-
     contents_params = params[:knowledge_knowledge].delete(:contents)
-    @knowledge = Knowledge::Knowledge.find params[:id]
     @knowledge.update_attributes(params[:knowledge_knowledge])
     @knowledge.contents = nil
     @knowledge.contents_count = 0
     @knowledge.add_contents(contents_params)
-
-    # _knowledge = params[:knowledge]
-    # if current_user.release_public_knowledge && params[:public].to_i == 1
-    #   _knowledge[:public] = true
-    #   _knowledge[:group_id] = nil
-    # else
-    #   _knowledge[:public] = false
-    #   @knowledge.status = Knowledge::KNOWLEDGE_STATUS_DRAFT unless _knowledge[:group_id]
-    # end
-    # respond_to do |format|
-    #   if @knowledge.save
-    #     format.html { redirect_to action: :my, notice: "文章修改成功."}
-    #   else
-    #     format.html { render action: :edit}
-    #   end
-    # end
-
-    # redirect_to :my, :notice => "文章修改成功" and retrun if @knowledge.save
-    # render :action => :edit and retrun
     if @knowledge.save
-      redirect_to :action => :my, notice: "文档创建成功!"
+      redirect_to my_knowledge_knowledges_path, notice: "文档修改成功!"
     else
       render :action => :edit
     end
   end
   
   def destroy
-    @knowledge = Knowledge::Knowledge.find params[:id]
     if @knowledge && @knowledge.creator_id == current_user.id
       @knowledge.destroy
     end
     redirect_to  :action => "my"
   end
-  
-  def delete
-    @knowledge = Knowledge.find params[:id]
-    if @knowledge && @knowledge.creator_id == current_user.id
-      @knowledge.destroy
-    end
-    redirect_to  :action => "my"
+
+  def pass_audit
+    @knowledge.audit_by_user(current_user, Knowledge::Knowledge::CHECK_AUDITED)
+    redirect_to my_knowledge_knowledges_path, :notice => "文档审核成功！" if @knowledge.errors.blank?
   end
-  
-  def content
-    @knowledge = Knowledge.find params[:id]
-    render :layout => nil
+
+  def not_pass_audit
+    @knowledge.audit_by_user(current_user, Knowledge::Knowledge::CHECK_AUDITED)
+    redirect_to my_knowledge_knowledges_path, :notice => "文档审核成功！" if @knowledge.errors.blank?
+  end
+
+  def publish
+    @knowledge.publish(@knowledge.can_audit?(current_user))
+    redirect_to my_knowledge_knowledges_path, :notice => "文档发布成功！" if @knowledge.errors.blank?  
+  end
+
+  def draft
+    @knowledge.draft
+    redirect_to my_knowledge_knowledges_path, :notice => "文档保存草稿成功！" if @knowledge.errors.blank?
   end
 
 end

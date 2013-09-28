@@ -1,0 +1,57 @@
+<%
+  is_creator = @knowledge.creator == current_user
+  is_show_operation_bar = is_creator && [:personal, :check].include?(view_status)
+%>
+
+<div class="zs_t">
+  <span class="f22">知识库</span>
+  <%= render('search_form') %>
+</div>
+<div class="zs_k">
+  <div class="bk_t"></div>
+  <div class="bk_c f12">当前位置：
+    <%= link_to "知识库", knowledge_knowledges_path %> >
+    <%= link_to @knowledge.knowledge_type.name, knowledge_knowledges_path(:type => @knowledge.knowledge_type.id) %> >
+    <%= @knowledge.title %>
+  </div>
+  <div class="bk_t bk_d"></div>
+</div>
+<div class="zs_k">
+  <div class="bk_t"></div>
+  <div class="bk_c">
+    <div class="zsk_tit zs_det_t">
+      <%= image_tag("logo.png", :width => "95") %>
+      <span>-<%= @content.page_index %>-</span>
+    </div>
+    <div class="zs_content">
+      <% if is_show_operation_bar %>
+        <div class="zsk_gn">
+          <%= link_to "删除", @knowledge, :method => :delete, confirm: "确定删除该文档么？！", :class => "zsk_sc" if view_status == :personal %>
+          <%= link_to "编辑", edit_knowledge_knowledge_path(@knowledge), :class => "zsk_bj" if is_creator || view_status == :check %>
+          <%= link_to "发布", publish_knowledge_knowledge_path(@knowledge), :method => :put, :class => "zsk_fb", :'data-skip-pjax' => true if view_status == :personal %>
+        </div>
+      <% end %>
+      <h1><%= show_knowledge_title(@knowledge) %></h1>
+      <h2>
+        <span><%= show_format_time(@knowledge.updated_at) %></span>
+        <span>创建人：<%= @knowledge.creator.name %></span>
+        <span>类别：<%= link_to @knowledge.knowledge_type.name, knowledge_knowledges_path(:type => @knowledge.knowledge_type) %></span>
+        <span><%= @knowledge.contents_count %>页</span>
+        <span><%= @knowledge.clicks %>人阅读</span>
+      </h2>
+      <div class="zs_nr">
+        <%= raw @contents.first.content %>
+        <div class="pagination">
+          <%= will_paginate @contents %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bk_t bk_d"></div>
+  <% if view_status == :check %>
+    <div class="zs_sc f16">
+      <%= link_to "审核通过", pass_audit_knowledge_knowledge_path(@knowledge), :method => :put, :class => "acc", :'data-skip-pjax' => true %>
+      <%= link_to "审核不通过", not_pass_audit_knowledge_knowledge_path(@knowledge), :method => :put, :class => "fai", :'data-skip-pjax' => true %>
+    </div>
+  <% end %>
+</div>

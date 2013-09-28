@@ -86,14 +86,32 @@ class Todo::TasksController < Todo::BaseController
 		end
   end
 
-  def update
-  	@task = @service.created_tasks.find(params[:id])
-    @service.update_task(@task,params[:todo_task])
-    redirect_to todo_task_path(@task)
+  def edit
+    @task = @service.created_tasks.unconfirmed.find(params[:id])
   end
 
-  def edit
-    @task = @service.created_tasks.find(params[:id])
+  def update
+  	@task = @service.created_tasks.unconfirmed.find(params[:id])
+  	
+  	_task = params[:todo_task]
+  	picture = current_user.attachments.pictures.find_by_id(_task.delete(:picture_id)) unless _task[:picture_id].blank?
+    file = current_user.attachments.find_by_id(_task.delete(:file_id)) unless _task[:file_id].blank?
+
+  	task_params = params.require(:todo_task).permit(:title, :details, :start_at, :end_at, :priority)
+  	
+  	@task.instance_eval do |task|
+    	task.assign_attributes(task_params)
+		  task.set_picture(picture) if defined?(picture) && picture
+		  task.set_file(file) if defined?(file) && file
+  	end
+
+		if @task.save
+		  flash.notice = '修改任务成功!'
+      redirect_to todo_task_path(@task)
+		else
+		  flash.now[:error] = @task.errors.full_messages.join(',')
+      render 'edit'
+		end
   end
 
   def destroy

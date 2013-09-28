@@ -13,6 +13,9 @@
     	<p>
       	截止时间：<%= l(@task.end_at, :format => :long) %>
       	<span>负责人：<%= user_tag @task.executor %></span>
+      	<% if @task.creator?(current_user) && !@task.confirmed? %>
+      	  <span class="edit">[ <a href="<%= edit_todo_task_path(@task) %>" title="修改任务">修改</a> ]</span>
+      	<% end %>
     	</p>
     </div>
     <div class="clearfix"></div>

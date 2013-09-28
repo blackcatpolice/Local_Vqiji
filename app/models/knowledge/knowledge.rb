@@ -43,6 +43,16 @@ class Knowledge::Knowledge
     knowledge.checked_user = knowledge.group.nil? ? User.where(:is_admin => true).first : knowledge.group.creator
   end
 
+  after_create do |knowledge|
+    if knowledge.check_status == CHECK_AUDITING
+      if can_audit?(knowledge.creator)
+        knowledge.audit_by_user(checked_user, CHECK_AUDITED) 
+      else
+        knowledge.deliver_auditing_notification
+      end
+    end
+  end  
+
 
   include Sunspot::Mongo
 
@@ -55,21 +65,62 @@ class Knowledge::Knowledge
     integer :check_status
   end
 
+  def can_audit?(user)
+    group = self.group
+    if group
+      group.admin_users.include?(user)
+    else
+      user.is_admin
+    end    
+  end
 
-  def checked_by_user(user = nil, status = CHECK_AUDITED)
+  def audit_by_user(user = nil, status = CHECK_AUDITED)
     raise "no user" unless user
-    unless status == CHECK_UNAUDITED
-      if self.group
-        raise "not group admin user" unless user == self.group.creator
-      end
+      if can_audit?(user)
+      self.checked_user =  user
+      self.check_status = status
+      self.checked_at = Time.now
+      self.save
     end
-    self.checked_user =  user
+  end
+
+  def publish(free_audit = false)
+    status = free_audit ? CHECK_AUDITED : CHECK_AUDITING
     self.check_status = status
-    self.checked_at = Time.now
     self.save
+    # self.update_attribute(:check_status, free_audit ? CHECK_AUDITED : CHECK_AUDITING)
+  end
+
+  def deliver_auditing_notification
+    users = if is_public?
+      User.where(:is_admin => true)
+    else
+      group.admin_users
+    end
+    users.each do |user|
+      Notification::Knowledge.create(
+        :user => user,
+        :knowledge => self
+      ).deliver
+    end
+  end
+
+  def deliver_audited_notification
+    Notification::KnowledgeCheck.create(
+      :user => self.creator,
+      :knowledge => self
+    ).deliver
+  end
+
+
+  def draft
+    self.check_status = CHECK_DRAFT
+    self.save
+    # self.update_attribute(:check_status, CHECK_DRAFT)
   end
 
   def add_contents(contents_params)
+    self.contents_count = 0
     contents = contents_params[:content]
     contents = contents.split(Knowledge::Knowledge::EDITOR_PAGE_HTML)
     contents.each_with_index do |content, index|

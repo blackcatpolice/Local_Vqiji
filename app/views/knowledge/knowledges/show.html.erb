@@ -1,51 +1,7 @@
 <!--中间内容开始-->
   <div class="main_ct left">
-    <div class="zs_t">
-      <span class="f22">知识库</span>
-      <%= render('search_form') %>
-    </div>
-    <div class="zs_k">
-      <div class="bk_t"></div>
-      <div class="bk_c f12">当前位置：
-        <%= link_to "知识库", knowledge_knowledges_path %> >
-        <%= link_to @knowledge.knowledge_type.name, knowledge_knowledges_path(:type => @knowledge.knowledge_type.id) %> >
-        <%= @knowledge.title %><%= Knowledge::Knowledge::CHECK_STATUS[@knowledge.check_status] unless @knowledge.published? %>
-      </div>
-      <div class="bk_t bk_d"></div>
-    </div>
-    <div class="zs_k">
-      <div class="bk_t"></div>
-      <div class="bk_c">
-        <div class="zsk_tit zs_det_t">
-          <%= image_tag("logo.png", :width => "95") %>
-          <span>-<%= @contents.first.page_index %>-</span>
-        </div>
-        <div class="zs_content">
-          <% if current_user == @knowledge.creator %>
-          <div class="zsk_gn">
-            <%= link_to "删除", @knowledge, :method => :delete, confirm: "确定删除该文档么？！", :class => "zsk_sc" %>
-            <%= link_to "编辑", edit_knowledge_knowledge_path(@knowledge), :class => "zsk_bj" %>
-          </div>
-          <% end %>
-          <h1><%= @knowledge.title %></h1>
-          <h2>
-            <span><%= @knowledge.updated_at.strftime("%Y年%m月%d日") %></span>
-            <span>创建人：<%= @knowledge.creator.name %></span>
-            <span>类别：<%= link_to @knowledge.knowledge_type.name, knowledge_knowledges_path(:type => @knowledge.knowledge_type) %></span>
-            <span><%= @knowledge.contents_count %>页</span>
-            <span><%= @knowledge.clicks %>人阅读</span>
-          </h2>
-          <div class="zs_nr">
-            <%= raw @contents.first.content %>
-            <div class="pagination">
-              <%= will_paginate @contents %>
-            </div>
-          </div>
-        </div>
-        <div class="clearfix"></div>
-      </div>
-    </div>
-
+    <%= render('knowledge/knowledges/detail', :view_status => :show) %>
+    <!-- 评论 -->
     <div class="zs_k">
       <div class="bk_t"></div>
       <div class="bk_c">
@@ -90,7 +46,7 @@
           <div class="zs_title f18">相关文档推荐</div>
           <div class="zs_rlb">
             <ul>
-              <%= render :collection => @knowledge.related_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
+              <%= render :collection => @knowledge.related_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/right_knowledge_item' %>
             </ul>
             <div class="clearfix"></div>
           </div>
@@ -105,7 +61,7 @@
         <div class="bk_c mr_c4">
           <div class="zs_rlb zs_rlb1">
             <ul>
-              <%= render :collection => @knowledge.knowledge_type_hot_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/aid_item' %>
+              <%= render :collection => @knowledge.knowledge_type_hot_knowledges, :as => :knowledge, :partial => '/knowledge/knowledges/right_knowledge_item' %>
             </ul>
             <div class="clearfix"></div>
           </div>
@@ -117,81 +73,40 @@
 
 
 <script>
-function SetCwinHeight(){
-  var iframeid=document.getElementById("iframeid"); //iframe id
-  	if (document.getElementById){
-   		if (iframeid && !window.opera){
-    		if (iframeid.contentDocument && iframeid.contentDocument.body.offsetHeight){
-     			iframeid.height = iframeid.contentDocument.body.offsetHeight;
-    		}else if(iframeid.Document && iframeid.Document.body.scrollHeight){
-     			iframeid.height = iframeid.Document.body.scrollHeight;
-    		}
-   		}
-  	}
-  }
-
   $(function(){
+    //  对文档发表评论
+    $('#submit_comment_btn').on('click', function(){
+      var content = $('#reply_area').val();
+      if(content.length == 0){
+        alert('请您输入评论内容！');
+        return false;
+      }
+      $('#new_knowledge_comment').submit();
+    });
 
-      $('#submit_comment_btn').on('click', function(){
-        var content = $('#reply_area').val();
-        if(content.length == 0){
-          alert('请您输入评论内容！');
-          return false;
-        }
-        $('#new_knowledge_comment').submit();
-      });
-
-      $('.delete_comment_btn').on('click', function(){
-        if(confirm("确定删除该条评论么？"))
-        {
-          var comment_id = $(this).attr('comment-id');
-          var url = "/knowledge/knowledges/<%= @knowledge.id %>/comments/"+comment_id;
-          $.post(url, {"_method" : "delete", "is_reply" : "false"});
-        }
-      });
-
-      $('.reply_comment_btn').on('click', function(){
-        // alert('start');
+    //  删除对文档发表的评论
+    $('.delete_comment_btn').on('click', function(){
+      if(confirm("确定删除该条评论么？"))
+      {
         var comment_id = $(this).attr('comment-id');
-        var reply_comment_div = $("#reply_comments_"+comment_id);
-        console.log(reply_comment_div);
-        console.log(comment_id);
-        var open = $(this).attr('comments-open');
-        console.log(open);
-        if(open == 'true'){
-          // reply_comment_div.hide();
-          $("#reply_comments_"+comment_id).remove();
-          $(this).attr('comments-open', 'false');
-          return false;
-        }else{
-          $(this).attr('comments-open', 'true');
-            var url = "/knowledge/knowledges/<%= @knowledge.id %>/comments/" + comment_id + "/reply_comments.js";
-            $.get(url);
-        }
-      });
+        var url = "/knowledge/knowledges/<%= @knowledge.id %>/comments/"+comment_id;
+        $.post(url, {"_method" : "delete", "is_reply" : "false"});
+      }
+    });
 
-
-      $('#button_x').click(function() {
-          alert('go');
-          var selectedText;
-          if(window.getSelection){
-              selectedText=window.getSelection();
-          }else if(document.selection){
-              selectedText=document.selection.createRange().text;
-          }
-          alert(selectedText);
-      })
-
-
-	  $('a[data-action=delete]', '#knowledge_show_form').click(function(){
-		  $.confirm("是否删除此文章?", function(tag){
-			  if(tag){
-				  $('#knowledge_show_form').submit();
-			  }
-		  });
-	  });
-	  $("form[data-pjax]").on('submit', function(e){
-		  $.pjax.submit(e, '[data-pjax-container]');
-	  });
+    //  展开/关闭某条对文档的评论
+    $('.reply_comment_btn').on('click', function(){
+      var comment_id = $(this).attr('comment-id');
+      var open = $(this).attr('comments-open');
+      if(open == 'true'){
+        $("#reply_comments_"+comment_id).remove();
+        $(this).attr('comments-open', 'false');
+        return false;
+      }else{
+        $(this).attr('comments-open', 'true');
+          var url = "/knowledge/knowledges/<%= @knowledge.id %>/comments/" + comment_id + "/reply_comments.js";
+          $.get(url);
+      }
+    });
   });
 </script>

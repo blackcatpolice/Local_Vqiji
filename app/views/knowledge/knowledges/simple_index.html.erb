@@ -1,0 +1,12 @@
+<!--中间内容开始-->
+<div class="main_ct left">
+  <div class="zs_t">
+    <span class="f22">知识库</span>
+    <%= render('search_form') %>
+  </div>
+  <%= render('top_nav', :current_nav => 'index') %>
+
+  <%= render('knowledge/knowledges/knowledges_list', :title => @title, :knowledges => @knowledges) %>
+</div>
+<!--中间内容结束-->
+<%= render('knowledge/knowledges/right_operation_bar') %>

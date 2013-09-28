@@ -3,7 +3,8 @@
   <div class="bk_c">
     <div class="nav_lb">工作交流</div>
     <div class="nav_lb <%= params[:controller] == 'home' ? 'nav_on' : '' %>">
-      <a class="ic_gz" href="/" data-skip-pjax>工作分享</a></div>
+      <a class="ic_gz" href="/" data-skip-pjax>工作分享</a>
+    </div>
     <div class="nav_lb <%= /^groups/.match(params[:controller]) ? 'nav_on' : '' %>">
       <%= link_to '我的工作组', mine_groups_path(), :class => 'ic_gzz', :'data-skip-pjax' => true %>
     </div>
@@ -15,13 +16,13 @@
            </li>
         <% end %>
       </ul>
-      <% if current_user.groups.length > 3 %>
+      <% if current_user.groups_count > 3 %>
         <ul>
           <li><a data-action="my-groups-toggle">展开</a></li>
         </ul>
       <% end %>
-      <script type="text/javascript">
-        $(document).ready(function() {
+      <script>
+        $(function() {
           $('a[data-action=my-groups-toggle]').click(function(e) {
             $("ul[node-type=my-groups-toggle] > li:gt(2)").toggle("slow", function() {
               $(e.delegateTarget).text( $(this).is(':visible') ? "收起" : "展开" );          
@@ -42,31 +43,29 @@
     <div class="nav_lb <%= params[:controller] == 'my/favorites' ? 'nav_on' : '' %>">
       <a class="ic_sc" href="<%= my_favorites_path %>" data-skip-pjax>收藏</a>
     </div>
-	<% unless current_user.is_expert %>
-    <div class="nav_lb">办公助手</div>
-    <div class="nav_lb <%= /^todo/.match(params[:controller]) ? 'nav_on' : '' %>">
-      <%= link_to "任务中心", todo_root_path, :class=>"ic_rw", :'data-skip-pjax' => true %>
-    </div>
-    <div class="nav_lb <%= params[:controller] == 'network_disks' ? 'nav_on' : '' %>">
-      <%= link_to "我的网盘", network_disks_path, :class=>'ic_wp', :'data-skip-pjax' => true %>
-    </div>
-    <div class="nav_lb <%= params[:controller] == 'knowledges' ? 'nav_on' : '' %>">
-      <%= link_to "知识库", knowledge_knowledges_path, :class=>'ic_zs', :'data-skip-pjax' => true %>
-    </div>
-	<% end %>
+	  <% if !current_user.is_expert %>
+      <div class="nav_lb">办公助手</div>
+      <div class="nav_lb <%= /^todo/.match(params[:controller]) ? 'nav_on' : '' %>">
+        <%= link_to "任务中心", todo_root_path, :class=>"ic_rw", :'data-skip-pjax' => true %>
+      </div>
+      <div class="nav_lb <%= params[:controller] == 'network_disks' ? 'nav_on' : '' %>">
+        <%= link_to "我的网盘", network_disks_path, :class=>'ic_wp', :'data-skip-pjax' => true %>
+      </div>
+      <div class="nav_lb <%= params[:controller] == 'knowledges' ? 'nav_on' : '' %>">
+        <%= link_to "知识库", knowledge_root_path, :class=>'ic_zs', :'data-skip-pjax' => true %>
+      </div>
+	  <% end %>
     <% if current_user.is_expert %>
       <%= render '/layouts/nav/advisory/menu_expert' %>
     <% else %>
       <%= render '/layouts/nav/advisory/menu_questioner' %>
     <% end %>
-	<% unless current_user.is_expert %>
-    <div class="nav_lb">考试培训</div>
-    <div class="nav_lb <%= /^elearn/.match(params[:controller]) ? 'nav_on' : '' %>">
-      <a href="/elearn/trainings" class="ic_px" data-skip-pjax>我的培训</a>
-    </div>
-	<% end %>
-    <!-- <div class="nav_lb">我的网盘</div>
-    <div class="nav_lb">文档中心</div> -->
+	  <% if !current_user.is_expert %>
+      <div class="nav_lb">考试培训</div>
+      <div class="nav_lb <%= /^elearn/.match(params[:controller]) ? 'nav_on' : '' %>">
+        <a href="/elearn/trainings" class="ic_px" data-skip-pjax>我的培训</a>
+      </div>
+	  <% end %>
   </div>
   <div class="bk_t bk_d"></div>
 </div>

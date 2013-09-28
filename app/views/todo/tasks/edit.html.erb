@@ -1,10 +1,10 @@
-<% provide(:title, '编辑任务') %>
+<% provide(:title, '修改任务') -%>
 <div class="bk">
 	<div class="bk_t"></div>
 	<div class="bk_c">
-		<div class="rw_xjt f18">编辑任务<a href="javascript:window.history.back();"></a></div>
-		<div class="rw_xj">
-			<%= render 'form.new', :task => @task %>
+		<div class="rw_xjt f18">修改任务<a href="javascript:window.history.back();"></a></div>
+		<div class="rw_xj" id="todo_task_editor">
+			<%= render 'form.edit', :task => @task %>
 			<div class="clearfix"></div>
 		</div>
 	</div>
